@@ -1,0 +1,10 @@
+{
+	"id": "lemons-plugin-template",
+	"name": "Lemons Plugin Template",
+	"version": "0.0.4",
+	"minAppVersion": "1.4.0",
+	"description": "This is a sample plugin for Obsidian. This plugin demonstrates some of the capabilities of the Obsidian API.",
+	"author": "Moritz Jung",
+	"authorUrl": "https://mprojectscode.github.io/",
+	"isDesktopOnly": false
+}

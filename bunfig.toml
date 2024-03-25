@@ -1,0 +1,3 @@
+[test]
+preload = ["./tests/svelteLoader.ts", "./tests/happydom.ts", "./tests/obsidianMock.ts"]
+root = "./tests"

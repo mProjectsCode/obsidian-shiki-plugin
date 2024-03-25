@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"module": "ESNext",
+		"target": "ES6",
+		"allowJs": true,
+		"noImplicitAny": true,
+		"strict": true,
+		"strictNullChecks": true,
+		"noImplicitReturns": true,
+		"moduleResolution": "node",
+		"importHelpers": true,
+		"isolatedModules": true,
+		"lib": ["DOM", "ESNext"],
+		// the web stuff is a workaround until https://github.com/oven-sh/bun/issues/5674 gets fixed
+		"types": ["svelte", "bun-types", "web"],
+		"allowSyntheticDefaultImports": true
+	},
+	"include": ["src/**/*.ts", "tests/**/*.ts"]
+}
