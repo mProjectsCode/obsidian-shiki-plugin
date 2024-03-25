@@ -2,7 +2,7 @@
 test: hello
 ---
 
-```ts
+```ts asdasd
 export class Parser<const SType extends STypeBase> {
 	public p: ParseFunction<SType>;
 
