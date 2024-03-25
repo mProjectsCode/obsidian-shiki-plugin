@@ -9,7 +9,7 @@ on:
             - '*' # Push events to matching any tag format, i.e. 1.0, 20.15.10
 
 env:
-    PLUGIN_NAME: lemons-plugin-template # Change this to the name of your plugin-id folder
+    PLUGIN_NAME: shiki-highlighter # Change this to the name of your plugin-id folder
 
 jobs:
     build:
