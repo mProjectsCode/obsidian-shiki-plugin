@@ -2,11 +2,21 @@ body {
 	--shiki-code-background: var(--code-background);
 	--shiki-code-normal: var(--code-normal);
 	--shiki-code-comment: var(--code-comment);
-	--shiki-code-function: var(--code-string);
+	--shiki-code-function: var(--color-green);
 	--shiki-code-important: var(--code-important);
 	--shiki-code-keyword: var(--code-keyword);
 	--shiki-code-property: var(--code-property);
 	--shiki-code-punctuation: var(--code-punctuation);
-	--shiki-code-string: var(--code-function);
+	--shiki-code-string: var(--color-yellow);
 	--shiki-code-value: var(--code-value);
+}
+
+/* Disable ligatures in code blocks, as they can cause incorrect highlighting */
+pre.shiki {
+	font-variant-ligatures: no-contextual;
+}
+
+/* Hide the frontmatter code block in reading view again */
+div.markdown-preview-view > div > div.mod-header + div > div {
+	display: none;
 }
