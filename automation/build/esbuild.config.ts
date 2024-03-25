@@ -10,7 +10,7 @@ const build = await esbuild.build({
 	banner: {
 		js: banner,
 	},
-	entryPoints: ['packages/obsidian/src/main.ts'],
+	entryPoints: ['src/main.ts'],
 	bundle: true,
 	external: [
 		'obsidian',

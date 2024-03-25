@@ -1,5 +1,5 @@
 {
 	"devBranch": "master",
 	"releaseBranch": "release",
-	"github": "https://github.com/mProjectsCode/lemons-plugin-template"
+	"github": "https://github.com/mProjectsCode/obsidian-shiki-plugin"
 }

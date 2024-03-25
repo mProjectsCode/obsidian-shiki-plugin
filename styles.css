@@ -1,8 +1,12 @@
-/*
-
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
-*/
+body {
+	--shiki-code-background: var(--code-background);
+	--shiki-code-normal: var(--code-normal);
+	--shiki-code-comment: var(--code-comment);
+	--shiki-code-function: var(--code-string);
+	--shiki-code-important: var(--code-important);
+	--shiki-code-keyword: var(--code-keyword);
+	--shiki-code-property: var(--code-property);
+	--shiki-code-punctuation: var(--code-punctuation);
+	--shiki-code-string: var(--code-function);
+	--shiki-code-value: var(--code-value);
+}
