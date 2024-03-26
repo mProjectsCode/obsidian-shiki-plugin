@@ -2,7 +2,9 @@
 test: hello
 ---
 
-```ts asdasd
+TypeScript code
+
+```ts title="A part of ParsiNOM" {13-15}
 export class Parser<const SType extends STypeBase> {
 	public p: ParseFunction<SType>;
 
@@ -35,6 +37,8 @@ export class Parser<const SType extends STypeBase> {
 }
 ```
 
+CSS code
+
 ```css
 input:is([data-task="式"], [data-task="式"] > *):checked::after {
     content: "式";
@@ -54,4 +58,17 @@ input:is([data-task="字"], [data-task="字"] > *):checked::after {
     -webkit-mask-size: 100%;
     -webkit-mask-clip: text;
 }
+```
+
+Bash
+
+```bash title="My Bash Script"
+echo "Hello"
+```
+
+
+```diff
++ this line will be marked as inserted
+- this line will be marked as deleted
+  this is a regular line
 ```

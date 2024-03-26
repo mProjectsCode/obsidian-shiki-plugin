@@ -1,31 +1,63 @@
 import { Plugin } from 'obsidian';
 import { bundledLanguages } from 'shiki';
-import { ThemeMapper } from 'src/ObsidianTheme';
 import { ExpressiveCodeEngine, ExpressiveCodeTheme } from '@expressive-code/core';
 import { pluginShiki } from '@expressive-code/plugin-shiki';
-import { toHtml } from 'hast-util-to-html';
 import { pluginTextMarkers } from '@expressive-code/plugin-text-markers';
+import { pluginCollapsibleSections } from '@expressive-code/plugin-collapsible-sections';
+import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
+import { pluginFrames } from '@expressive-code/plugin-frames';
+import { ThemeMapper } from 'src/ThemeMapper';
+import { EC_THEME } from 'src/ECTheme';
+import { CodeBlock } from 'src/CodeBlock';
 
 // some languages break obsidian's `registerMarkdownCodeBlockProcessor`, so we blacklist them
 const languageNameBlacklist = new Set(['c++', 'c#', 'f#']);
 
 export default class ShikiPlugin extends Plugin {
-	async onload(): Promise<void> {
-		const themeMapper = new ThemeMapper();
+	// @ts-expect-error TS2564
+	themeMapper: ThemeMapper;
+	// @ts-expect-error TS2564
+	ec: ExpressiveCodeEngine;
+	// @ts-expect-error TS2564
+	ecElements: HTMLElement[];
 
-		const ec = new ExpressiveCodeEngine({
-			themes: [new ExpressiveCodeTheme(themeMapper.getTheme())],
+	async onload(): Promise<void> {
+		this.themeMapper = new ThemeMapper();
+
+		await this.loadEC();
+
+		await this.registerCodeBlockProcessors();
+	}
+
+	async loadEC(): Promise<void> {
+		this.ec = new ExpressiveCodeEngine({
+			themes: [new ExpressiveCodeTheme(this.themeMapper.getTheme())],
 			plugins: [
 				pluginShiki({
 					langs: Object.values(bundledLanguages),
 				}),
-				// pluginCollapsibleSections(),
+				pluginCollapsibleSections(),
 				pluginTextMarkers(),
-				// pluginLineNumbers(),
+				pluginLineNumbers(),
+				pluginFrames(),
 			],
+			styleOverrides: EC_THEME,
 			minSyntaxHighlightingColorContrast: 0,
+			themeCssRoot: 'div.expressive-code',
 		});
 
+		this.ecElements = [];
+
+		const styles = (await this.ec.getBaseStyles()) + (await this.ec.getThemeStyles());
+		this.ecElements.push(document.head.createEl('style', { text: styles }));
+
+		const jsModules = await this.ec.getJsModules();
+		for (const jsModule of jsModules) {
+			this.ecElements.push(document.head.createEl('script', { attr: { type: 'module' }, text: jsModule }));
+		}
+	}
+
+	async registerCodeBlockProcessors(): Promise<void> {
 		const registeredLanguages = new Set<string>();
 
 		for (const [shikiLanguage, registration] of Object.entries(bundledLanguages)) {
@@ -52,21 +84,22 @@ export default class ShikiPlugin extends Plugin {
 
 				// register the language with obsidian
 				this.registerMarkdownCodeBlockProcessor(languageAlias, async (source, el, ctx) => {
-					const rederResult = await ec.render({
-						code: source,
-						language: shikiLanguage,
-						// TODO: parse from code block
-						meta: '{1-2}',
-					});
+					const codeBlock = new CodeBlock(this, el, source, shikiLanguage, languageAlias, ctx.getSectionInfo(el));
 
-					const ast = themeMapper.fixAST(rederResult.renderedGroupAst);
-
-					// yes, this is innerHTML, but we trust hast
-					el.innerHTML = toHtml(ast);
+					ctx.addChild(codeBlock);
 				});
 			}
 		}
 	}
 
-	onunload(): void {}
+	onunload(): void {
+		this.unloadEC();
+	}
+
+	unloadEC(): void {
+		for (const el of this.ecElements) {
+			el.remove();
+		}
+		this.ecElements = [];
+	}
 }
