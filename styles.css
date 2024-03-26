@@ -15,18 +15,24 @@ body {
 	--shiki-code-block-border-radius: var(--code-radius);
 	--shiki-code-block-border-width: 0px; /* this has to have a unit */
 
-	--shiki-highlight-red-rgb: var(--color-red-rgb);
-	--shiki-highlight-green-rgb: var(--color-green-rgb);
-	--shiki-highlight-neutral-rgb: var(--mono-rgb-100);
+	--shiki-code-block-spacing: var(--p-spacing);
 
-	--shiki-highlight-opacity: 0.1;
+	--shiki-highlight-red: rgba(var(--color-red-rgb), 0.5);
+	--shiki-highlight-green: rgba(var(--color-green-rgb), 0.5);
+	--shiki-highlight-neutral: var(--code-normal);
+	--shiki-highlight-red-background: rgba(var(--color-red-rgb), 0.05);
+	--shiki-highlight-green-background: rgba(var(--color-green-rgb), 0.05);
+	--shiki-highlight-neutral-background: rgba(var(--mono-rgb-100), 0.05);
 
 	--shiki-terminal-dots-color: var(--text-faint);
 
 	--shiki-tooltip-background: var(--background-modifier-message);
 	--shiki-tooltip-text-color: #fafafa;
 
-	--shiki-code-block-spacing: var(--p-spacing);
+	--shiki-gutter-border-color: var(--background-modifier-border);
+	--shiki-gutter-border-width: var(--border-width);
+	--shiki-gutter-text-color: var(--text-faint);
+	--shiki-gutter-text-color-highlight: var(--code-normal);
 }
 
 /* Disable ligatures in code blocks, as they can cause incorrect highlighting */
