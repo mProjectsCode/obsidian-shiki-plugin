@@ -2,12 +2,6 @@ import { ThemeRegistration } from 'shiki';
 import * as hast_util_to_html_lib_types from 'hast-util-to-html/lib/types';
 import * as hast_types from 'hast';
 
-interface Theme {
-	theme: ThemeRegistration;
-	mapping: Map<string, string>;
-	reverseMapping: Map<string, string>;
-}
-
 export class ThemeMapper {
 	mapCounter: number;
 	mapping: Map<string, string>;
@@ -17,8 +11,8 @@ export class ThemeMapper {
 		this.mapping = new Map();
 	}
 
-	getTheme(): Theme {
-		const theme: ThemeRegistration = {
+	getTheme(): ThemeRegistration {
+		return {
 			displayName: OBSIDIAN_THEME.displayName,
 			name: OBSIDIAN_THEME.name,
 			semanticHighlighting: OBSIDIAN_THEME.semanticHighlighting,
@@ -37,14 +31,6 @@ export class ThemeMapper {
 				return newToken;
 			}),
 		};
-
-		const reverseMapping = this.getReverseMapping();
-
-		return {
-			theme: theme,
-			mapping: this.mapping,
-			reverseMapping: reverseMapping,
-		};
 	}
 
 	mapColor(color: string): string {
@@ -56,14 +42,6 @@ export class ThemeMapper {
 			this.mapping.set(color, newColor);
 			return newColor;
 		}
-	}
-
-	private getReverseMapping(): Map<string, string> {
-		const reverseMapping = new Map<string, string>();
-		this.mapping.forEach((value, key) => {
-			reverseMapping.set(value, key);
-		});
-		return reverseMapping;
 	}
 
 	fixAST(ast: hast_util_to_html_lib_types.Parent): hast_util_to_html_lib_types.Parent {

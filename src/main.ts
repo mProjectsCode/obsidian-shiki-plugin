@@ -12,10 +12,9 @@ const languageNameBlacklist = new Set(['c++', 'c#', 'f#']);
 export default class ShikiPlugin extends Plugin {
 	async onload(): Promise<void> {
 		const themeMapper = new ThemeMapper();
-		const theme = themeMapper.getTheme();
 
 		const ec = new ExpressiveCodeEngine({
-			themes: [new ExpressiveCodeTheme(theme.theme)],
+			themes: [new ExpressiveCodeTheme(themeMapper.getTheme())],
 			plugins: [
 				pluginShiki({
 					langs: Object.values(bundledLanguages),
@@ -56,6 +55,7 @@ export default class ShikiPlugin extends Plugin {
 					const rederResult = await ec.render({
 						code: source,
 						language: shikiLanguage,
+						// TODO: parse from code block
 						meta: '{1-2}',
 					});
 
