@@ -1,6 +1,6 @@
 # Obsidian Shiki Plugin
 
-This plugin integrates [shiki](https://shiki.style/) into Obsidian, providing better syntax highlighting for over 250 languages.
+This plugin integrates [shiki](https://shiki.style/) via [Expressive Code](https://expressive-code.com/) into Obsidian, providing better syntax highlighting for over 100 languages.
 
 This plugin works in reading mode and in live preview mode, as long as your cursor is not inside the code block.
 
@@ -19,4 +19,9 @@ This plugin works in reading mode and in live preview mode, as long as your curs
 
 ## Credits
 
-This plugin uses the [shiki](https://shiki.style/) library and parts of the Dracula VSCode theme for syntax highlighting.
+This plugin uses [shiki](https://shiki.style/), [Expressive Code](https://expressive-code.com/), and parts of the Dracula VSCode theme for syntax highlighting.
+
+Special thanks to:
+
+-   Hippo (hippotastic) for their work and support with Expressive Code
+-   sailKite for CSS help and testing the plugin
