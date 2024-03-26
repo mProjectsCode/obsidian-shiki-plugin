@@ -12,8 +12,23 @@ body {
 }
 
 /* Disable ligatures in code blocks, as they can cause incorrect highlighting */
-pre.shiki {
+div.expressive-code {
 	font-variant-ligatures: no-contextual;
+
+	div.ec-line {
+		span {
+			color: var(--0);
+			font-style: var(--0fs);
+		}
+
+		&.highlight {
+			background-color: var(--highlight);
+		}
+
+		&.mark {
+			--highlight: var(--background-modifier-hover);
+		}
+	}
 }
 
 /* Hide the frontmatter code block in reading view again */

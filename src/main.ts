@@ -1,32 +1,33 @@
 import { Plugin } from 'obsidian';
-import { bundledLanguages, getHighlighter } from 'shiki';
-import { OBSIDIAN_THEME } from 'src/ObsidianTheme';
+import { bundledLanguages } from 'shiki';
+import { ThemeMapper } from 'src/ObsidianTheme';
 import { ExpressiveCodeEngine, ExpressiveCodeTheme } from '@expressive-code/core';
 import { pluginShiki } from '@expressive-code/plugin-shiki';
 import { toHtml } from 'hast-util-to-html';
+import { pluginTextMarkers } from '@expressive-code/plugin-text-markers';
 
 // some languages break obsidian's `registerMarkdownCodeBlockProcessor`, so we blacklist them
 const languageNameBlacklist = new Set(['c++', 'c#', 'f#']);
 
 export default class ShikiPlugin extends Plugin {
 	async onload(): Promise<void> {
-		// const highlighter = await getHighlighter({
-		// 	themes: [OBSIDIAN_THEME],
-		// 	langs: Object.keys(bundledLanguages),
-		// });
-
-		const registeredLanguages = new Set<string>();
+		const themeMapper = new ThemeMapper();
+		const theme = themeMapper.getTheme();
 
 		const ec = new ExpressiveCodeEngine({
-			themes: [new ExpressiveCodeTheme(OBSIDIAN_THEME as any)],
+			themes: [new ExpressiveCodeTheme(theme.theme)],
 			plugins: [
 				pluginShiki({
-					langs: Object.entries(bundledLanguages).map(([_, langFn]) => langFn),
+					langs: Object.values(bundledLanguages),
 				}),
+				// pluginCollapsibleSections(),
+				pluginTextMarkers(),
+				// pluginLineNumbers(),
 			],
+			minSyntaxHighlightingColorContrast: 0,
 		});
 
-		console.log(ec);
+		const registeredLanguages = new Set<string>();
 
 		for (const [shikiLanguage, registration] of Object.entries(bundledLanguages)) {
 			// the last element of the array is seemingly the most recent version of the language
@@ -52,25 +53,16 @@ export default class ShikiPlugin extends Plugin {
 
 				// register the language with obsidian
 				this.registerMarkdownCodeBlockProcessor(languageAlias, async (source, el, ctx) => {
-					// yes, this is innerHTML, but we trust shiki
-					// and this is how shiki recommends using it
-					// https://shiki.style/guide/install#shorthands
-					// this is also async, against what eslint thinks
-					// eslint-disable-next-line @typescript-eslint/await-thenable
-					// el.innerHTML = await highlighter.codeToHtml(source, {
-					// 	lang: shikiLanguage,
-					// 	theme: 'obsidian-theme',
-					// 	meta: {
-					// 		__raw: '',
-					// 	},
-					// });
-
 					const rederResult = await ec.render({
 						code: source,
-						language: language.name,
+						language: shikiLanguage,
+						meta: '{1-2}',
 					});
 
-					el.innerHTML = toHtml(rederResult.renderedGroupAst);
+					const ast = themeMapper.fixAST(rederResult.renderedGroupAst);
+
+					// yes, this is innerHTML, but we trust hast
+					el.innerHTML = toHtml(ast);
 				});
 			}
 		}
