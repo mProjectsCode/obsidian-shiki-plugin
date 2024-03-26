@@ -1,4 +1,4 @@
-import { Plugin } from 'obsidian';
+import { Plugin, TFile } from 'obsidian';
 import { bundledLanguages } from 'shiki';
 import { ExpressiveCodeEngine, ExpressiveCodeTheme } from '@expressive-code/core';
 import { pluginShiki } from '@expressive-code/plugin-shiki';
@@ -20,13 +20,33 @@ export default class ShikiPlugin extends Plugin {
 	ec: ExpressiveCodeEngine;
 	// @ts-expect-error TS2564
 	ecElements: HTMLElement[];
+	// @ts-expect-error TS2564
+	activeCodeBlocks: Map<string, CodeBlock[]>;
 
 	async onload(): Promise<void> {
 		this.themeMapper = new ThemeMapper();
+		this.activeCodeBlocks = new Map();
 
 		await this.loadEC();
 
 		await this.registerCodeBlockProcessors();
+
+		// this is a workaround for the fact that obsidian does not rerender the code block
+		// when the start line with the language changes, and we need that for the EC meta string
+		this.registerEvent(
+			this.app.vault.on('modify', async file => {
+				// sleep 0 so that the code block context is updated before we rerender
+				await sleep(100);
+
+				if (file instanceof TFile) {
+					if (this.activeCodeBlocks.has(file.path)) {
+						for (const codeBlock of this.activeCodeBlocks.get(file.path)!) {
+							void codeBlock.rerenderOnNoteChange();
+						}
+					}
+				}
+			}),
+		);
 	}
 
 	async loadEC(): Promise<void> {
@@ -44,6 +64,9 @@ export default class ShikiPlugin extends Plugin {
 			styleOverrides: EC_THEME,
 			minSyntaxHighlightingColorContrast: 0,
 			themeCssRoot: 'div.expressive-code',
+			defaultProps: {
+				showLineNumbers: false,
+			},
 		});
 
 		this.ecElements = [];
@@ -84,7 +107,7 @@ export default class ShikiPlugin extends Plugin {
 
 				// register the language with obsidian
 				this.registerMarkdownCodeBlockProcessor(languageAlias, async (source, el, ctx) => {
-					const codeBlock = new CodeBlock(this, el, source, shikiLanguage, languageAlias, ctx.getSectionInfo(el));
+					const codeBlock = new CodeBlock(this, el, source, shikiLanguage, languageAlias, ctx);
 
 					ctx.addChild(codeBlock);
 				});
@@ -101,5 +124,26 @@ export default class ShikiPlugin extends Plugin {
 			el.remove();
 		}
 		this.ecElements = [];
+	}
+
+	addActiveCodeBlock(codeBlock: CodeBlock): void {
+		const filePath = codeBlock.ctx.sourcePath;
+
+		if (!this.activeCodeBlocks.has(filePath)) {
+			this.activeCodeBlocks.set(filePath, [codeBlock]);
+		} else {
+			this.activeCodeBlocks.get(filePath)!.push(codeBlock);
+		}
+	}
+
+	removeActiveCodeBlock(codeBlock: CodeBlock): void {
+		const filePath = codeBlock.ctx.sourcePath;
+
+		if (this.activeCodeBlocks.has(filePath)) {
+			const index = this.activeCodeBlocks.get(filePath)!.indexOf(codeBlock);
+			if (index !== -1) {
+				this.activeCodeBlocks.get(filePath)!.splice(index, 1);
+			}
+		}
 	}
 }

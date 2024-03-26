@@ -4,7 +4,7 @@ test: hello
 
 TypeScript code
 
-```ts title="A part of ParsiNOM" {13-15}
+```ts title="A part of ParsiNOM" {13-15, 22-29} showLineNumbers
 export class Parser<const SType extends STypeBase> {
 	public p: ParseFunction<SType>;
 
@@ -62,7 +62,7 @@ input:is([data-task="字"], [data-task="字"] > *):checked::after {
 
 Bash
 
-```bash title="My Bash Script"
+```bash title="Other Title"
 echo "Hello"
 ```
 
