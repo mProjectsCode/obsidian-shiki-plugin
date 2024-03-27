@@ -4,6 +4,10 @@ This plugin integrates [shiki](https://shiki.style/) via [Expressive Code](https
 
 This plugin works in reading mode and in live preview mode, as long as your cursor is not inside the code block.
 
+Below is an example with line numbers, a custom header, and line highlighting.
+
+![exampleImage](https://raw.githubusercontent.com/mProjectsCode/obsidian-shiki-plugin/master/exampleImage.png)
+
 ## License
 
 [MIT](https://github.com/mProjectsCode/obsidian-shiki-plugin/blob/master/LICENSE)
