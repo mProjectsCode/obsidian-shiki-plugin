@@ -39,7 +39,7 @@ export class Parser<const SType extends STypeBase> {
 
 CSS code
 
-```css
+```css title="Some CSS by sailKite" showLineNumbers {2} ins={6-8, 15-17} del={15-17}
 input:is([data-task="式"], [data-task="式"] > *):checked::after {
     content: "式";
     color: transparent;
