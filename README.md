@@ -2,7 +2,7 @@
 
 This plugin integrates [shiki](https://shiki.style/) via [Expressive Code](https://expressive-code.com/) into Obsidian, providing better syntax highlighting for over 100 languages.
 
-This plugin works in reading mode and in live preview mode, as long as your cursor is not inside the code block.
+This plugin works in reading, live preview and edit mode, providing a consistent experience across the app.
 
 Below is an example with line numbers, a custom header, and line highlighting.
 

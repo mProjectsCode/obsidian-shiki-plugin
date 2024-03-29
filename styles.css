@@ -1,14 +1,14 @@
 body {
 	--shiki-code-background: var(--code-background);
-	--shiki-code-normal: var(--code-normal);
-	--shiki-code-comment: var(--code-comment);
+	--shiki-code-normal: var(--text-muted);
+	--shiki-code-comment: var(--text-faint);
 	--shiki-code-function: var(--color-green);
-	--shiki-code-important: var(--code-important);
-	--shiki-code-keyword: var(--code-keyword);
-	--shiki-code-property: var(--code-property);
-	--shiki-code-punctuation: var(--code-punctuation);
+	--shiki-code-important: var(--color-orange);
+	--shiki-code-keyword: var(--color-pink);
+	--shiki-code-property: var(--color-cyan);
+	--shiki-code-punctuation: var(--text-muted);
 	--shiki-code-string: var(--color-yellow);
-	--shiki-code-value: var(--code-value);
+	--shiki-code-value: var(--color-purple);
 
 	/*--shiki-code-border-color: var(--background-modifier-border);*/
 	--shiki-code-block-border-color: transparent;
@@ -19,7 +19,7 @@ body {
 
 	--shiki-highlight-red: rgba(var(--color-red-rgb), 0.5);
 	--shiki-highlight-green: rgba(var(--color-green-rgb), 0.5);
-	--shiki-highlight-neutral: var(--code-normal);
+	--shiki-highlight-neutral: var(--shiki-code-normal);
 	--shiki-highlight-red-background: rgba(var(--color-red-rgb), 0.05);
 	--shiki-highlight-green-background: rgba(var(--color-green-rgb), 0.05);
 	--shiki-highlight-neutral-background: rgba(var(--mono-rgb-100), 0.05);
@@ -32,32 +32,45 @@ body {
 	--shiki-gutter-border-color: var(--background-modifier-border);
 	--shiki-gutter-border-width: var(--border-width);
 	--shiki-gutter-text-color: var(--text-faint);
-	--shiki-gutter-text-color-highlight: var(--code-normal);
+	--shiki-gutter-text-color-highlight: var(--shiki-code-normal);
+}
+
+.edit-block-button {
+	pointer-events: all;
+
+	& > svg {
+		pointer-events: all;
+	}
 }
 
 /* Disable ligatures in code blocks, as they can cause incorrect highlighting */
 div.expressive-code {
 	font-variant-ligatures: no-contextual;
 
-	/*div.ec-line {*/
-	/*	span {*/
-	/*		color: var(--0);*/
-	/*		font-style: var(--0fs);*/
-	/*	}*/
+	& > figure > pre {
+		/* Fix for shimmering focus */
+		margin: 0 !important;
+	}
 
-	/*	&.highlight {*/
-	/*		background-color: var(--highlight);*/
-	/*	}*/
+	& > figure.frame {
+		&.has-title > figcaption.header::before {
+			pointer-events: all !important;
+		}
 
-	/*	&.mark {*/
-	/*		--highlight: var(--background-modifier-hover);*/
-	/*	}*/
-	/*}*/
+		& > figcaption.header {
+			z-index: unset;
+		}
+
+		& > div.copy {
+			/* Move the copy button to the bottom right */
+			inset-block-end: calc(var(--ec-brdWd) + var(--ec-uiPadInl) / 2);
+		}
+	}
 }
 
 .markdown-preview-view {
 	div.expressive-code {
-		margin-block: var(--p-spacing);
+		margin-block: var(--shiki-code-block-spacing);
 	}
 }
 

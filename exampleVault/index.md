@@ -2,7 +2,7 @@
 test: hello
 ---
 
-TypeScript code
+TypeScript codearsiNOM
 
 ```ts title="A part of ParsiNOM" {13-15, 22-29} showLineNumbers
 export class Parser<const SType extends STypeBase> {
@@ -86,7 +86,6 @@ Bash
 ```bash title="Other Title"
 echo "Hello"
 ```
-
 
 ```diff
 + this line will be marked as inserted
