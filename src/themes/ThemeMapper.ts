@@ -1,7 +1,7 @@
 import { type ThemeRegistration } from 'shiki';
 import type * as hast_util_to_html_lib_types from 'hast-util-to-html/lib/types';
 import type * as hast_types from 'hast';
-import { OBSIDIAN_THEME } from 'src/ObsidianTheme';
+import { OBSIDIAN_THEME } from 'src/themes/ObsidianTheme';
 
 export class ThemeMapper {
 	mapCounter: number;

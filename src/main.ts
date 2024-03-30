@@ -1,19 +1,23 @@
-import { Plugin, TFile } from 'obsidian';
-import { type BundledLanguage, bundledLanguages, getHighlighter, type Highlighter, type TokensResult } from 'shiki';
+import { loadPrism, Plugin, TFile } from 'obsidian';
+import { bundledLanguages, getHighlighter, type Highlighter, type TokensResult } from 'shiki';
 import { ExpressiveCodeEngine, ExpressiveCodeTheme } from '@expressive-code/core';
 import { pluginShiki } from '@expressive-code/plugin-shiki';
 import { pluginTextMarkers } from '@expressive-code/plugin-text-markers';
 import { pluginCollapsibleSections } from '@expressive-code/plugin-collapsible-sections';
 import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 import { pluginFrames } from '@expressive-code/plugin-frames';
-import { ThemeMapper } from 'src/ThemeMapper';
-import { EC_THEME } from 'src/ECTheme';
+import { ThemeMapper } from 'src/themes/ThemeMapper';
+import { EC_THEME } from 'src/themes/ECTheme';
 import { CodeBlock } from 'src/CodeBlock';
-import { OBSIDIAN_THEME } from 'src/ObsidianTheme';
-import { createCm6Plugin } from 'src/Cm6_ViewPlugin';
+import { OBSIDIAN_THEME } from 'src/themes/ObsidianTheme';
+import { createCm6Plugin } from 'src/codemirror/Cm6_ViewPlugin';
+import { DEFAULT_SETTINGS, type Settings } from 'src/settings/Settings';
+import { ShikiSettingsTab } from 'src/settings/SettingsTab';
+import { filterHighlightAllPlugin } from 'src/PrismPlugin';
+import { LoadedLanguage } from 'src/LoadedLanguage';
 
 // some languages break obsidian's `registerMarkdownCodeBlockProcessor`, so we blacklist them
-const languageNameBlacklist = new Set(['c++', 'c#', 'f#']);
+const languageNameBlacklist = new Set(['c++', 'c#', 'f#', 'mermaid']);
 
 export default class ShikiPlugin extends Plugin {
 	// @ts-expect-error TS2564
@@ -25,23 +29,25 @@ export default class ShikiPlugin extends Plugin {
 	// @ts-expect-error TS2564
 	activeCodeBlocks: Map<string, CodeBlock[]>;
 	// @ts-expect-error TS2564
-	loadedLanguages: Map<string, string>;
+	loadedLanguages: Map<string, LoadedLanguage>;
 	// @ts-expect-error TS2564
 	shiki: Highlighter;
+	// @ts-expect-error TS2564
+	settings: Settings;
 
 	async onload(): Promise<void> {
+		await this.loadSettings();
+
+		this.addSettingTab(new ShikiSettingsTab(this));
+
 		this.themeMapper = new ThemeMapper();
 		this.activeCodeBlocks = new Map();
 		this.loadedLanguages = new Map();
 
 		await this.loadLanguages();
 
-		this.shiki = await getHighlighter({
-			themes: [OBSIDIAN_THEME],
-			langs: Object.keys(bundledLanguages),
-		});
-
 		await this.loadEC();
+		await this.loadShiki();
 
 		this.registerCodeBlockProcessors();
 
@@ -69,16 +75,44 @@ export default class ShikiPlugin extends Plugin {
 		for (const [shikiLanguage, registration] of Object.entries(bundledLanguages)) {
 			// the last element of the array is seemingly the most recent version of the language
 			const language = (await registration()).default.at(-1);
+			const shikiLanguageName = shikiLanguage as keyof typeof bundledLanguages;
 
 			if (language === undefined) {
 				continue;
 			}
 
 			for (const alias of [language.name, ...(language.aliases ?? [])]) {
-				if (!this.loadedLanguages.has(alias) && !languageNameBlacklist.has(alias)) {
-					this.loadedLanguages.set(alias, shikiLanguage);
+				if (languageNameBlacklist.has(alias)) {
+					continue;
+				}
+
+				if (!this.loadedLanguages.has(alias)) {
+					const newLanguage = new LoadedLanguage(alias);
+					newLanguage.addLanguage(shikiLanguageName);
+
+					this.loadedLanguages.set(alias, newLanguage);
+				}
+
+				this.loadedLanguages.get(alias)!.addLanguage(shikiLanguageName);
+			}
+		}
+
+		for (const [alias, language] of this.loadedLanguages) {
+			if (language.languages.length === 1) {
+				language.setDefaultLanguage(language.languages[0]);
+			} else {
+				const defaultLanguage = language.languages.find(lang => lang === alias);
+				if (defaultLanguage !== undefined) {
+					language.setDefaultLanguage(defaultLanguage);
+				} else {
+					console.warn(`No default language found for ${alias}, using the first language in the list`);
+					language.setDefaultLanguage(language.languages[0]);
 				}
 			}
+		}
+
+		for (const disabledLanguage of this.settings.disabledLanguages) {
+			this.loadedLanguages.delete(disabledLanguage);
 		}
 	}
 
@@ -113,17 +147,38 @@ export default class ShikiPlugin extends Plugin {
 		}
 	}
 
+	async loadShiki(): Promise<void> {
+		this.shiki = await getHighlighter({
+			themes: [OBSIDIAN_THEME],
+			langs: Object.keys(bundledLanguages),
+		});
+	}
+
+	async registerPrismPlugin(): Promise<void> {
+		/* eslint-disable */
+
+		await loadPrism();
+
+		const prism = await loadPrism();
+		filterHighlightAllPlugin(prism);
+		prism.plugins.filterHighlightAll.reject.addSelector('div.expressive-code pre code');
+	}
+
 	registerCodeBlockProcessors(): void {
 		for (const [alias, language] of this.loadedLanguages) {
-			this.registerMarkdownCodeBlockProcessor(
-				alias,
-				async (source, el, ctx) => {
-					const codeBlock = new CodeBlock(this, el, source, language, alias, ctx);
+			try {
+				this.registerMarkdownCodeBlockProcessor(
+					alias,
+					async (source, el, ctx) => {
+						const codeBlock = new CodeBlock(this, el, source, language.getDefaultLanguage(), alias, ctx);
 
-					ctx.addChild(codeBlock);
-				},
-				-1,
-			);
+						ctx.addChild(codeBlock);
+					},
+					-1,
+				);
+			} catch (e) {
+				console.warn(`Failed to register code block processor for ${alias}`, e);
+			}
 		}
 	}
 
@@ -167,8 +222,16 @@ export default class ShikiPlugin extends Plugin {
 		}
 
 		return this.shiki.codeToTokens(code, {
-			lang: shikiLanguage as BundledLanguage,
+			lang: shikiLanguage.getDefaultLanguage(),
 			theme: 'obsidian-theme',
 		});
+	}
+
+	async loadSettings(): Promise<void> {
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData()) as Settings;
+	}
+
+	async saveSettings(): Promise<void> {
+		await this.saveData(this.settings);
 	}
 }

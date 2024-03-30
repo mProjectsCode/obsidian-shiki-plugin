@@ -3,7 +3,7 @@ import { Decoration, type DecorationSet, type EditorView, ViewPlugin, type ViewU
 import { type Range } from '@codemirror/state';
 import { type SyntaxNode } from '@lezer/common';
 import { syntaxTree } from '@codemirror/language';
-import { Cm6_Util } from './Cm6_Util';
+import { Cm6_Util } from 'src/codemirror/Cm6_Util';
 import { type ThemedToken } from 'shiki';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
