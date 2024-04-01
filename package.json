@@ -42,6 +42,7 @@
 		"builtin-modules": "^3.3.0",
 		"esbuild": "^0.20.2",
 		"esbuild-plugin-copy-watch": "^2.1.0",
+		"esbuild-plugins-node-modules-polyfill": "^1.6.3",
 		"esbuild-svelte": "^0.8.0",
 		"eslint": "^8.57.0",
 		"eslint-plugin-import": "^2.29.1",

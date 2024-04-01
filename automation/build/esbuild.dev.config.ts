@@ -4,6 +4,7 @@ import esbuildSvelte from 'esbuild-svelte';
 import sveltePreprocess from 'svelte-preprocess';
 import manifest from '../../manifest.json' assert { type: 'json' };
 import { getBuildBanner } from 'build/buildBanner';
+import { nodeModulesPolyfillPlugin } from 'esbuild-plugins-node-modules-polyfill';
 
 const banner = getBuildBanner('Dev Build', _ => 'Dev Build');
 
@@ -57,6 +58,13 @@ const context = await esbuild.context({
 			filterWarnings: warning => {
 				// we don't want warnings from node modules that we can do nothing about
 				return !warning.filename?.includes('node_modules');
+			},
+		}),
+		nodeModulesPolyfillPlugin({
+			modules: {
+				fs: true,
+				path: true,
+				url: true,
 			},
 		}),
 	],

@@ -69,6 +69,8 @@ export default class ShikiPlugin extends Plugin {
 				}
 			}),
 		);
+
+		await loadPrism();
 	}
 
 	async loadLanguages(): Promise<void> {
