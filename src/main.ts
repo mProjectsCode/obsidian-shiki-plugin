@@ -7,14 +7,13 @@ import { pluginCollapsibleSections } from '@expressive-code/plugin-collapsible-s
 import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 import { pluginFrames } from '@expressive-code/plugin-frames';
 import { ThemeMapper } from 'src/themes/ThemeMapper';
-import { EC_THEME } from 'src/themes/ECTheme';
 import { CodeBlock } from 'src/CodeBlock';
-import { OBSIDIAN_THEME } from 'src/themes/ObsidianTheme';
 import { createCm6Plugin } from 'src/codemirror/Cm6_ViewPlugin';
 import { DEFAULT_SETTINGS, type Settings } from 'src/settings/Settings';
 import { ShikiSettingsTab } from 'src/settings/SettingsTab';
 import { filterHighlightAllPlugin } from 'src/PrismPlugin';
 import { LoadedLanguage } from 'src/LoadedLanguage';
+import { getECTheme } from 'src/themes/ECTheme';
 
 // some languages break obsidian's `registerMarkdownCodeBlockProcessor`, so we blacklist them
 const languageNameBlacklist = new Set(['c++', 'c#', 'f#', 'mermaid']);
@@ -34,13 +33,17 @@ export default class ShikiPlugin extends Plugin {
 	shiki: Highlighter;
 	// @ts-expect-error TS2564
 	settings: Settings;
+	// @ts-expect-error TS2564
+	loadedSettings: Settings;
 
 	async onload(): Promise<void> {
 		await this.loadSettings();
 
+		this.loadedSettings = structuredClone(this.settings);
+
 		this.addSettingTab(new ShikiSettingsTab(this));
 
-		this.themeMapper = new ThemeMapper();
+		this.themeMapper = new ThemeMapper(this);
 		this.activeCodeBlocks = new Map();
 		this.loadedLanguages = new Map();
 
@@ -70,7 +73,7 @@ export default class ShikiPlugin extends Plugin {
 			}),
 		);
 
-		await loadPrism();
+		await this.registerPrismPlugin();
 	}
 
 	async loadLanguages(): Promise<void> {
@@ -113,14 +116,14 @@ export default class ShikiPlugin extends Plugin {
 			}
 		}
 
-		for (const disabledLanguage of this.settings.disabledLanguages) {
+		for (const disabledLanguage of this.loadedSettings.disabledLanguages) {
 			this.loadedLanguages.delete(disabledLanguage);
 		}
 	}
 
 	async loadEC(): Promise<void> {
 		this.ec = new ExpressiveCodeEngine({
-			themes: [new ExpressiveCodeTheme(this.themeMapper.getTheme())],
+			themes: [new ExpressiveCodeTheme(await this.themeMapper.getThemeForEC())],
 			plugins: [
 				pluginShiki({
 					langs: Object.values(bundledLanguages),
@@ -130,7 +133,7 @@ export default class ShikiPlugin extends Plugin {
 				pluginLineNumbers(),
 				pluginFrames(),
 			],
-			styleOverrides: EC_THEME,
+			styleOverrides: getECTheme(this.loadedSettings),
 			minSyntaxHighlightingColorContrast: 0,
 			themeCssRoot: 'div.expressive-code',
 			defaultProps: {
@@ -151,7 +154,7 @@ export default class ShikiPlugin extends Plugin {
 
 	async loadShiki(): Promise<void> {
 		this.shiki = await getHighlighter({
-			themes: [OBSIDIAN_THEME],
+			themes: [await this.themeMapper.getTheme()],
 			langs: Object.keys(bundledLanguages),
 		});
 	}
@@ -225,7 +228,7 @@ export default class ShikiPlugin extends Plugin {
 
 		return this.shiki.codeToTokens(code, {
 			lang: shikiLanguage.getDefaultLanguage(),
-			theme: 'obsidian-theme',
+			theme: this.settings.theme,
 		});
 	}
 

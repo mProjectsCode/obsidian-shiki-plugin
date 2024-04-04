@@ -1,6 +1,7 @@
 import { PluginSettingTab, Setting } from 'obsidian';
 import type ShikiPlugin from 'src/main';
 import { StringSelectModal } from 'src/settings/StringSelectModal';
+import { bundledThemesInfo } from 'shiki';
 
 export class ShikiSettingsTab extends PluginSettingTab {
 	plugin: ShikiPlugin;
@@ -13,6 +14,32 @@ export class ShikiSettingsTab extends PluginSettingTab {
 
 	display(): void {
 		this.containerEl.empty();
+
+		const themes = Object.fromEntries(bundledThemesInfo.map(theme => [theme.id, `${theme.displayName} (${theme.type})`]));
+		themes['obsidian-theme'] = 'Obsidian built-in (both)';
+
+		new Setting(this.containerEl)
+			.setName('Theme')
+			.setDesc('Select the theme for the code blocks. RESTART REQUIRED AFTER CHANGES.')
+			.addDropdown(dropdown => {
+				dropdown.addOptions(themes);
+				dropdown.setValue(this.plugin.settings.theme).onChange(async value => {
+					this.plugin.settings.theme = value;
+					await this.plugin.saveSettings();
+				});
+			});
+
+		new Setting(this.containerEl)
+			.setName('Prefer theme colors')
+			.setDesc(
+				'When enabled the plugin will prefer theme colors over CSS variables for things like the code block background. RESTART REQUIRED AFTER CHANGES.',
+			)
+			.addToggle(toggle => {
+				toggle.setValue(this.plugin.settings.preferThemeColors).onChange(async value => {
+					this.plugin.settings.preferThemeColors = value;
+					await this.plugin.saveSettings();
+				});
+			});
 
 		new Setting(this.containerEl)
 			.setName('Excluded Languages')

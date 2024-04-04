@@ -1,23 +1,30 @@
-import { type ThemeRegistration } from 'shiki';
+import { type BundledTheme, bundledThemes, type ThemeRegistration } from 'shiki';
 import type * as hast_util_to_html_lib_types from 'hast-util-to-html/lib/types';
 import type * as hast_types from 'hast';
 import { OBSIDIAN_THEME } from 'src/themes/ObsidianTheme';
+import type ShikiPlugin from 'src/main';
 
 export class ThemeMapper {
+	plugin: ShikiPlugin;
 	mapCounter: number;
 	mapping: Map<string, string>;
 
-	constructor() {
+	constructor(plugin: ShikiPlugin) {
+		this.plugin = plugin;
+
 		this.mapCounter = 0;
 		this.mapping = new Map();
 	}
 
-	getTheme(): ThemeRegistration {
+	async getThemeForEC(): Promise<ThemeRegistration> {
+		if (this.plugin.loadedSettings.theme !== 'obsidian-theme') {
+			return (await bundledThemes[this.plugin.loadedSettings.theme as BundledTheme]()).default;
+		}
+
 		return {
 			displayName: OBSIDIAN_THEME.displayName,
 			name: OBSIDIAN_THEME.name,
 			semanticHighlighting: OBSIDIAN_THEME.semanticHighlighting,
-			colors: Object.fromEntries(Object.entries(OBSIDIAN_THEME.colors).map(([key, value]) => [key, this.mapColor(value)])),
 			tokenColors: OBSIDIAN_THEME.tokenColors.map(token => {
 				const newToken = { ...token };
 
@@ -34,6 +41,14 @@ export class ThemeMapper {
 		};
 	}
 
+	async getTheme(): Promise<ThemeRegistration> {
+		if (this.plugin.loadedSettings.theme !== 'obsidian-theme') {
+			return (await bundledThemes[this.plugin.loadedSettings.theme as BundledTheme]()).default;
+		}
+
+		return OBSIDIAN_THEME;
+	}
+
 	mapColor(color: string): string {
 		if (this.mapping.has(color)) {
 			return this.mapping.get(color)!;
@@ -46,6 +61,10 @@ export class ThemeMapper {
 	}
 
 	fixAST(ast: hast_util_to_html_lib_types.Parent): hast_util_to_html_lib_types.Parent {
+		if (this.plugin.loadedSettings.theme !== 'obsidian-theme') {
+			return ast;
+		}
+
 		ast.children = ast.children.map(child => {
 			if (child.type === 'element') {
 				return this.fixNode(child);

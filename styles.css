@@ -33,6 +33,9 @@ body {
 	--shiki-gutter-border-width: var(--border-width);
 	--shiki-gutter-text-color: var(--text-faint);
 	--shiki-gutter-text-color-highlight: var(--shiki-code-normal);
+
+	--shiki-active-tab-border-width: 2px;
+	--shiki-active-tab-border-color: var(--shiki-highlight-neutral);
 }
 
 .edit-block-button {
