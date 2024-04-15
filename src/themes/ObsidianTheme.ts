@@ -4,6 +4,10 @@ export const OBSIDIAN_THEME = {
 	displayName: 'Obsidian Theme',
 	name: 'obsidian-theme',
 	semanticHighlighting: true,
+	colors: {
+		'editor.background': 'var(--shiki-code-background)',
+		'editor.foreground': 'var(--shiki-code-normal)',
+	},
 	tokenColors: [
 		{
 			scope: ['emphasis'],

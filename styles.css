@@ -20,8 +20,8 @@ body {
 	--shiki-highlight-red: rgba(var(--color-red-rgb), 0.5);
 	--shiki-highlight-green: rgba(var(--color-green-rgb), 0.5);
 	--shiki-highlight-neutral: var(--shiki-code-normal);
-	--shiki-highlight-red-background: rgba(var(--color-red-rgb), 0.05);
-	--shiki-highlight-green-background: rgba(var(--color-green-rgb), 0.05);
+	--shiki-highlight-red-background: rgba(var(--color-red-rgb), 0.1);
+	--shiki-highlight-green-background: rgba(var(--color-green-rgb), 0.1);
 	--shiki-highlight-neutral-background: rgba(var(--mono-rgb-100), 0.05);
 
 	--shiki-terminal-dots-color: var(--text-faint);

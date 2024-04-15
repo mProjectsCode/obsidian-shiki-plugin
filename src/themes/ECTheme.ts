@@ -49,11 +49,11 @@ export function getECTheme(settings: Settings): ExpressiveCodeEngineConfig['styl
 		textMarkers: {
 			delBackground: 'var(--shiki-highlight-red-background)',
 			delBorderColor: 'var(--shiki-highlight-red)',
-			delDiffIndicatorColor: 'rgba(var(--shiki-highlight-red-rgb), 1)',
+			delDiffIndicatorColor: 'var(--shiki-highlight-red)',
 			inlineMarkerBorderWidth: 'var(--border-width)',
 			insBackground: 'var(--shiki-highlight-green-background)',
 			insBorderColor: 'var(--shiki-highlight-green)',
-			insDiffIndicatorColor: 'rgba(var(--shiki-highlight-green-rgb), 1)',
+			insDiffIndicatorColor: 'var(--shiki-highlight-green)',
 			lineDiffIndicatorMarginLeft: '0.3rem',
 			lineMarkerAccentMargin: '0rem',
 			lineMarkerAccentWidth: '0.15rem',

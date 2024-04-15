@@ -1,5 +1,5 @@
 import { type BundledTheme, bundledThemes, type ThemeRegistration } from 'shiki';
-import type * as hast_util_to_html_lib_types from 'hast-util-to-html/lib/types';
+import type * as hast_util_to_html_lib_types from 'hast-util-to-html/lib';
 import type * as hast_types from 'hast';
 import { OBSIDIAN_THEME } from 'src/themes/ObsidianTheme';
 import type ShikiPlugin from 'src/main';
@@ -25,6 +25,7 @@ export class ThemeMapper {
 			displayName: OBSIDIAN_THEME.displayName,
 			name: OBSIDIAN_THEME.name,
 			semanticHighlighting: OBSIDIAN_THEME.semanticHighlighting,
+			colors: Object.fromEntries(Object.entries(OBSIDIAN_THEME.colors).map(([key, value]) => [key, this.mapColor(value)])),
 			tokenColors: OBSIDIAN_THEME.tokenColors.map(token => {
 				const newToken = { ...token };
 
@@ -60,7 +61,7 @@ export class ThemeMapper {
 		}
 	}
 
-	fixAST(ast: hast_util_to_html_lib_types.Parent): hast_util_to_html_lib_types.Parent {
+	fixAST(ast: hast_util_to_html_lib_types.Parents): hast_util_to_html_lib_types.Parents {
 		if (this.plugin.loadedSettings.theme !== 'obsidian-theme') {
 			return ast;
 		}
