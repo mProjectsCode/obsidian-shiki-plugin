@@ -175,6 +175,14 @@ export default class ShikiPlugin extends Plugin {
 				this.registerMarkdownCodeBlockProcessor(
 					alias,
 					async (source, el, ctx) => {
+						// this is so that we leave the hidden frontmatter code block in reading mode alone
+						if (alias === 'yaml' && ctx.frontmatter) {
+							const sectionInfo = ctx.getSectionInfo(el);
+							if (sectionInfo && sectionInfo.lineStart === 0) {
+								el.addClass('shiki-hide-in-reading-mode');
+							}
+						}
+
 						const codeBlock = new CodeBlock(this, el, source, language.getDefaultLanguage(), alias, ctx);
 
 						ctx.addChild(codeBlock);

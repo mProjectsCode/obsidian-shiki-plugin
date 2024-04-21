@@ -78,6 +78,6 @@ div.expressive-code {
 }
 
 /* Hide the frontmatter code block in reading view again */
-div.markdown-preview-view > div > div.mod-header + div > div {
+div.markdown-preview-view > div > div.mod-header + div > div.block-language-yaml.shiki-hide-in-reading-mode {
 	display: none;
 }
