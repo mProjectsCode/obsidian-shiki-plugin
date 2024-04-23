@@ -41,6 +41,16 @@ Line numbers can be enabled with `showLineNumbers`.
 ...
 ```
 ````
+### Word Wrap
+
+The default setting for Word Wrap is true. This can be changed in the Plugin Settings.
+Individual code blocks can be set with `wrap=true` or `wrap=false`, which will always override the global setting.
+
+````md
+```language wrap=true
+...
+```
+````
 
 ### Title
 
