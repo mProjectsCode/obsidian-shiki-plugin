@@ -138,6 +138,7 @@ export default class ShikiPlugin extends Plugin {
 			themeCssRoot: 'div.expressive-code',
 			defaultProps: {
 				showLineNumbers: false,
+				wrap: this.settings.wrapGlobal,
 			},
 		});
 
