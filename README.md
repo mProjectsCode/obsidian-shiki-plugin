@@ -26,7 +26,7 @@ To configure the code block you add the configuration options on the same line a
 
 ````md
 ```language configurationHere
-...
+some code ...
 ```
 ````
 
@@ -38,7 +38,7 @@ Line numbers can be enabled with `showLineNumbers`.
 
 ````md
 ```language showLineNumbers
-...
+some code ...
 ```
 ````
 
@@ -48,7 +48,7 @@ A title can be added with `title="Title Here"`.
 
 ````md
 ```language title="Title Here"
-...
+some code ...
 ```
 ````
 
@@ -59,7 +59,7 @@ Lines can either be single lines or ranges.
 
 ````md
 ```language {1, 5-10}
-...
+some code ...
 ```
 ````
 
@@ -71,7 +71,7 @@ Lines can once again either be single lines or ranges.
 
 ````md
 ```language ins={1} del={5-10}
-...
+some code ...
 ```
 ````
 
