@@ -52,6 +52,7 @@ export default class ShikiPlugin extends Plugin {
 		await this.loadEC();
 		await this.loadShiki();
 
+		this.registerInlineCodeProcessor();
 		this.registerCodeBlockProcessors();
 
 		this.registerEditorExtension([createCm6Plugin(this)]);
@@ -193,6 +194,31 @@ export default class ShikiPlugin extends Plugin {
 				console.warn(`Failed to register code block processor for ${alias}`, e);
 			}
 		}
+	}
+
+	registerInlineCodeProcessor(): void {
+		this.registerMarkdownPostProcessor(async (el, ctx) => {
+		    const inlineCodes = el.findAll(":not(pre) > code");
+		    for (let codeElm of inlineCodes) {
+		        let match = codeElm.textContent.match(/^\{([^\s]+)\} (.*)/i);  // format: `{lang} code`
+		        if (match && this.loadedLanguages.has(match[1])) {
+		            let tokens = await this.getHighlightTokens(match[2], match[1]);
+		            tokens = tokens.tokens.flat(1);
+		            if (!tokens.length) continue;
+		            codeElm.innerHTML = '';  // clear content
+		            codeElm.addClass('shiki-inline');
+		            for (let token of tokens) {
+		                codeElm.createSpan({
+		                    text: token.content,
+		                    cls: ((token.fontStyle & 1) === 1 ? "italic" : "") + 
+		                          ((token.fontStyle & 2) === 2 ? " bold" : "") +
+		                          ((token.fontStyle & 4) === 4 ? " ul" : ""),
+		                    attr: {style: `color: ${token.color}`}
+		                });
+		            }
+		        }
+		    }
+		})
 	}
 
 	onunload(): void {
