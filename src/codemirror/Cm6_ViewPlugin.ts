@@ -27,7 +27,7 @@ export function createCm6Plugin(plugin: ShikiPlugin): ViewPlugin<any> {
 				this.decorations = this.decorations.map(update.changes);
 
 				if (update.docChanged || update.selectionSet) {
-					this.updateWidgets(update.view);
+					this.updateWidgets(update.view, update.docChanged);
 				}
 			}
 
@@ -36,7 +36,7 @@ export function createCm6Plugin(plugin: ShikiPlugin): ViewPlugin<any> {
 			 *
 			 * @param view
 			 */
-			updateWidgets(view: EditorView): void {
+			updateWidgets(view: EditorView, docChanged: boolean = true): void {
 				let lang = '';
 				let state: SyntaxNode[] = [];
 
@@ -51,6 +51,34 @@ export function createCm6Plugin(plugin: ShikiPlugin): ViewPlugin<any> {
 						if (props.has('formatting')) {
 							return;
 						}
+
+						if (props.has('inline-code')) {
+						    const content = Cm6_Util.getContent(view.state, node.from, node.to);
+						    if (content.startsWith('{')) {
+						        let match = content.match(/^\{([^\s]+)\} (.*)/i);  // format: `{lang} code`
+						        if (match) {
+						            let ranges = view.state.selection.ranges;
+						            for (const r of ranges) { // check if selection and this node overlaps
+						                if (r.from < node.to && r.to > node.from) {
+						                    this.removeDecoration(node.from, node.to);
+						                    return;
+						                }
+						            }
+						            let hideTo = node.from + match[1].length + 3;  // hide `{lang} `
+						            this.renderWidget(hideTo, node.to, match[1], match[2])
+						                .then(decorations => {
+						                    this.removeDecoration(node.from, node.to);
+						                    decorations.unshift(Decoration.replace({}).range(node.from, hideTo));
+						                    this.addDecoration(node.from, node.to, decorations);
+						                })
+						                .catch(console.error);
+						        }
+						    } else {
+						        this.removeDecoration(node.from, node.to);
+						    }
+						    return;
+						}
+						if (!docChanged) return;
 
 						if (props.has('HyperMD-codeblock') && !props.has('HyperMD-codeblock-begin') && !props.has('HyperMD-codeblock-end')) {
 							state.push(node);
