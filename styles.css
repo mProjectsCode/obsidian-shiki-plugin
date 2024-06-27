@@ -83,13 +83,13 @@ div.markdown-preview-view > div > div.mod-header + div > div.block-language-yaml
 }
 
 .shiki-inline {
-	& .bold {
+	& .shiki-bold {
 		font-weight: var(--bold-weight, 600);
 	}
-	& .italic {
+	& .shiki-italic {
 		font-style: italic;
 	}
-	& .ul {
+	& .shiki-ul {
 		text-decoration: underline;
 	}
 }

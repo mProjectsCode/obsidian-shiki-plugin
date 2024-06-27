@@ -1,4 +1,5 @@
 import type ShikiPlugin from 'src/main';
+import { SHIKI_INLINE_REGEX } from 'src/main';
 import { Decoration, type DecorationSet, type EditorView, ViewPlugin, type ViewUpdate } from '@codemirror/view';
 import { type Range } from '@codemirror/state';
 import { type SyntaxNode } from '@lezer/common';
@@ -53,30 +54,28 @@ export function createCm6Plugin(plugin: ShikiPlugin): ViewPlugin<any> {
 						}
 
 						if (props.has('inline-code')) {
-						    const content = Cm6_Util.getContent(view.state, node.from, node.to);
-						    if (content.startsWith('{')) {
-						        let match = content.match(/^\{([^\s]+)\} (.*)/i);  // format: `{lang} code`
-						        if (match) {
-						            let ranges = view.state.selection.ranges;
-						            for (const r of ranges) { // check if selection and this node overlaps
-						                if (r.from < node.to && r.to > node.from) {
-						                    this.removeDecoration(node.from, node.to);
-						                    return;
-						                }
-						            }
-						            let hideTo = node.from + match[1].length + 3;  // hide `{lang} `
-						            this.renderWidget(hideTo, node.to, match[1], match[2])
-						                .then(decorations => {
-						                    this.removeDecoration(node.from, node.to);
-						                    decorations.unshift(Decoration.replace({}).range(node.from, hideTo));
-						                    this.addDecoration(node.from, node.to, decorations);
-						                })
-						                .catch(console.error);
-						        }
-						    } else {
-						        this.removeDecoration(node.from, node.to);
-						    }
-						    return;
+							const content = Cm6_Util.getContent(view.state, node.from, node.to);
+							if (content.startsWith('{')) {
+								const match = content.match(SHIKI_INLINE_REGEX);  // format: `{lang} code`
+								if (match) {
+									// check if selection and this node overlaps
+									if (Cm6_Util.checkSelectionAndRangeOverlap(view.state.selection, node.from, node.to)) {
+										this.removeDecoration(node.from, node.to);
+										return;
+									}
+									const hideTo = node.from + match[1].length + 3;  // hide `{lang} `
+									this.renderWidget(hideTo, node.to, match[1], match[2])
+										.then(decorations => {
+											this.removeDecoration(node.from, node.to);
+											decorations.unshift(Decoration.replace({}).range(node.from, hideTo));
+											this.addDecoration(node.from, node.to, decorations);
+										})
+										.catch(console.error);
+								}
+							} else {
+								this.removeDecoration(node.from, node.to);
+							}
+							return;
 						}
 						if (!docChanged) return;
 

@@ -99,3 +99,7 @@ echo "Hello"
 > - this line will be marked as deleted
 >   this is a regular line
 > ```
+
+Inline code
+
+`{jsx} <button role="button" />`
