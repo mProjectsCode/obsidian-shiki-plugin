@@ -1,4 +1,4 @@
-import { type EditorState } from '@codemirror/state';
+import { type EditorState, type EditorSelection } from '@codemirror/state';
 import { type DecorationSet } from '@codemirror/view';
 
 export class Cm6_Util {
@@ -12,6 +12,22 @@ export class Cm6_Util {
 	 */
 	static checkRangeOverlap(fromA: number, toA: number, fromB: number, toB: number): boolean {
 		return fromA <= toB && fromB <= toA;
+	}
+
+	/**
+	 * Checks if editor selection and the given range overlap.
+	 *
+	 * @param selection
+	 * @param from
+	 * @param to
+	 */
+	static checkSelectionAndRangeOverlap(selection: EditorSelection, from: number, to: number): boolean {
+        for (const r of selection.ranges) {
+            if (r.from < to && r.to > from) {
+                return true;
+            }
+        }
+        return false;
 	}
 
 	/**

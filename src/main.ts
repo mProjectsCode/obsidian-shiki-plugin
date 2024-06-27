@@ -18,6 +18,8 @@ import { getECTheme } from 'src/themes/ECTheme';
 // some languages break obsidian's `registerMarkdownCodeBlockProcessor`, so we blacklist them
 const languageNameBlacklist = new Set(['c++', 'c#', 'f#', 'mermaid']);
 
+export const SHIKI_INLINE_REGEX = /^\{([^\s]+)\} (.*)/i;  // format: `{lang} code`
+
 export default class ShikiPlugin extends Plugin {
 	// @ts-expect-error TS2564
 	themeMapper: ThemeMapper;
@@ -52,6 +54,7 @@ export default class ShikiPlugin extends Plugin {
 		await this.loadEC();
 		await this.loadShiki();
 
+		this.registerInlineCodeProcessor();
 		this.registerCodeBlockProcessors();
 
 		this.registerEditorExtension([createCm6Plugin(this)]);
@@ -193,6 +196,32 @@ export default class ShikiPlugin extends Plugin {
 				console.warn(`Failed to register code block processor for ${alias}`, e);
 			}
 		}
+	}
+
+	registerInlineCodeProcessor(): void {
+		this.registerMarkdownPostProcessor(async (el, ctx) => {
+		    const inlineCodes = el.findAll(":not(pre) > code");
+		    for (let codeElm of inlineCodes) {
+		        let match = codeElm.textContent?.match(SHIKI_INLINE_REGEX);  // format: `{lang} code`
+		        if (match) {
+		            const highlight = await this.getHighlightTokens(match[2], match[1]);
+		            const tokens = highlight ? highlight.tokens.flat(1) : [];
+		            if (!tokens.length) continue;
+		            codeElm.empty();  // clear content
+		            codeElm.addClass('shiki-inline');
+		            for (let token of tokens) {
+						let fontStyle = token.fontStyle ?? 0;
+		                codeElm.createSpan({
+		                    text: token.content,
+		                    cls: ((fontStyle & 1) === 1 ? "shiki-italic" : "") + 
+		                          ((fontStyle & 2) === 2 ? " shiki-bold" : "") +
+		                          ((fontStyle & 4) === 4 ? " shiki-ul" : ""),
+		                    attr: {style: `color: ${token.color}`}
+		                });
+		            }
+		        }
+		    }
+		})
 	}
 
 	onunload(): void {

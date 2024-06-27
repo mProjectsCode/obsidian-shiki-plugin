@@ -81,3 +81,15 @@ div.expressive-code {
 div.markdown-preview-view > div > div.mod-header + div > div.block-language-yaml.shiki-hide-in-reading-mode {
 	display: none;
 }
+
+.shiki-inline {
+	& .shiki-bold {
+		font-weight: var(--bold-weight, 600);
+	}
+	& .shiki-italic {
+		font-style: italic;
+	}
+	& .shiki-ul {
+		text-decoration: underline;
+	}
+}
