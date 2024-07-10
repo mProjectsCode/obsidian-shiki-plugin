@@ -22,12 +22,12 @@ export class Cm6_Util {
 	 * @param to
 	 */
 	static checkSelectionAndRangeOverlap(selection: EditorSelection, from: number, to: number): boolean {
-        for (const r of selection.ranges) {
-            if (r.from < to && r.to > from) {
-                return true;
-            }
-        }
-        return false;
+		for (const range of selection.ranges) {
+			if (Cm6_Util.checkRangeOverlap(range.from, range.to, from, to)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

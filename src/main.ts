@@ -1,5 +1,5 @@
 import { loadPrism, Plugin, TFile } from 'obsidian';
-import { bundledLanguages, getHighlighter, type Highlighter, type TokensResult } from 'shiki';
+import { bundledLanguages, getHighlighter, type ThemedToken, type Highlighter, type TokensResult } from 'shiki';
 import { ExpressiveCodeEngine, ExpressiveCodeTheme } from '@expressive-code/core';
 import { pluginShiki } from '@expressive-code/plugin-shiki';
 import { pluginTextMarkers } from '@expressive-code/plugin-text-markers';
@@ -18,7 +18,7 @@ import { getECTheme } from 'src/themes/ECTheme';
 // some languages break obsidian's `registerMarkdownCodeBlockProcessor`, so we blacklist them
 const languageNameBlacklist = new Set(['c++', 'c#', 'f#', 'mermaid']);
 
-export const SHIKI_INLINE_REGEX = /^\{([^\s]+)\} (.*)/i;  // format: `{lang} code`
+export const SHIKI_INLINE_REGEX = /^\{([^\s]+)\} (.*)/i; // format: `{lang} code`
 
 export default class ShikiPlugin extends Plugin {
 	// @ts-expect-error TS2564
@@ -200,28 +200,25 @@ export default class ShikiPlugin extends Plugin {
 
 	registerInlineCodeProcessor(): void {
 		this.registerMarkdownPostProcessor(async (el, ctx) => {
-		    const inlineCodes = el.findAll(":not(pre) > code");
-		    for (let codeElm of inlineCodes) {
-		        let match = codeElm.textContent?.match(SHIKI_INLINE_REGEX);  // format: `{lang} code`
-		        if (match) {
-		            const highlight = await this.getHighlightTokens(match[2], match[1]);
-		            const tokens = highlight ? highlight.tokens.flat(1) : [];
-		            if (!tokens.length) continue;
-		            codeElm.empty();  // clear content
-		            codeElm.addClass('shiki-inline');
-		            for (let token of tokens) {
-						let fontStyle = token.fontStyle ?? 0;
-		                codeElm.createSpan({
-		                    text: token.content,
-		                    cls: ((fontStyle & 1) === 1 ? "shiki-italic" : "") + 
-		                          ((fontStyle & 2) === 2 ? " shiki-bold" : "") +
-		                          ((fontStyle & 4) === 4 ? " shiki-ul" : ""),
-		                    attr: {style: `color: ${token.color}`}
-		                });
-		            }
-		        }
-		    }
-		})
+			const inlineCodes = el.findAll(':not(pre) > code');
+			for (let codeElm of inlineCodes) {
+				let match = codeElm.textContent?.match(SHIKI_INLINE_REGEX); // format: `{lang} code`
+				if (match) {
+					const highlight = await this.getHighlightTokens(match[2], match[1]);
+					const tokens = highlight?.tokens.flat(1);
+					if (!tokens?.length) {
+						continue;
+					}
+
+					codeElm.empty();
+					codeElm.addClass('shiki-inline');
+
+					for (let token of tokens) {
+						this.tokenToSpan(token, codeElm);
+					}
+				}
+			}
+		});
 	}
 
 	onunload(): void {
@@ -256,7 +253,7 @@ export default class ShikiPlugin extends Plugin {
 		}
 	}
 
-	async getHighlightTokens(code: string, lang: string): Promise<TokensResult | undefined> {
+	getHighlightTokens(code: string, lang: string): TokensResult | undefined {
 		const shikiLanguage = this.loadedLanguages.get(lang);
 
 		if (shikiLanguage === undefined) {
@@ -267,6 +264,28 @@ export default class ShikiPlugin extends Plugin {
 			lang: shikiLanguage.getDefaultLanguage(),
 			theme: this.settings.theme,
 		});
+	}
+
+	tokenToSpan(token: ThemedToken, parent: HTMLElement): void {
+		const tokenStyle = this.getTokenStyle(token);
+		parent.createSpan({
+			text: token.content,
+			cls: tokenStyle.classes.join(' '),
+			attr: { style: tokenStyle.style },
+		});
+	}
+
+	getTokenStyle(token: ThemedToken): { style: string; classes: string[] } {
+		let fontStyle = token.fontStyle ?? 0;
+
+		return {
+			style: `color: ${token.color}`,
+			classes: [
+				(fontStyle & 1) !== 0 ? 'shiki-italic' : undefined,
+				(fontStyle & 2) !== 0 ? 'shiki-bold' : undefined,
+				(fontStyle & 4) !== 0 ? 'shiki-ul' : undefined,
+			].filter(Boolean) as string[],
+		};
 	}
 
 	async loadSettings(): Promise<void> {
