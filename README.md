@@ -22,6 +22,18 @@ Shiki Plugin syntax highlighting:
 
 The plugin will automatically highlight code blocks in your notes.
 
+### Inline Highlighting
+
+This plugin offers inline code block highlighting. The language for inline code blocks is specified via `{lang} code`.
+
+```md
+Some inline code `{jsx} <button role="button" />`.
+```
+
+This feature can be turned off in the settings.
+
+## Code Block Configuration
+
 To configure the code block you add the configuration options on the same line as the opening triple backticks.
 
 ````md
@@ -63,7 +75,7 @@ some code ...
 ```
 ````
 
-#### Diff Highlighting
+### Diff Highlighting
 
 Diff highlighting can be enabled with `ins={1}` and `del={5-10}`.
 Lines specified in `ins` will be highlighted green, and lines specified in `del` will be highlighted red.
