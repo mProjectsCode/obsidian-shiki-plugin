@@ -6,7 +6,7 @@
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/actionscript-3.mjs": {
-			"bytes": 15542,
+			"bytes": 15622,
 			"imports": [],
 			"format": "esm"
 		},
@@ -58,7 +58,7 @@
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/angular-template-blocks.mjs": {
-			"bytes": 1619,
+			"bytes": 1680,
 			"imports": [
 				{
 					"path": "node_modules/shiki/dist/langs/angular-expression.mjs",
@@ -137,7 +137,7 @@
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/angular-inline-template.mjs": {
-			"bytes": 1531,
+			"bytes": 1722,
 			"imports": [
 				{
 					"path": "node_modules/shiki/dist/langs/angular-html.mjs",
@@ -148,6 +148,11 @@
 					"path": "node_modules/shiki/dist/langs/angular-template.mjs",
 					"kind": "import-statement",
 					"original": "./angular-template.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/angular-template-blocks.mjs",
+					"kind": "import-statement",
+					"original": "./angular-template-blocks.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/html.mjs",
@@ -168,11 +173,6 @@
 					"path": "node_modules/shiki/dist/langs/angular-expression.mjs",
 					"kind": "import-statement",
 					"original": "./angular-expression.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/angular-template-blocks.mjs",
-					"kind": "import-statement",
-					"original": "./angular-template-blocks.mjs"
 				}
 			],
 			"format": "esm"
@@ -310,18 +310,383 @@
 			"imports": [],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/asm.mjs": {
-			"bytes": 42065,
+		"node_modules/shiki/dist/langs/yaml.mjs": {
+			"bytes": 11957,
 			"imports": [],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/typescript.mjs": {
-			"bytes": 189703,
+		"node_modules/shiki/dist/langs/csv.mjs": {
+			"bytes": 1186,
 			"imports": [],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/stylus.mjs": {
-			"bytes": 32768,
+		"node_modules/shiki/dist/langs/c.mjs": {
+			"bytes": 76484,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/clojure.mjs": {
+			"bytes": 7238,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/coffee.mjs": {
+			"bytes": 29064,
+			"imports": [
+				{
+					"path": "node_modules/shiki/dist/langs/javascript.mjs",
+					"kind": "import-statement",
+					"original": "./javascript.mjs"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/regexp.mjs": {
+			"bytes": 8732,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/glsl.mjs": {
+			"bytes": 3988,
+			"imports": [
+				{
+					"path": "node_modules/shiki/dist/langs/c.mjs",
+					"kind": "import-statement",
+					"original": "./c.mjs"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/sql.mjs": {
+			"bytes": 24417,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/cpp-macro.mjs": {
+			"bytes": 249118,
+			"imports": [
+				{
+					"path": "node_modules/shiki/dist/langs/regexp.mjs",
+					"kind": "import-statement",
+					"original": "./regexp.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/glsl.mjs",
+					"kind": "import-statement",
+					"original": "./glsl.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/sql.mjs",
+					"kind": "import-statement",
+					"original": "./sql.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/c.mjs",
+					"kind": "import-statement",
+					"original": "./c.mjs"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/cpp.mjs": {
+			"bytes": 444260,
+			"imports": [
+				{
+					"path": "node_modules/shiki/dist/langs/cpp-macro.mjs",
+					"kind": "import-statement",
+					"original": "./cpp-macro.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/regexp.mjs",
+					"kind": "import-statement",
+					"original": "./regexp.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/glsl.mjs",
+					"kind": "import-statement",
+					"original": "./glsl.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/sql.mjs",
+					"kind": "import-statement",
+					"original": "./sql.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/c.mjs",
+					"kind": "import-statement",
+					"original": "./c.mjs"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/csharp.mjs": {
+			"bytes": 93383,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/diff.mjs": {
+			"bytes": 2829,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/docker.mjs": {
+			"bytes": 1806,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/elixir.mjs": {
+			"bytes": 18984,
+			"imports": [
+				{
+					"path": "node_modules/shiki/dist/langs/html.mjs",
+					"kind": "import-statement",
+					"original": "./html.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/javascript.mjs",
+					"kind": "import-statement",
+					"original": "./javascript.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/css.mjs",
+					"kind": "import-statement",
+					"original": "./css.mjs"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/elm.mjs": {
+			"bytes": 12048,
+			"imports": [
+				{
+					"path": "node_modules/shiki/dist/langs/glsl.mjs",
+					"kind": "import-statement",
+					"original": "./glsl.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/c.mjs",
+					"kind": "import-statement",
+					"original": "./c.mjs"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/erlang.mjs": {
+			"bytes": 38736,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/go.mjs": {
+			"bytes": 50678,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/groovy.mjs": {
+			"bytes": 21073,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/haskell.mjs": {
+			"bytes": 45882,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/jsx.mjs": {
+			"bytes": 186195,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/python.mjs": {
+			"bytes": 81458,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/r.mjs": {
+			"bytes": 35631,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/julia.mjs": {
+			"bytes": 45220,
+			"imports": [
+				{
+					"path": "node_modules/shiki/dist/langs/cpp.mjs",
+					"kind": "import-statement",
+					"original": "./cpp.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/python.mjs",
+					"kind": "import-statement",
+					"original": "./python.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/javascript.mjs",
+					"kind": "import-statement",
+					"original": "./javascript.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/r.mjs",
+					"kind": "import-statement",
+					"original": "./r.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/sql.mjs",
+					"kind": "import-statement",
+					"original": "./sql.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/cpp-macro.mjs",
+					"kind": "import-statement",
+					"original": "./cpp-macro.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/regexp.mjs",
+					"kind": "import-statement",
+					"original": "./regexp.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/glsl.mjs",
+					"kind": "import-statement",
+					"original": "./glsl.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/c.mjs",
+					"kind": "import-statement",
+					"original": "./c.mjs"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/kotlin.mjs": {
+			"bytes": 9362,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/less.mjs": {
+			"bytes": 88676,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/make.mjs": {
+			"bytes": 9614,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/objective-c.mjs": {
+			"bytes": 111554,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/ocaml.mjs": {
+			"bytes": 67524,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/perl.mjs": {
+			"bytes": 47657,
+			"imports": [
+				{
+					"path": "node_modules/shiki/dist/langs/html.mjs",
+					"kind": "import-statement",
+					"original": "./html.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/xml.mjs",
+					"kind": "import-statement",
+					"original": "./xml.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/css.mjs",
+					"kind": "import-statement",
+					"original": "./css.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/javascript.mjs",
+					"kind": "import-statement",
+					"original": "./javascript.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/sql.mjs",
+					"kind": "import-statement",
+					"original": "./sql.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/java.mjs",
+					"kind": "import-statement",
+					"original": "./java.mjs"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/shellscript.mjs": {
+			"bytes": 44418,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/lua.mjs": {
+			"bytes": 16258,
+			"imports": [
+				{
+					"path": "node_modules/shiki/dist/langs/c.mjs",
+					"kind": "import-statement",
+					"original": "./c.mjs"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/ruby.mjs": {
+			"bytes": 41269,
+			"imports": [
+				{
+					"path": "node_modules/shiki/dist/langs/html.mjs",
+					"kind": "import-statement",
+					"original": "./html.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/xml.mjs",
+					"kind": "import-statement",
+					"original": "./xml.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/sql.mjs",
+					"kind": "import-statement",
+					"original": "./sql.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/css.mjs",
+					"kind": "import-statement",
+					"original": "./css.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/c.mjs",
+					"kind": "import-statement",
+					"original": "./c.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/javascript.mjs",
+					"kind": "import-statement",
+					"original": "./javascript.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/shellscript.mjs",
+					"kind": "import-statement",
+					"original": "./shellscript.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/lua.mjs",
+					"kind": "import-statement",
+					"original": "./lua.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/java.mjs",
+					"kind": "import-statement",
+					"original": "./java.mjs"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/rust.mjs": {
+			"bytes": 19025,
 			"imports": [],
 			"format": "esm"
 		},
@@ -330,8 +695,264 @@
 			"imports": [],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/less.mjs": {
-			"bytes": 88662,
+		"node_modules/shiki/dist/langs/scala.mjs": {
+			"bytes": 29519,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/swift.mjs": {
+			"bytes": 101839,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/toml.mjs": {
+			"bytes": 7073,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/typescript.mjs": {
+			"bytes": 189703,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/asciidoc.mjs": {
+			"bytes": 101184,
+			"imports": [
+				{
+					"path": "node_modules/shiki/dist/langs/html.mjs",
+					"kind": "import-statement",
+					"original": "./html.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/yaml.mjs",
+					"kind": "import-statement",
+					"original": "./yaml.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/csv.mjs",
+					"kind": "import-statement",
+					"original": "./csv.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/c.mjs",
+					"kind": "import-statement",
+					"original": "./c.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/clojure.mjs",
+					"kind": "import-statement",
+					"original": "./clojure.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/coffee.mjs",
+					"kind": "import-statement",
+					"original": "./coffee.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/cpp.mjs",
+					"kind": "import-statement",
+					"original": "./cpp.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/css.mjs",
+					"kind": "import-statement",
+					"original": "./css.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/csharp.mjs",
+					"kind": "import-statement",
+					"original": "./csharp.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/diff.mjs",
+					"kind": "import-statement",
+					"original": "./diff.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/docker.mjs",
+					"kind": "import-statement",
+					"original": "./docker.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/elixir.mjs",
+					"kind": "import-statement",
+					"original": "./elixir.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/elm.mjs",
+					"kind": "import-statement",
+					"original": "./elm.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/erlang.mjs",
+					"kind": "import-statement",
+					"original": "./erlang.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/go.mjs",
+					"kind": "import-statement",
+					"original": "./go.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/groovy.mjs",
+					"kind": "import-statement",
+					"original": "./groovy.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/haskell.mjs",
+					"kind": "import-statement",
+					"original": "./haskell.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/java.mjs",
+					"kind": "import-statement",
+					"original": "./java.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/javascript.mjs",
+					"kind": "import-statement",
+					"original": "./javascript.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/json.mjs",
+					"kind": "import-statement",
+					"original": "./json.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/jsx.mjs",
+					"kind": "import-statement",
+					"original": "./jsx.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/julia.mjs",
+					"kind": "import-statement",
+					"original": "./julia.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/kotlin.mjs",
+					"kind": "import-statement",
+					"original": "./kotlin.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/less.mjs",
+					"kind": "import-statement",
+					"original": "./less.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/make.mjs",
+					"kind": "import-statement",
+					"original": "./make.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/objective-c.mjs",
+					"kind": "import-statement",
+					"original": "./objective-c.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/ocaml.mjs",
+					"kind": "import-statement",
+					"original": "./ocaml.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/perl.mjs",
+					"kind": "import-statement",
+					"original": "./perl.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/python.mjs",
+					"kind": "import-statement",
+					"original": "./python.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/r.mjs",
+					"kind": "import-statement",
+					"original": "./r.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/ruby.mjs",
+					"kind": "import-statement",
+					"original": "./ruby.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/rust.mjs",
+					"kind": "import-statement",
+					"original": "./rust.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/sass.mjs",
+					"kind": "import-statement",
+					"original": "./sass.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/scala.mjs",
+					"kind": "import-statement",
+					"original": "./scala.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/scss.mjs",
+					"kind": "import-statement",
+					"original": "./scss.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/shellscript.mjs",
+					"kind": "import-statement",
+					"original": "./shellscript.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/sql.mjs",
+					"kind": "import-statement",
+					"original": "./sql.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/swift.mjs",
+					"kind": "import-statement",
+					"original": "./swift.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/toml.mjs",
+					"kind": "import-statement",
+					"original": "./toml.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/typescript.mjs",
+					"kind": "import-statement",
+					"original": "./typescript.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/xml.mjs",
+					"kind": "import-statement",
+					"original": "./xml.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/cpp-macro.mjs",
+					"kind": "import-statement",
+					"original": "./cpp-macro.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/regexp.mjs",
+					"kind": "import-statement",
+					"original": "./regexp.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/glsl.mjs",
+					"kind": "import-statement",
+					"original": "./glsl.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/lua.mjs",
+					"kind": "import-statement",
+					"original": "./lua.mjs"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/asm.mjs": {
+			"bytes": 42065,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/stylus.mjs": {
+			"bytes": 32768,
 			"imports": [],
 			"format": "esm"
 		},
@@ -346,7 +967,7 @@
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/astro.mjs": {
-			"bytes": 25277,
+			"bytes": 25405,
 			"imports": [
 				{
 					"path": "node_modules/shiki/dist/langs/json.mjs",
@@ -432,12 +1053,7 @@
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/bicep.mjs": {
-			"bytes": 4461,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/sql.mjs": {
-			"bytes": 24417,
+			"bytes": 4466,
 			"imports": [],
 			"format": "esm"
 		},
@@ -482,23 +1098,13 @@
 			],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/c.mjs": {
-			"bytes": 76484,
-			"imports": [],
-			"format": "esm"
-		},
 		"node_modules/shiki/dist/langs/cadence.mjs": {
 			"bytes": 11753,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/clarity.mjs": {
-			"bytes": 15493,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/clojure.mjs": {
-			"bytes": 7238,
+			"bytes": 15594,
 			"imports": [],
 			"format": "esm"
 		},
@@ -508,7 +1114,7 @@
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/cobol.mjs": {
-			"bytes": 41127,
+			"bytes": 41402,
 			"imports": [
 				{
 					"path": "node_modules/shiki/dist/langs/sql.mjs",
@@ -538,82 +1144,18 @@
 			],
 			"format": "esm"
 		},
+		"node_modules/shiki/dist/langs/codeowners.mjs": {
+			"bytes": 622,
+			"imports": [],
+			"format": "esm"
+		},
 		"node_modules/shiki/dist/langs/codeql.mjs": {
 			"bytes": 35814,
 			"imports": [],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/coffee.mjs": {
-			"bytes": 29064,
-			"imports": [
-				{
-					"path": "node_modules/shiki/dist/langs/javascript.mjs",
-					"kind": "import-statement",
-					"original": "./javascript.mjs"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/glsl.mjs": {
-			"bytes": 3988,
-			"imports": [
-				{
-					"path": "node_modules/shiki/dist/langs/c.mjs",
-					"kind": "import-statement",
-					"original": "./c.mjs"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/cpp-macro.mjs": {
-			"bytes": 249060,
-			"imports": [
-				{
-					"path": "node_modules/shiki/dist/langs/glsl.mjs",
-					"kind": "import-statement",
-					"original": "./glsl.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/sql.mjs",
-					"kind": "import-statement",
-					"original": "./sql.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/c.mjs",
-					"kind": "import-statement",
-					"original": "./c.mjs"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/cpp.mjs": {
-			"bytes": 444202,
-			"imports": [
-				{
-					"path": "node_modules/shiki/dist/langs/cpp-macro.mjs",
-					"kind": "import-statement",
-					"original": "./cpp-macro.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/glsl.mjs",
-					"kind": "import-statement",
-					"original": "./glsl.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/sql.mjs",
-					"kind": "import-statement",
-					"original": "./sql.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/c.mjs",
-					"kind": "import-statement",
-					"original": "./c.mjs"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/shellscript.mjs": {
-			"bytes": 36659,
+		"node_modules/shiki/dist/langs/common-lisp.mjs": {
+			"bytes": 25004,
 			"imports": [],
 			"format": "esm"
 		},
@@ -653,16 +1195,6 @@
 			],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/csharp.mjs": {
-			"bytes": 93349,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/csv.mjs": {
-			"bytes": 1186,
-			"imports": [],
-			"format": "esm"
-		},
 		"node_modules/shiki/dist/langs/cue.mjs": {
 			"bytes": 17994,
 			"imports": [],
@@ -679,7 +1211,7 @@
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/dart.mjs": {
-			"bytes": 7721,
+			"bytes": 7916,
 			"imports": [],
 			"format": "esm"
 		},
@@ -688,13 +1220,8 @@
 			"imports": [],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/diff.mjs": {
-			"bytes": 2829,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/docker.mjs": {
-			"bytes": 1806,
+		"node_modules/shiki/dist/langs/desktop.mjs": {
+			"bytes": 2086,
 			"imports": [],
 			"format": "esm"
 		},
@@ -703,8 +1230,8 @@
 			"imports": [],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/elixir.mjs": {
-			"bytes": 18984,
+		"node_modules/shiki/dist/langs/html-derivative.mjs": {
+			"bytes": 1059,
 			"imports": [
 				{
 					"path": "node_modules/shiki/dist/langs/html.mjs",
@@ -724,60 +1251,23 @@
 			],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/elm.mjs": {
-			"bytes": 12048,
+		"node_modules/shiki/dist/langs/edge.mjs": {
+			"bytes": 2600,
 			"imports": [
 				{
-					"path": "node_modules/shiki/dist/langs/glsl.mjs",
+					"path": "node_modules/shiki/dist/langs/typescript.mjs",
 					"kind": "import-statement",
-					"original": "./glsl.mjs"
+					"original": "./typescript.mjs"
 				},
-				{
-					"path": "node_modules/shiki/dist/langs/c.mjs",
-					"kind": "import-statement",
-					"original": "./c.mjs"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/lua.mjs": {
-			"bytes": 16243,
-			"imports": [
-				{
-					"path": "node_modules/shiki/dist/langs/c.mjs",
-					"kind": "import-statement",
-					"original": "./c.mjs"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/ruby.mjs": {
-			"bytes": 41269,
-			"imports": [
 				{
 					"path": "node_modules/shiki/dist/langs/html.mjs",
 					"kind": "import-statement",
 					"original": "./html.mjs"
 				},
 				{
-					"path": "node_modules/shiki/dist/langs/xml.mjs",
+					"path": "node_modules/shiki/dist/langs/html-derivative.mjs",
 					"kind": "import-statement",
-					"original": "./xml.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/sql.mjs",
-					"kind": "import-statement",
-					"original": "./sql.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/css.mjs",
-					"kind": "import-statement",
-					"original": "./css.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/c.mjs",
-					"kind": "import-statement",
-					"original": "./c.mjs"
+					"original": "./html-derivative.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/javascript.mjs",
@@ -785,21 +1275,16 @@
 					"original": "./javascript.mjs"
 				},
 				{
-					"path": "node_modules/shiki/dist/langs/shellscript.mjs",
+					"path": "node_modules/shiki/dist/langs/css.mjs",
 					"kind": "import-statement",
-					"original": "./shellscript.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/lua.mjs",
-					"kind": "import-statement",
-					"original": "./lua.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/java.mjs",
-					"kind": "import-statement",
-					"original": "./java.mjs"
+					"original": "./css.mjs"
 				}
 			],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/emacs-lisp.mjs": {
+			"bytes": 816935,
+			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/erb.mjs": {
@@ -858,13 +1343,18 @@
 			],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/erlang.mjs": {
-			"bytes": 31576,
+		"node_modules/shiki/dist/langs/fennel.mjs": {
+			"bytes": 5079,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/fish.mjs": {
 			"bytes": 5546,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/fluent.mjs": {
+			"bytes": 3883,
 			"imports": [],
 			"format": "esm"
 		},
@@ -885,12 +1375,12 @@
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/markdown.mjs": {
-			"bytes": 58927,
+			"bytes": 58944,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/fsharp.mjs": {
-			"bytes": 27595,
+			"bytes": 27675,
 			"imports": [
 				{
 					"path": "node_modules/shiki/dist/langs/markdown.mjs",
@@ -906,7 +1396,7 @@
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/gdscript.mjs": {
-			"bytes": 18015,
+			"bytes": 19943,
 			"imports": [],
 			"format": "esm"
 		},
@@ -924,6 +1414,11 @@
 					"original": "./gdscript.mjs"
 				}
 			],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/genie.mjs": {
+			"bytes": 3529,
+			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/gherkin.mjs": {
@@ -954,7 +1449,7 @@
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/gleam.mjs": {
-			"bytes": 2866,
+			"bytes": 2903,
 			"imports": [],
 			"format": "esm"
 		},
@@ -1015,16 +1510,6 @@
 			"imports": [],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/go.mjs": {
-			"bytes": 48272,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/jsx.mjs": {
-			"bytes": 186195,
-			"imports": [],
-			"format": "esm"
-		},
 		"node_modules/shiki/dist/langs/graphql.mjs": {
 			"bytes": 19721,
 			"imports": [
@@ -1049,11 +1534,6 @@
 					"original": "./tsx.mjs"
 				}
 			],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/groovy.mjs": {
-			"bytes": 21073,
-			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/hack.mjs": {
@@ -1153,11 +1633,6 @@
 			],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/yaml.mjs": {
-			"bytes": 11809,
-			"imports": [],
-			"format": "esm"
-		},
 		"node_modules/shiki/dist/langs/handlebars.mjs": {
 			"bytes": 13324,
 			"imports": [
@@ -1184,13 +1659,13 @@
 			],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/haskell.mjs": {
-			"bytes": 45882,
+		"node_modules/shiki/dist/langs/haxe.mjs": {
+			"bytes": 38063,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/hcl.mjs": {
-			"bytes": 12706,
+			"bytes": 12719,
 			"imports": [],
 			"format": "esm"
 		},
@@ -1202,27 +1677,6 @@
 		"node_modules/shiki/dist/langs/hlsl.mjs": {
 			"bytes": 7720,
 			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/html-derivative.mjs": {
-			"bytes": 1059,
-			"imports": [
-				{
-					"path": "node_modules/shiki/dist/langs/html.mjs",
-					"kind": "import-statement",
-					"original": "./html.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/javascript.mjs",
-					"kind": "import-statement",
-					"original": "./javascript.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/css.mjs",
-					"kind": "import-statement",
-					"original": "./css.mjs"
-				}
-			],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/http.mjs": {
@@ -1274,6 +1728,22 @@
 					"original": "./tsx.mjs"
 				}
 			],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/hxml.mjs": {
+			"bytes": 1913,
+			"imports": [
+				{
+					"path": "node_modules/shiki/dist/langs/haxe.mjs",
+					"kind": "import-statement",
+					"original": "./haxe.mjs"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/hy.mjs": {
+			"bytes": 3331,
+			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/imba.mjs": {
@@ -1375,74 +1845,13 @@
 			"imports": [],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/python.mjs": {
-			"bytes": 81458,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/r.mjs": {
-			"bytes": 35631,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/julia.mjs": {
-			"bytes": 41502,
-			"imports": [
-				{
-					"path": "node_modules/shiki/dist/langs/cpp.mjs",
-					"kind": "import-statement",
-					"original": "./cpp.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/python.mjs",
-					"kind": "import-statement",
-					"original": "./python.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/javascript.mjs",
-					"kind": "import-statement",
-					"original": "./javascript.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/r.mjs",
-					"kind": "import-statement",
-					"original": "./r.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/sql.mjs",
-					"kind": "import-statement",
-					"original": "./sql.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/cpp-macro.mjs",
-					"kind": "import-statement",
-					"original": "./cpp-macro.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/glsl.mjs",
-					"kind": "import-statement",
-					"original": "./glsl.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/c.mjs",
-					"kind": "import-statement",
-					"original": "./c.mjs"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/kotlin.mjs": {
-			"bytes": 9362,
-			"imports": [],
-			"format": "esm"
-		},
 		"node_modules/shiki/dist/langs/kusto.mjs": {
-			"bytes": 20783,
+			"bytes": 21197,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/tex.mjs": {
-			"bytes": 8598,
+			"bytes": 9629,
 			"imports": [
 				{
 					"path": "node_modules/shiki/dist/langs/r.mjs",
@@ -1452,18 +1861,8 @@
 			],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/rust.mjs": {
-			"bytes": 19021,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/scala.mjs": {
-			"bytes": 29519,
-			"imports": [],
-			"format": "esm"
-		},
 		"node_modules/shiki/dist/langs/latex.mjs": {
-			"bytes": 45610,
+			"bytes": 60899,
 			"imports": [
 				{
 					"path": "node_modules/shiki/dist/langs/tex.mjs",
@@ -1471,9 +1870,19 @@
 					"original": "./tex.mjs"
 				},
 				{
+					"path": "node_modules/shiki/dist/langs/shellscript.mjs",
+					"kind": "import-statement",
+					"original": "./shellscript.mjs"
+				},
+				{
 					"path": "node_modules/shiki/dist/langs/css.mjs",
 					"kind": "import-statement",
 					"original": "./css.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/gnuplot.mjs",
+					"kind": "import-statement",
+					"original": "./gnuplot.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/haskell.mjs",
@@ -1486,19 +1895,9 @@
 					"original": "./html.mjs"
 				},
 				{
-					"path": "node_modules/shiki/dist/langs/xml.mjs",
-					"kind": "import-statement",
-					"original": "./xml.mjs"
-				},
-				{
 					"path": "node_modules/shiki/dist/langs/java.mjs",
 					"kind": "import-statement",
 					"original": "./java.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/lua.mjs",
-					"kind": "import-statement",
-					"original": "./lua.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/julia.mjs",
@@ -1506,19 +1905,14 @@
 					"original": "./julia.mjs"
 				},
 				{
-					"path": "node_modules/shiki/dist/langs/ruby.mjs",
-					"kind": "import-statement",
-					"original": "./ruby.mjs"
-				},
-				{
 					"path": "node_modules/shiki/dist/langs/javascript.mjs",
 					"kind": "import-statement",
 					"original": "./javascript.mjs"
 				},
 				{
-					"path": "node_modules/shiki/dist/langs/typescript.mjs",
+					"path": "node_modules/shiki/dist/langs/lua.mjs",
 					"kind": "import-statement",
-					"original": "./typescript.mjs"
+					"original": "./lua.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/python.mjs",
@@ -1526,9 +1920,9 @@
 					"original": "./python.mjs"
 				},
 				{
-					"path": "node_modules/shiki/dist/langs/yaml.mjs",
+					"path": "node_modules/shiki/dist/langs/ruby.mjs",
 					"kind": "import-statement",
-					"original": "./yaml.mjs"
+					"original": "./ruby.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/rust.mjs",
@@ -1536,24 +1930,29 @@
 					"original": "./rust.mjs"
 				},
 				{
+					"path": "node_modules/shiki/dist/langs/typescript.mjs",
+					"kind": "import-statement",
+					"original": "./typescript.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/xml.mjs",
+					"kind": "import-statement",
+					"original": "./xml.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/yaml.mjs",
+					"kind": "import-statement",
+					"original": "./yaml.mjs"
+				},
+				{
 					"path": "node_modules/shiki/dist/langs/scala.mjs",
 					"kind": "import-statement",
 					"original": "./scala.mjs"
 				},
 				{
-					"path": "node_modules/shiki/dist/langs/gnuplot.mjs",
-					"kind": "import-statement",
-					"original": "./gnuplot.mjs"
-				},
-				{
 					"path": "node_modules/shiki/dist/langs/r.mjs",
 					"kind": "import-statement",
 					"original": "./r.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/c.mjs",
-					"kind": "import-statement",
-					"original": "./c.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/cpp.mjs",
@@ -1566,19 +1965,24 @@
 					"original": "./cpp-macro.mjs"
 				},
 				{
+					"path": "node_modules/shiki/dist/langs/regexp.mjs",
+					"kind": "import-statement",
+					"original": "./regexp.mjs"
+				},
+				{
 					"path": "node_modules/shiki/dist/langs/glsl.mjs",
 					"kind": "import-statement",
 					"original": "./glsl.mjs"
 				},
 				{
+					"path": "node_modules/shiki/dist/langs/c.mjs",
+					"kind": "import-statement",
+					"original": "./c.mjs"
+				},
+				{
 					"path": "node_modules/shiki/dist/langs/sql.mjs",
 					"kind": "import-statement",
 					"original": "./sql.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/shellscript.mjs",
-					"kind": "import-statement",
-					"original": "./shellscript.mjs"
 				}
 			],
 			"format": "esm"
@@ -1609,8 +2013,8 @@
 			],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/lisp.mjs": {
-			"bytes": 14039,
+		"node_modules/shiki/dist/langs/log.mjs": {
+			"bytes": 2836,
 			"imports": [],
 			"format": "esm"
 		},
@@ -1619,8 +2023,8 @@
 			"imports": [],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/make.mjs": {
-			"bytes": 9614,
+		"node_modules/shiki/dist/langs/luau.mjs": {
+			"bytes": 13462,
 			"imports": [],
 			"format": "esm"
 		},
@@ -1697,17 +2101,17 @@
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/mermaid.mjs": {
-			"bytes": 22510,
+			"bytes": 31648,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/mojo.mjs": {
-			"bytes": 80544,
+			"bytes": 80489,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/move.mjs": {
-			"bytes": 18557,
+			"bytes": 21064,
 			"imports": [],
 			"format": "esm"
 		},
@@ -1784,17 +2188,12 @@
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/nix.mjs": {
-			"bytes": 16357,
+			"bytes": 16400,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/nushell.mjs": {
-			"bytes": 20388,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/objective-c.mjs": {
-			"bytes": 111552,
+			"bytes": 20416,
 			"imports": [],
 			"format": "esm"
 		},
@@ -1803,50 +2202,9 @@
 			"imports": [],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/ocaml.mjs": {
-			"bytes": 67524,
-			"imports": [],
-			"format": "esm"
-		},
 		"node_modules/shiki/dist/langs/pascal.mjs": {
-			"bytes": 4256,
+			"bytes": 4316,
 			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/perl.mjs": {
-			"bytes": 47657,
-			"imports": [
-				{
-					"path": "node_modules/shiki/dist/langs/html.mjs",
-					"kind": "import-statement",
-					"original": "./html.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/xml.mjs",
-					"kind": "import-statement",
-					"original": "./xml.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/css.mjs",
-					"kind": "import-statement",
-					"original": "./css.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/javascript.mjs",
-					"kind": "import-statement",
-					"original": "./javascript.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/sql.mjs",
-					"kind": "import-statement",
-					"original": "./sql.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/java.mjs",
-					"kind": "import-statement",
-					"original": "./java.mjs"
-				}
-			],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/php.mjs": {
@@ -1892,6 +2250,11 @@
 		},
 		"node_modules/shiki/dist/langs/plsql.mjs": {
 			"bytes": 8618,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/po.mjs": {
+			"bytes": 3579,
 			"imports": [],
 			"format": "esm"
 		},
@@ -1971,13 +2334,39 @@
 			"imports": [],
 			"format": "esm"
 		},
+		"node_modules/shiki/dist/langs/qml.mjs": {
+			"bytes": 5830,
+			"imports": [
+				{
+					"path": "node_modules/shiki/dist/langs/javascript.mjs",
+					"kind": "import-statement",
+					"original": "./javascript.mjs"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/qmldir.mjs": {
+			"bytes": 1093,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/qss.mjs": {
+			"bytes": 8095,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/racket.mjs": {
+			"bytes": 105750,
+			"imports": [],
+			"format": "esm"
+		},
 		"node_modules/shiki/dist/langs/raku.mjs": {
 			"bytes": 10820,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/razor.mjs": {
-			"bytes": 27702,
+			"bytes": 27982,
 			"imports": [
 				{
 					"path": "node_modules/shiki/dist/langs/html.mjs",
@@ -2018,7 +2407,7 @@
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/rst.mjs": {
-			"bytes": 11089,
+			"bytes": 11112,
 			"imports": [
 				{
 					"path": "node_modules/shiki/dist/langs/html-derivative.mjs",
@@ -2074,6 +2463,11 @@
 					"path": "node_modules/shiki/dist/langs/cpp-macro.mjs",
 					"kind": "import-statement",
 					"original": "./cpp-macro.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/regexp.mjs",
+					"kind": "import-statement",
+					"original": "./regexp.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/glsl.mjs",
@@ -2154,6 +2548,27 @@
 		"node_modules/shiki/dist/langs/solidity.mjs": {
 			"bytes": 17302,
 			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/soy.mjs": {
+			"bytes": 7648,
+			"imports": [
+				{
+					"path": "node_modules/shiki/dist/langs/html.mjs",
+					"kind": "import-statement",
+					"original": "./html.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/javascript.mjs",
+					"kind": "import-statement",
+					"original": "./javascript.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/css.mjs",
+					"kind": "import-statement",
+					"original": "./css.mjs"
+				}
+			],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/turtle.mjs": {
@@ -2259,13 +2674,13 @@
 			],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/swift.mjs": {
-			"bytes": 101812,
+		"node_modules/shiki/dist/langs/system-verilog.mjs": {
+			"bytes": 27334,
 			"imports": [],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/system-verilog.mjs": {
-			"bytes": 20597,
+		"node_modules/shiki/dist/langs/systemd.mjs": {
+			"bytes": 8266,
 			"imports": [],
 			"format": "esm"
 		},
@@ -2279,13 +2694,34 @@
 			"imports": [],
 			"format": "esm"
 		},
+		"node_modules/shiki/dist/langs/templ.mjs": {
+			"bytes": 25094,
+			"imports": [
+				{
+					"path": "node_modules/shiki/dist/langs/go.mjs",
+					"kind": "import-statement",
+					"original": "./go.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/javascript.mjs",
+					"kind": "import-statement",
+					"original": "./javascript.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/css.mjs",
+					"kind": "import-statement",
+					"original": "./css.mjs"
+				}
+			],
+			"format": "esm"
+		},
 		"node_modules/shiki/dist/langs/terraform.mjs": {
-			"bytes": 14107,
+			"bytes": 14191,
 			"imports": [],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/langs/toml.mjs": {
-			"bytes": 7073,
+		"node_modules/shiki/dist/langs/tsv.mjs": {
+			"bytes": 783,
 			"imports": [],
 			"format": "esm"
 		},
@@ -2365,6 +2801,11 @@
 			],
 			"format": "esm"
 		},
+		"node_modules/shiki/dist/langs/typespec.mjs": {
+			"bytes": 29287,
+			"imports": [],
+			"format": "esm"
+		},
 		"node_modules/shiki/dist/langs/typst.mjs": {
 			"bytes": 9108,
 			"imports": [],
@@ -2372,6 +2813,11 @@
 		},
 		"node_modules/shiki/dist/langs/v.mjs": {
 			"bytes": 14554,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/vala.mjs": {
+			"bytes": 3555,
 			"imports": [],
 			"format": "esm"
 		},
@@ -2422,7 +2868,7 @@
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/vue.mjs": {
-			"bytes": 20124,
+			"bytes": 20855,
 			"imports": [
 				{
 					"path": "node_modules/shiki/dist/langs/html.mjs",
@@ -2485,6 +2931,11 @@
 					"original": "./tsx.mjs"
 				},
 				{
+					"path": "node_modules/shiki/dist/langs/coffee.mjs",
+					"kind": "import-statement",
+					"original": "./coffee.mjs"
+				},
+				{
 					"path": "node_modules/shiki/dist/langs/json.mjs",
 					"kind": "import-statement",
 					"original": "./json.mjs"
@@ -2538,11 +2989,6 @@
 					"path": "node_modules/shiki/dist/langs/vue-sfc-style-variable-injection.mjs",
 					"kind": "import-statement",
 					"original": "./vue-sfc-style-variable-injection.mjs"
-				},
-				{
-					"path": "node_modules/shiki/dist/langs/coffee.mjs",
-					"kind": "import-statement",
-					"original": "./coffee.mjs"
 				}
 			],
 			"format": "esm"
@@ -2679,7 +3125,7 @@
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/vyper.mjs": {
-			"bytes": 106985,
+			"bytes": 87236,
 			"imports": [],
 			"format": "esm"
 		},
@@ -2695,11 +3141,6 @@
 		},
 		"node_modules/shiki/dist/langs/wgsl.mjs": {
 			"bytes": 6916,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/shiki/dist/langs/wolfram.mjs": {
-			"bytes": 270242,
 			"imports": [],
 			"format": "esm"
 		},
@@ -2719,18 +3160,314 @@
 			],
 			"format": "esm"
 		},
+		"node_modules/shiki/dist/langs/wikitext.mjs": {
+			"bytes": 63153,
+			"imports": [
+				{
+					"path": "node_modules/shiki/dist/langs/html.mjs",
+					"kind": "import-statement",
+					"original": "./html.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/css.mjs",
+					"kind": "import-statement",
+					"original": "./css.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/ini.mjs",
+					"kind": "import-statement",
+					"original": "./ini.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/java.mjs",
+					"kind": "import-statement",
+					"original": "./java.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/lua.mjs",
+					"kind": "import-statement",
+					"original": "./lua.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/make.mjs",
+					"kind": "import-statement",
+					"original": "./make.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/perl.mjs",
+					"kind": "import-statement",
+					"original": "./perl.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/r.mjs",
+					"kind": "import-statement",
+					"original": "./r.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/ruby.mjs",
+					"kind": "import-statement",
+					"original": "./ruby.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/php.mjs",
+					"kind": "import-statement",
+					"original": "./php.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/sql.mjs",
+					"kind": "import-statement",
+					"original": "./sql.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/vb.mjs",
+					"kind": "import-statement",
+					"original": "./vb.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/xml.mjs",
+					"kind": "import-statement",
+					"original": "./xml.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/xsl.mjs",
+					"kind": "import-statement",
+					"original": "./xsl.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/yaml.mjs",
+					"kind": "import-statement",
+					"original": "./yaml.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/bat.mjs",
+					"kind": "import-statement",
+					"original": "./bat.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/clojure.mjs",
+					"kind": "import-statement",
+					"original": "./clojure.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/coffee.mjs",
+					"kind": "import-statement",
+					"original": "./coffee.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/c.mjs",
+					"kind": "import-statement",
+					"original": "./c.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/cpp.mjs",
+					"kind": "import-statement",
+					"original": "./cpp.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/diff.mjs",
+					"kind": "import-statement",
+					"original": "./diff.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/docker.mjs",
+					"kind": "import-statement",
+					"original": "./docker.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/go.mjs",
+					"kind": "import-statement",
+					"original": "./go.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/groovy.mjs",
+					"kind": "import-statement",
+					"original": "./groovy.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/pug.mjs",
+					"kind": "import-statement",
+					"original": "./pug.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/javascript.mjs",
+					"kind": "import-statement",
+					"original": "./javascript.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/jsonc.mjs",
+					"kind": "import-statement",
+					"original": "./jsonc.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/less.mjs",
+					"kind": "import-statement",
+					"original": "./less.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/objective-c.mjs",
+					"kind": "import-statement",
+					"original": "./objective-c.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/swift.mjs",
+					"kind": "import-statement",
+					"original": "./swift.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/scss.mjs",
+					"kind": "import-statement",
+					"original": "./scss.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/raku.mjs",
+					"kind": "import-statement",
+					"original": "./raku.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/powershell.mjs",
+					"kind": "import-statement",
+					"original": "./powershell.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/python.mjs",
+					"kind": "import-statement",
+					"original": "./python.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/julia.mjs",
+					"kind": "import-statement",
+					"original": "./julia.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/rust.mjs",
+					"kind": "import-statement",
+					"original": "./rust.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/scala.mjs",
+					"kind": "import-statement",
+					"original": "./scala.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/shellscript.mjs",
+					"kind": "import-statement",
+					"original": "./shellscript.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/typescript.mjs",
+					"kind": "import-statement",
+					"original": "./typescript.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/csharp.mjs",
+					"kind": "import-statement",
+					"original": "./csharp.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/fsharp.mjs",
+					"kind": "import-statement",
+					"original": "./fsharp.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/dart.mjs",
+					"kind": "import-statement",
+					"original": "./dart.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/handlebars.mjs",
+					"kind": "import-statement",
+					"original": "./handlebars.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/markdown.mjs",
+					"kind": "import-statement",
+					"original": "./markdown.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/erlang.mjs",
+					"kind": "import-statement",
+					"original": "./erlang.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/elixir.mjs",
+					"kind": "import-statement",
+					"original": "./elixir.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/latex.mjs",
+					"kind": "import-statement",
+					"original": "./latex.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/bibtex.mjs",
+					"kind": "import-statement",
+					"original": "./bibtex.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/json.mjs",
+					"kind": "import-statement",
+					"original": "./json.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/cpp-macro.mjs",
+					"kind": "import-statement",
+					"original": "./cpp-macro.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/regexp.mjs",
+					"kind": "import-statement",
+					"original": "./regexp.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/glsl.mjs",
+					"kind": "import-statement",
+					"original": "./glsl.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/sass.mjs",
+					"kind": "import-statement",
+					"original": "./sass.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/stylus.mjs",
+					"kind": "import-statement",
+					"original": "./stylus.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/tex.mjs",
+					"kind": "import-statement",
+					"original": "./tex.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/gnuplot.mjs",
+					"kind": "import-statement",
+					"original": "./gnuplot.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/haskell.mjs",
+					"kind": "import-statement",
+					"original": "./haskell.mjs"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/langs/wolfram.mjs": {
+			"bytes": 270242,
+			"imports": [],
+			"format": "esm"
+		},
 		"node_modules/shiki/dist/langs/zenscript.mjs": {
 			"bytes": 4646,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs/zig.mjs": {
-			"bytes": 5293,
+			"bytes": 5729,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/langs.mjs": {
-			"bytes": 20751,
+			"bytes": 23745,
 			"imports": [
 				{
 					"path": "node_modules/shiki/dist/langs/abap.mjs",
@@ -2781,6 +3518,11 @@
 					"path": "node_modules/shiki/dist/langs/ara.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/ara.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/asciidoc.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/asciidoc.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/asm.mjs",
@@ -2863,6 +3605,11 @@
 					"original": "./langs/cobol.mjs"
 				},
 				{
+					"path": "node_modules/shiki/dist/langs/codeowners.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/codeowners.mjs"
+				},
+				{
 					"path": "node_modules/shiki/dist/langs/codeql.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/codeql.mjs"
@@ -2871,6 +3618,11 @@
 					"path": "node_modules/shiki/dist/langs/coffee.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/coffee.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/common-lisp.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/common-lisp.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/cpp.mjs",
@@ -2923,6 +3675,11 @@
 					"original": "./langs/dax.mjs"
 				},
 				{
+					"path": "node_modules/shiki/dist/langs/desktop.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/desktop.mjs"
+				},
+				{
 					"path": "node_modules/shiki/dist/langs/diff.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/diff.mjs"
@@ -2938,6 +3695,11 @@
 					"original": "./langs/dream-maker.mjs"
 				},
 				{
+					"path": "node_modules/shiki/dist/langs/edge.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/edge.mjs"
+				},
+				{
 					"path": "node_modules/shiki/dist/langs/elixir.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/elixir.mjs"
@@ -2946,6 +3708,11 @@
 					"path": "node_modules/shiki/dist/langs/elm.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/elm.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/emacs-lisp.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/emacs-lisp.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/erb.mjs",
@@ -2958,9 +3725,19 @@
 					"original": "./langs/erlang.mjs"
 				},
 				{
+					"path": "node_modules/shiki/dist/langs/fennel.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/fennel.mjs"
+				},
+				{
 					"path": "node_modules/shiki/dist/langs/fish.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/fish.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/fluent.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/fluent.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/fortran-fixed-form.mjs",
@@ -2991,6 +3768,11 @@
 					"path": "node_modules/shiki/dist/langs/gdshader.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/gdshader.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/genie.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/genie.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/gherkin.mjs",
@@ -3068,6 +3850,11 @@
 					"original": "./langs/haskell.mjs"
 				},
 				{
+					"path": "node_modules/shiki/dist/langs/haxe.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/haxe.mjs"
+				},
+				{
 					"path": "node_modules/shiki/dist/langs/hcl.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/hcl.mjs"
@@ -3096,6 +3883,16 @@
 					"path": "node_modules/shiki/dist/langs/http.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/http.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/hxml.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/hxml.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/hy.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/hy.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/imba.mjs",
@@ -3193,9 +3990,9 @@
 					"original": "./langs/liquid.mjs"
 				},
 				{
-					"path": "node_modules/shiki/dist/langs/lisp.mjs",
+					"path": "node_modules/shiki/dist/langs/log.mjs",
 					"kind": "dynamic-import",
-					"original": "./langs/lisp.mjs"
+					"original": "./langs/log.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/logo.mjs",
@@ -3206,6 +4003,11 @@
 					"path": "node_modules/shiki/dist/langs/lua.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/lua.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/luau.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/luau.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/make.mjs",
@@ -3318,6 +4120,11 @@
 					"original": "./langs/plsql.mjs"
 				},
 				{
+					"path": "node_modules/shiki/dist/langs/po.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/po.mjs"
+				},
+				{
 					"path": "node_modules/shiki/dist/langs/postcss.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/postcss.mjs"
@@ -3368,9 +4175,29 @@
 					"original": "./langs/python.mjs"
 				},
 				{
+					"path": "node_modules/shiki/dist/langs/qml.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/qml.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/qmldir.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/qmldir.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/qss.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/qss.mjs"
+				},
+				{
 					"path": "node_modules/shiki/dist/langs/r.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/r.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/racket.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/racket.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/raku.mjs",
@@ -3386,6 +4213,11 @@
 					"path": "node_modules/shiki/dist/langs/reg.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/reg.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/regexp.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/regexp.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/rel.mjs",
@@ -3463,6 +4295,11 @@
 					"original": "./langs/solidity.mjs"
 				},
 				{
+					"path": "node_modules/shiki/dist/langs/soy.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/soy.mjs"
+				},
+				{
 					"path": "node_modules/shiki/dist/langs/sparql.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/sparql.mjs"
@@ -3508,6 +4345,11 @@
 					"original": "./langs/system-verilog.mjs"
 				},
 				{
+					"path": "node_modules/shiki/dist/langs/systemd.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/systemd.mjs"
+				},
+				{
 					"path": "node_modules/shiki/dist/langs/tasl.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/tasl.mjs"
@@ -3516,6 +4358,11 @@
 					"path": "node_modules/shiki/dist/langs/tcl.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/tcl.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/templ.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/templ.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/terraform.mjs",
@@ -3531,6 +4378,11 @@
 					"path": "node_modules/shiki/dist/langs/toml.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/toml.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/tsv.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/tsv.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/tsx.mjs",
@@ -3553,6 +4405,11 @@
 					"original": "./langs/typescript.mjs"
 				},
 				{
+					"path": "node_modules/shiki/dist/langs/typespec.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/typespec.mjs"
+				},
+				{
 					"path": "node_modules/shiki/dist/langs/typst.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/typst.mjs"
@@ -3561,6 +4418,11 @@
 					"path": "node_modules/shiki/dist/langs/v.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/v.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/vala.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/vala.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/vb.mjs",
@@ -3611,6 +4473,11 @@
 					"path": "node_modules/shiki/dist/langs/wgsl.mjs",
 					"kind": "dynamic-import",
 					"original": "./langs/wgsl.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/langs/wikitext.mjs",
+					"kind": "dynamic-import",
+					"original": "./langs/wikitext.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/langs/wolfram.mjs",
@@ -3688,22 +4555,22 @@
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/themes/catppuccin-frappe.mjs": {
-			"bytes": 59196,
+			"bytes": 60246,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/themes/catppuccin-latte.mjs": {
-			"bytes": 59190,
+			"bytes": 60240,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/themes/catppuccin-macchiato.mjs": {
-			"bytes": 59205,
+			"bytes": 60255,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/themes/catppuccin-mocha.mjs": {
-			"bytes": 59189,
+			"bytes": 60239,
 			"imports": [],
 			"format": "esm"
 		},
@@ -3752,33 +4619,38 @@
 			"imports": [],
 			"format": "esm"
 		},
+		"node_modules/shiki/dist/themes/laserwave.mjs": {
+			"bytes": 15267,
+			"imports": [],
+			"format": "esm"
+		},
 		"node_modules/shiki/dist/themes/light-plus.mjs": {
 			"bytes": 14343,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/themes/material-theme.mjs": {
-			"bytes": 23903,
+			"bytes": 23895,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/themes/material-theme-darker.mjs": {
-			"bytes": 23929,
+			"bytes": 23921,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/themes/material-theme-lighter.mjs": {
-			"bytes": 23936,
+			"bytes": 23928,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/themes/material-theme-ocean.mjs": {
-			"bytes": 23927,
+			"bytes": 23919,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/themes/material-theme-palenight.mjs": {
-			"bytes": 23941,
+			"bytes": 23933,
 			"imports": [],
 			"format": "esm"
 		},
@@ -3809,6 +4681,11 @@
 		},
 		"node_modules/shiki/dist/themes/one-dark-pro.mjs": {
 			"bytes": 47624,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/shiki/dist/themes/one-light.mjs": {
+			"bytes": 38764,
 			"imports": [],
 			"format": "esm"
 		},
@@ -3847,6 +4724,11 @@
 			"imports": [],
 			"format": "esm"
 		},
+		"node_modules/shiki/dist/themes/snazzy-light.mjs": {
+			"bytes": 31379,
+			"imports": [],
+			"format": "esm"
+		},
 		"node_modules/shiki/dist/themes/solarized-dark.mjs": {
 			"bytes": 9508,
 			"imports": [],
@@ -3873,22 +4755,22 @@
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/themes/vitesse-black.mjs": {
-			"bytes": 18209,
+			"bytes": 18307,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/themes/vitesse-dark.mjs": {
-			"bytes": 18292,
+			"bytes": 18387,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/themes/vitesse-light.mjs": {
-			"bytes": 18139,
+			"bytes": 18234,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/shiki/dist/themes.mjs": {
-			"bytes": 6530,
+			"bytes": 6952,
 			"imports": [
 				{
 					"path": "node_modules/shiki/dist/themes/andromeeda.mjs",
@@ -3971,6 +4853,11 @@
 					"original": "./themes/houston.mjs"
 				},
 				{
+					"path": "node_modules/shiki/dist/themes/laserwave.mjs",
+					"kind": "dynamic-import",
+					"original": "./themes/laserwave.mjs"
+				},
+				{
 					"path": "node_modules/shiki/dist/themes/light-plus.mjs",
 					"kind": "dynamic-import",
 					"original": "./themes/light-plus.mjs"
@@ -4031,6 +4918,11 @@
 					"original": "./themes/one-dark-pro.mjs"
 				},
 				{
+					"path": "node_modules/shiki/dist/themes/one-light.mjs",
+					"kind": "dynamic-import",
+					"original": "./themes/one-light.mjs"
+				},
+				{
 					"path": "node_modules/shiki/dist/themes/poimandres.mjs",
 					"kind": "dynamic-import",
 					"original": "./themes/poimandres.mjs"
@@ -4064,6 +4956,11 @@
 					"path": "node_modules/shiki/dist/themes/slack-ochin.mjs",
 					"kind": "dynamic-import",
 					"original": "./themes/slack-ochin.mjs"
+				},
+				{
+					"path": "node_modules/shiki/dist/themes/snazzy-light.mjs",
+					"kind": "dynamic-import",
+					"original": "./themes/snazzy-light.mjs"
 				},
 				{
 					"path": "node_modules/shiki/dist/themes/solarized-dark.mjs",
@@ -4114,7 +5011,7 @@
 			"format": "esm"
 		},
 		"node_modules/@shikijs/core/dist/textmate.mjs": {
-			"bytes": 119633,
+			"bytes": 119640,
 			"imports": [
 				{
 					"path": "node_modules/@shikijs/core/dist/types.mjs",
@@ -4130,7 +5027,7 @@
 			"format": "esm"
 		},
 		"node_modules/@shikijs/core/dist/index.mjs": {
-			"bytes": 157333,
+			"bytes": 169274,
 			"imports": [
 				{
 					"path": "node_modules/@shikijs/core/dist/textmate.mjs",
@@ -4150,8 +5047,13 @@
 			],
 			"format": "esm"
 		},
+		"node_modules/shiki/dist/theme-css-variables.mjs": {
+			"bytes": 6641,
+			"imports": [],
+			"format": "esm"
+		},
 		"node_modules/shiki/dist/bundle-full.mjs": {
-			"bytes": 920,
+			"bytes": 1136,
 			"imports": [
 				{
 					"path": "node_modules/shiki/dist/langs.mjs",
@@ -4187,17 +5089,17 @@
 					"path": "node_modules/@shikijs/core/dist/index.mjs",
 					"kind": "import-statement",
 					"original": "@shikijs/core"
+				},
+				{
+					"path": "node_modules/shiki/dist/theme-css-variables.mjs",
+					"kind": "import-statement",
+					"original": "./theme-css-variables.mjs"
 				}
 			],
 			"format": "esm"
 		},
-		"node_modules/shiki/dist/theme-css-variables.mjs": {
-			"bytes": 5953,
-			"imports": [],
-			"format": "esm"
-		},
 		"node_modules/shiki/dist/index.mjs": {
-			"bytes": 502,
+			"bytes": 542,
 			"imports": [
 				{
 					"path": "node_modules/shiki/dist/bundle-full.mjs",
@@ -4230,6 +5132,11 @@
 					"original": "./chunks/wasm-dynamic.mjs"
 				}
 			],
+			"format": "esm"
+		},
+		"node_modules/html-void-elements/index.js": {
+			"bytes": 316,
+			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/property-information/lib/util/schema.js": {
@@ -4371,7 +5278,7 @@
 			"format": "esm"
 		},
 		"node_modules/property-information/lib/html.js": {
-			"bytes": 8576,
+			"bytes": 8639,
 			"imports": [
 				{
 					"path": "node_modules/property-information/lib/util/types.js",
@@ -4494,8 +5401,883 @@
 			],
 			"format": "esm"
 		},
+		"node_modules/zwitch/index.js": {
+			"bytes": 3787,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/stringify-entities/lib/core.js": {
+			"bytes": 3040,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/stringify-entities/lib/util/to-hexadecimal.js": {
+			"bytes": 436,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/stringify-entities/lib/util/to-decimal.js": {
+			"bytes": 392,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/character-entities-legacy/index.js": {
+			"bytes": 1316,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/character-entities-html4/index.js": {
+			"bytes": 3908,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/stringify-entities/lib/constant/dangerous.js": {
+			"bytes": 290,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/stringify-entities/lib/util/to-named.js": {
+			"bytes": 1290,
+			"imports": [
+				{
+					"path": "node_modules/character-entities-legacy/index.js",
+					"kind": "import-statement",
+					"original": "character-entities-legacy"
+				},
+				{
+					"path": "node_modules/character-entities-html4/index.js",
+					"kind": "import-statement",
+					"original": "character-entities-html4"
+				},
+				{
+					"path": "node_modules/stringify-entities/lib/constant/dangerous.js",
+					"kind": "import-statement",
+					"original": "../constant/dangerous.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/stringify-entities/lib/util/format-smart.js": {
+			"bytes": 2478,
+			"imports": [
+				{
+					"path": "node_modules/stringify-entities/lib/util/to-hexadecimal.js",
+					"kind": "import-statement",
+					"original": "./to-hexadecimal.js"
+				},
+				{
+					"path": "node_modules/stringify-entities/lib/util/to-decimal.js",
+					"kind": "import-statement",
+					"original": "./to-decimal.js"
+				},
+				{
+					"path": "node_modules/stringify-entities/lib/util/to-named.js",
+					"kind": "import-statement",
+					"original": "./to-named.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/stringify-entities/lib/util/format-basic.js": {
+			"bytes": 192,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/stringify-entities/lib/index.js": {
+			"bytes": 961,
+			"imports": [
+				{
+					"path": "node_modules/stringify-entities/lib/core.js",
+					"kind": "import-statement",
+					"original": "./core.js"
+				},
+				{
+					"path": "node_modules/stringify-entities/lib/util/format-smart.js",
+					"kind": "import-statement",
+					"original": "./util/format-smart.js"
+				},
+				{
+					"path": "node_modules/stringify-entities/lib/util/format-basic.js",
+					"kind": "import-statement",
+					"original": "./util/format-basic.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/stringify-entities/index.js": {
+			"bytes": 160,
+			"imports": [
+				{
+					"path": "node_modules/stringify-entities/lib/index.js",
+					"kind": "import-statement",
+					"original": "./lib/index.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-to-html/lib/handle/comment.js": {
+			"bytes": 1389,
+			"imports": [
+				{
+					"path": "node_modules/stringify-entities/index.js",
+					"kind": "import-statement",
+					"original": "stringify-entities"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-to-html/lib/handle/doctype.js": {
+			"bytes": 717,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/ccount/index.js": {
+			"bytes": 619,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/comma-separated-tokens/index.js": {
+			"bytes": 1592,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/space-separated-tokens/index.js": {
+			"bytes": 551,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/hast-util-whitespace/lib/index.js": {
+			"bytes": 885,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/hast-util-whitespace/index.js": {
+			"bytes": 42,
+			"imports": [
+				{
+					"path": "node_modules/hast-util-whitespace/lib/index.js",
+					"kind": "import-statement",
+					"original": "./lib/index.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-to-html/lib/omission/util/siblings.js": {
+			"bytes": 1317,
+			"imports": [
+				{
+					"path": "node_modules/hast-util-whitespace/index.js",
+					"kind": "import-statement",
+					"original": "hast-util-whitespace"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-to-html/lib/omission/omission.js": {
+			"bytes": 1026,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/hast-util-to-html/lib/omission/closing.js": {
+			"bytes": 8785,
+			"imports": [
+				{
+					"path": "node_modules/hast-util-whitespace/index.js",
+					"kind": "import-statement",
+					"original": "hast-util-whitespace"
+				},
+				{
+					"path": "node_modules/hast-util-to-html/lib/omission/util/siblings.js",
+					"kind": "import-statement",
+					"original": "./util/siblings.js"
+				},
+				{
+					"path": "node_modules/hast-util-to-html/lib/omission/omission.js",
+					"kind": "import-statement",
+					"original": "./omission.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-to-html/lib/omission/opening.js": {
+			"bytes": 3459,
+			"imports": [
+				{
+					"path": "node_modules/hast-util-whitespace/index.js",
+					"kind": "import-statement",
+					"original": "hast-util-whitespace"
+				},
+				{
+					"path": "node_modules/hast-util-to-html/lib/omission/util/siblings.js",
+					"kind": "import-statement",
+					"original": "./util/siblings.js"
+				},
+				{
+					"path": "node_modules/hast-util-to-html/lib/omission/closing.js",
+					"kind": "import-statement",
+					"original": "./closing.js"
+				},
+				{
+					"path": "node_modules/hast-util-to-html/lib/omission/omission.js",
+					"kind": "import-statement",
+					"original": "./omission.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-to-html/lib/handle/element.js": {
+			"bytes": 7618,
+			"imports": [
+				{
+					"path": "node_modules/ccount/index.js",
+					"kind": "import-statement",
+					"original": "ccount"
+				},
+				{
+					"path": "node_modules/comma-separated-tokens/index.js",
+					"kind": "import-statement",
+					"original": "comma-separated-tokens"
+				},
+				{
+					"path": "node_modules/property-information/index.js",
+					"kind": "import-statement",
+					"original": "property-information"
+				},
+				{
+					"path": "node_modules/space-separated-tokens/index.js",
+					"kind": "import-statement",
+					"original": "space-separated-tokens"
+				},
+				{
+					"path": "node_modules/stringify-entities/index.js",
+					"kind": "import-statement",
+					"original": "stringify-entities"
+				},
+				{
+					"path": "node_modules/hast-util-to-html/lib/omission/closing.js",
+					"kind": "import-statement",
+					"original": "../omission/closing.js"
+				},
+				{
+					"path": "node_modules/hast-util-to-html/lib/omission/opening.js",
+					"kind": "import-statement",
+					"original": "../omission/opening.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-to-html/lib/handle/text.js": {
+			"bytes": 1087,
+			"imports": [
+				{
+					"path": "node_modules/stringify-entities/index.js",
+					"kind": "import-statement",
+					"original": "stringify-entities"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-to-html/lib/handle/raw.js": {
+			"bytes": 668,
+			"imports": [
+				{
+					"path": "node_modules/hast-util-to-html/lib/handle/text.js",
+					"kind": "import-statement",
+					"original": "./text.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-to-html/lib/handle/root.js": {
+			"bytes": 586,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/hast-util-to-html/lib/handle/index.js": {
+			"bytes": 1163,
+			"imports": [
+				{
+					"path": "node_modules/zwitch/index.js",
+					"kind": "import-statement",
+					"original": "zwitch"
+				},
+				{
+					"path": "node_modules/hast-util-to-html/lib/handle/comment.js",
+					"kind": "import-statement",
+					"original": "./comment.js"
+				},
+				{
+					"path": "node_modules/hast-util-to-html/lib/handle/doctype.js",
+					"kind": "import-statement",
+					"original": "./doctype.js"
+				},
+				{
+					"path": "node_modules/hast-util-to-html/lib/handle/element.js",
+					"kind": "import-statement",
+					"original": "./element.js"
+				},
+				{
+					"path": "node_modules/hast-util-to-html/lib/handle/raw.js",
+					"kind": "import-statement",
+					"original": "./raw.js"
+				},
+				{
+					"path": "node_modules/hast-util-to-html/lib/handle/root.js",
+					"kind": "import-statement",
+					"original": "./root.js"
+				},
+				{
+					"path": "node_modules/hast-util-to-html/lib/handle/text.js",
+					"kind": "import-statement",
+					"original": "./text.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-to-html/lib/index.js": {
+			"bytes": 9828,
+			"imports": [
+				{
+					"path": "node_modules/html-void-elements/index.js",
+					"kind": "import-statement",
+					"original": "html-void-elements"
+				},
+				{
+					"path": "node_modules/property-information/index.js",
+					"kind": "import-statement",
+					"original": "property-information"
+				},
+				{
+					"path": "node_modules/hast-util-to-html/lib/handle/index.js",
+					"kind": "import-statement",
+					"original": "./handle/index.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-to-html/index.js": {
+			"bytes": 283,
+			"imports": [
+				{
+					"path": "node_modules/hast-util-to-html/lib/index.js",
+					"kind": "import-statement",
+					"original": "./lib/index.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/unist-util-is/lib/index.js": {
+			"bytes": 8391,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/unist-util-is/index.js": {
+			"bytes": 217,
+			"imports": [
+				{
+					"path": "node_modules/unist-util-is/lib/index.js",
+					"kind": "import-statement",
+					"original": "./lib/index.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/unist-util-find-after/lib/index.js": {
+			"bytes": 3613,
+			"imports": [
+				{
+					"path": "node_modules/unist-util-is/index.js",
+					"kind": "import-statement",
+					"original": "unist-util-is"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/unist-util-find-after/index.js": {
+			"bytes": 41,
+			"imports": [
+				{
+					"path": "node_modules/unist-util-find-after/lib/index.js",
+					"kind": "import-statement",
+					"original": "./lib/index.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-is-element/lib/index.js": {
+			"bytes": 7777,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/hast-util-is-element/index.js": {
+			"bytes": 231,
+			"imports": [
+				{
+					"path": "node_modules/hast-util-is-element/lib/index.js",
+					"kind": "import-statement",
+					"original": "./lib/index.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-to-text/lib/index.js": {
+			"bytes": 19593,
+			"imports": [
+				{
+					"path": "node_modules/unist-util-find-after/index.js",
+					"kind": "import-statement",
+					"original": "unist-util-find-after"
+				},
+				{
+					"path": "node_modules/hast-util-is-element/index.js",
+					"kind": "import-statement",
+					"original": "hast-util-is-element"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-to-text/index.js": {
+			"bytes": 163,
+			"imports": [
+				{
+					"path": "node_modules/hast-util-to-text/lib/index.js",
+					"kind": "import-statement",
+					"original": "./lib/index.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/css-selector-parser/dist/mjs/indexes.js": {
+			"bytes": 1057,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/css-selector-parser/dist/mjs/pseudo-signatures.js": {
+			"bytes": 2040,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/css-selector-parser/dist/mjs/syntax-definitions.js": {
+			"bytes": 7336,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/css-selector-parser/dist/mjs/utils.js": {
+			"bytes": 3135,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/css-selector-parser/dist/mjs/parser.js": {
+			"bytes": 26944,
+			"imports": [
+				{
+					"path": "node_modules/css-selector-parser/dist/mjs/indexes.js",
+					"kind": "import-statement",
+					"original": "./indexes.js"
+				},
+				{
+					"path": "node_modules/css-selector-parser/dist/mjs/pseudo-signatures.js",
+					"kind": "import-statement",
+					"original": "./pseudo-signatures.js"
+				},
+				{
+					"path": "node_modules/css-selector-parser/dist/mjs/syntax-definitions.js",
+					"kind": "import-statement",
+					"original": "./syntax-definitions.js"
+				},
+				{
+					"path": "node_modules/css-selector-parser/dist/mjs/utils.js",
+					"kind": "import-statement",
+					"original": "./utils.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/css-selector-parser/dist/mjs/render.js": {
+			"bytes": 5077,
+			"imports": [
+				{
+					"path": "node_modules/css-selector-parser/dist/mjs/utils.js",
+					"kind": "import-statement",
+					"original": "./utils.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/css-selector-parser/dist/mjs/ast.js": {
+			"bytes": 3140,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/css-selector-parser/dist/mjs/index.js": {
+			"bytes": 114,
+			"imports": [
+				{
+					"path": "node_modules/css-selector-parser/dist/mjs/parser.js",
+					"kind": "import-statement",
+					"original": "./parser.js"
+				},
+				{
+					"path": "node_modules/css-selector-parser/dist/mjs/render.js",
+					"kind": "import-statement",
+					"original": "./render.js"
+				},
+				{
+					"path": "node_modules/css-selector-parser/dist/mjs/ast.js",
+					"kind": "import-statement",
+					"original": "./ast.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-select/lib/parse.js": {
+			"bytes": 495,
+			"imports": [
+				{
+					"path": "node_modules/css-selector-parser/dist/mjs/index.js",
+					"kind": "import-statement",
+					"original": "css-selector-parser"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/direction/index.js": {
+			"bytes": 739,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/hast-util-to-string/lib/index.js": {
+			"bytes": 1031,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/hast-util-to-string/index.js": {
+			"bytes": 1122,
+			"imports": [
+				{
+					"path": "node_modules/hast-util-to-string/lib/index.js",
+					"kind": "import-statement",
+					"original": "./lib/index.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/unist-util-visit-parents/lib/color.js": {
+			"bytes": 90,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/unist-util-visit-parents/lib/index.js": {
+			"bytes": 11714,
+			"imports": [
+				{
+					"path": "node_modules/unist-util-is/index.js",
+					"kind": "import-statement",
+					"original": "unist-util-is"
+				},
+				{
+					"path": "node_modules/unist-util-visit-parents/lib/color.js",
+					"kind": "import-statement",
+					"original": "unist-util-visit-parents/do-not-use-color"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/unist-util-visit-parents/index.js": {
+			"bytes": 108,
+			"imports": [
+				{
+					"path": "node_modules/unist-util-visit-parents/lib/index.js",
+					"kind": "import-statement",
+					"original": "./lib/index.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/unist-util-visit/lib/index.js": {
+			"bytes": 9624,
+			"imports": [
+				{
+					"path": "node_modules/unist-util-visit-parents/index.js",
+					"kind": "import-statement",
+					"original": "unist-util-visit-parents"
+				},
+				{
+					"path": "node_modules/unist-util-visit-parents/index.js",
+					"kind": "import-statement",
+					"original": "unist-util-visit-parents"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/unist-util-visit/index.js": {
+			"bytes": 101,
+			"imports": [
+				{
+					"path": "node_modules/unist-util-visit/lib/index.js",
+					"kind": "import-statement",
+					"original": "./lib/index.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-select/lib/enter-state.js": {
+			"bytes": 4381,
+			"imports": [
+				{
+					"path": "node_modules/direction/index.js",
+					"kind": "import-statement",
+					"original": "direction"
+				},
+				{
+					"path": "node_modules/hast-util-to-string/index.js",
+					"kind": "import-statement",
+					"original": "hast-util-to-string"
+				},
+				{
+					"path": "node_modules/property-information/index.js",
+					"kind": "import-statement",
+					"original": "property-information"
+				},
+				{
+					"path": "node_modules/unist-util-visit/index.js",
+					"kind": "import-statement",
+					"original": "unist-util-visit"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/devlop/lib/default.js": {
+			"bytes": 133,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/hast-util-select/lib/attribute.js": {
+			"bytes": 2794,
+			"imports": [
+				{
+					"path": "node_modules/comma-separated-tokens/index.js",
+					"kind": "import-statement",
+					"original": "comma-separated-tokens"
+				},
+				{
+					"path": "node_modules/devlop/lib/default.js",
+					"kind": "import-statement",
+					"original": "devlop"
+				},
+				{
+					"path": "node_modules/property-information/index.js",
+					"kind": "import-statement",
+					"original": "property-information"
+				},
+				{
+					"path": "node_modules/space-separated-tokens/index.js",
+					"kind": "import-statement",
+					"original": "space-separated-tokens"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-select/lib/class-name.js": {
+			"bytes": 625,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/hast-util-select/lib/id.js": {
+			"bytes": 468,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/hast-util-select/lib/name.js": {
+			"bytes": 484,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/bcp-47-match/index.js": {
+			"bytes": 5963,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/hast-util-has-property/lib/index.js": {
+			"bytes": 870,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/hast-util-has-property/index.js": {
+			"bytes": 43,
+			"imports": [
+				{
+					"path": "node_modules/hast-util-has-property/lib/index.js",
+					"kind": "import-statement",
+					"original": "./lib/index.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/nth-check/lib/esm/parse.js": {
+			"bytes": 2239,
+			"imports": [],
+			"format": "esm"
+		},
+		"node_modules/boolbase/index.js": {
+			"bytes": 125,
+			"imports": [],
+			"format": "cjs"
+		},
+		"node_modules/nth-check/lib/esm/compile.js": {
+			"bytes": 3320,
+			"imports": [
+				{
+					"path": "node_modules/boolbase/index.js",
+					"kind": "import-statement",
+					"original": "boolbase"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/nth-check/lib/esm/index.js": {
+			"bytes": 1655,
+			"imports": [
+				{
+					"path": "node_modules/nth-check/lib/esm/parse.js",
+					"kind": "import-statement",
+					"original": "./parse.js"
+				},
+				{
+					"path": "node_modules/nth-check/lib/esm/compile.js",
+					"kind": "import-statement",
+					"original": "./compile.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-select/lib/pseudo.js": {
+			"bytes": 18236,
+			"imports": [
+				{
+					"path": "node_modules/bcp-47-match/index.js",
+					"kind": "import-statement",
+					"original": "bcp-47-match"
+				},
+				{
+					"path": "node_modules/comma-separated-tokens/index.js",
+					"kind": "import-statement",
+					"original": "comma-separated-tokens"
+				},
+				{
+					"path": "node_modules/devlop/lib/default.js",
+					"kind": "import-statement",
+					"original": "devlop"
+				},
+				{
+					"path": "node_modules/hast-util-has-property/index.js",
+					"kind": "import-statement",
+					"original": "hast-util-has-property"
+				},
+				{
+					"path": "node_modules/hast-util-whitespace/index.js",
+					"kind": "import-statement",
+					"original": "hast-util-whitespace"
+				},
+				{
+					"path": "node_modules/nth-check/lib/esm/index.js",
+					"kind": "import-statement",
+					"original": "nth-check"
+				},
+				{
+					"path": "node_modules/zwitch/index.js",
+					"kind": "import-statement",
+					"original": "zwitch"
+				},
+				{
+					"path": "node_modules/hast-util-select/lib/walk.js",
+					"kind": "import-statement",
+					"original": "./walk.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-select/lib/test.js": {
+			"bytes": 1604,
+			"imports": [
+				{
+					"path": "node_modules/hast-util-select/lib/attribute.js",
+					"kind": "import-statement",
+					"original": "./attribute.js"
+				},
+				{
+					"path": "node_modules/hast-util-select/lib/class-name.js",
+					"kind": "import-statement",
+					"original": "./class-name.js"
+				},
+				{
+					"path": "node_modules/hast-util-select/lib/id.js",
+					"kind": "import-statement",
+					"original": "./id.js"
+				},
+				{
+					"path": "node_modules/hast-util-select/lib/name.js",
+					"kind": "import-statement",
+					"original": "./name.js"
+				},
+				{
+					"path": "node_modules/hast-util-select/lib/pseudo.js",
+					"kind": "import-statement",
+					"original": "./pseudo.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-select/lib/walk.js": {
+			"bytes": 7760,
+			"imports": [
+				{
+					"path": "node_modules/hast-util-select/lib/enter-state.js",
+					"kind": "import-statement",
+					"original": "./enter-state.js"
+				},
+				{
+					"path": "node_modules/hast-util-select/lib/test.js",
+					"kind": "import-statement",
+					"original": "./test.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-select/lib/index.js": {
+			"bytes": 4727,
+			"imports": [
+				{
+					"path": "node_modules/property-information/index.js",
+					"kind": "import-statement",
+					"original": "property-information"
+				},
+				{
+					"path": "node_modules/hast-util-select/lib/parse.js",
+					"kind": "import-statement",
+					"original": "./parse.js"
+				},
+				{
+					"path": "node_modules/hast-util-select/lib/walk.js",
+					"kind": "import-statement",
+					"original": "./walk.js"
+				}
+			],
+			"format": "esm"
+		},
+		"node_modules/hast-util-select/index.js": {
+			"bytes": 118,
+			"imports": [
+				{
+					"path": "node_modules/hast-util-select/lib/index.js",
+					"kind": "import-statement",
+					"original": "./lib/index.js"
+				}
+			],
+			"format": "esm"
+		},
 		"node_modules/hast-util-parse-selector/lib/index.js": {
-			"bytes": 1806,
+			"bytes": 2405,
 			"imports": [],
 			"format": "esm"
 		},
@@ -4510,23 +6292,13 @@
 			],
 			"format": "esm"
 		},
-		"node_modules/space-separated-tokens/index.js": {
-			"bytes": 551,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/comma-separated-tokens/index.js": {
-			"bytes": 1592,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/hastscript/lib/core.js": {
-			"bytes": 8275,
+		"node_modules/hastscript/lib/create-h.js": {
+			"bytes": 9357,
 			"imports": [
 				{
-					"path": "node_modules/property-information/index.js",
+					"path": "node_modules/comma-separated-tokens/index.js",
 					"kind": "import-statement",
-					"original": "property-information"
+					"original": "comma-separated-tokens"
 				},
 				{
 					"path": "node_modules/hast-util-parse-selector/index.js",
@@ -4534,30 +6306,14 @@
 					"original": "hast-util-parse-selector"
 				},
 				{
-					"path": "node_modules/space-separated-tokens/index.js",
-					"kind": "import-statement",
-					"original": "space-separated-tokens"
-				},
-				{
-					"path": "node_modules/comma-separated-tokens/index.js",
-					"kind": "import-statement",
-					"original": "comma-separated-tokens"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hastscript/lib/html.js": {
-			"bytes": 717,
-			"imports": [
-				{
 					"path": "node_modules/property-information/index.js",
 					"kind": "import-statement",
 					"original": "property-information"
 				},
 				{
-					"path": "node_modules/hastscript/lib/core.js",
+					"path": "node_modules/space-separated-tokens/index.js",
 					"kind": "import-statement",
-					"original": "./core.js"
+					"original": "space-separated-tokens"
 				}
 			],
 			"format": "esm"
@@ -4567,8 +6323,8 @@
 			"imports": [],
 			"format": "esm"
 		},
-		"node_modules/hastscript/lib/svg.js": {
-			"bytes": 814,
+		"node_modules/hastscript/lib/index.js": {
+			"bytes": 1517,
 			"imports": [
 				{
 					"path": "node_modules/property-information/index.js",
@@ -4576,30 +6332,14 @@
 					"original": "property-information"
 				},
 				{
-					"path": "node_modules/hastscript/lib/core.js",
+					"path": "node_modules/hastscript/lib/create-h.js",
 					"kind": "import-statement",
-					"original": "./core.js"
+					"original": "./create-h.js"
 				},
 				{
 					"path": "node_modules/hastscript/lib/svg-case-sensitive-tag-names.js",
 					"kind": "import-statement",
 					"original": "./svg-case-sensitive-tag-names.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hastscript/lib/index.js": {
-			"bytes": 330,
-			"imports": [
-				{
-					"path": "node_modules/hastscript/lib/html.js",
-					"kind": "import-statement",
-					"original": "./html.js"
-				},
-				{
-					"path": "node_modules/hastscript/lib/svg.js",
-					"kind": "import-statement",
-					"original": "./svg.js"
 				}
 			],
 			"format": "esm"
@@ -6050,7 +7790,7 @@
 			"format": "cjs"
 		},
 		"node_modules/postcss-selector-parser/dist/parser.js": {
-			"bytes": 38824,
+			"bytes": 38998,
 			"imports": [
 				{
 					"path": "node_modules/postcss-selector-parser/dist/selectors/root.js",
@@ -6287,7 +8027,7 @@
 			"format": "esm"
 		},
 		"node_modules/@ctrl/tinycolor/dist/module/conversion.js": {
-			"bytes": 6388,
+			"bytes": 7419,
 			"imports": [
 				{
 					"path": "node_modules/@ctrl/tinycolor/dist/module/util.js",
@@ -6298,12 +8038,12 @@
 			"format": "esm"
 		},
 		"node_modules/@ctrl/tinycolor/dist/module/css-color-names.js": {
-			"bytes": 3962,
+			"bytes": 3964,
 			"imports": [],
 			"format": "esm"
 		},
 		"node_modules/@ctrl/tinycolor/dist/module/format-input.js": {
-			"bytes": 6776,
+			"bytes": 7441,
 			"imports": [
 				{
 					"path": "node_modules/@ctrl/tinycolor/dist/module/conversion.js",
@@ -6324,7 +8064,7 @@
 			"format": "esm"
 		},
 		"node_modules/@ctrl/tinycolor/dist/module/index.js": {
-			"bytes": 18401,
+			"bytes": 16270,
 			"imports": [
 				{
 					"path": "node_modules/@ctrl/tinycolor/dist/module/conversion.js",
@@ -6339,7 +8079,7 @@
 				{
 					"path": "node_modules/@ctrl/tinycolor/dist/module/format-input.js",
 					"kind": "import-statement",
-					"original": "./format-input"
+					"original": "./format-input.js"
 				},
 				{
 					"path": "node_modules/@ctrl/tinycolor/dist/module/util.js",
@@ -6350,7 +8090,7 @@
 			"format": "esm"
 		},
 		"node_modules/@ctrl/tinycolor/dist/module/readability.js": {
-			"bytes": 3504,
+			"bytes": 3217,
 			"imports": [
 				{
 					"path": "node_modules/@ctrl/tinycolor/dist/module/index.js",
@@ -6361,7 +8101,7 @@
 			"format": "esm"
 		},
 		"node_modules/@ctrl/tinycolor/dist/module/to-ms-filter.js": {
-			"bytes": 774,
+			"bytes": 752,
 			"imports": [
 				{
 					"path": "node_modules/@ctrl/tinycolor/dist/module/conversion.js",
@@ -6377,7 +8117,7 @@
 			"format": "esm"
 		},
 		"node_modules/@ctrl/tinycolor/dist/module/from-ratio.js": {
-			"bytes": 723,
+			"bytes": 725,
 			"imports": [
 				{
 					"path": "node_modules/@ctrl/tinycolor/dist/module/index.js",
@@ -6393,7 +8133,7 @@
 			"format": "esm"
 		},
 		"node_modules/@ctrl/tinycolor/dist/module/random.js": {
-			"bytes": 7439,
+			"bytes": 7266,
 			"imports": [
 				{
 					"path": "node_modules/@ctrl/tinycolor/dist/module/index.js",
@@ -6409,13 +8149,8 @@
 			"format": "esm"
 		},
 		"node_modules/@ctrl/tinycolor/dist/module/public_api.js": {
-			"bytes": 408,
+			"bytes": 298,
 			"imports": [
-				{
-					"path": "node_modules/@ctrl/tinycolor/dist/module/index.js",
-					"kind": "import-statement",
-					"original": "./index.js"
-				},
 				{
 					"path": "node_modules/@ctrl/tinycolor/dist/module/index.js",
 					"kind": "import-statement",
@@ -6465,8 +8200,33 @@
 			"format": "esm"
 		},
 		"node_modules/@expressive-code/core/dist/index.js": {
-			"bytes": 162439,
+			"bytes": 165184,
 			"imports": [
+				{
+					"path": "node_modules/hast-util-to-html/index.js",
+					"kind": "import-statement",
+					"original": "hast-util-to-html"
+				},
+				{
+					"path": "node_modules/hast-util-to-text/index.js",
+					"kind": "import-statement",
+					"original": "hast-util-to-text"
+				},
+				{
+					"path": "node_modules/hast-util-select/index.js",
+					"kind": "import-statement",
+					"original": "hast-util-select"
+				},
+				{
+					"path": "node_modules/unist-util-visit/index.js",
+					"kind": "import-statement",
+					"original": "unist-util-visit"
+				},
+				{
+					"path": "node_modules/unist-util-visit-parents/index.js",
+					"kind": "import-statement",
+					"original": "unist-util-visit-parents"
+				},
 				{
 					"path": "node_modules/hastscript/index.js",
 					"kind": "import-statement",
@@ -6476,21 +8236,6 @@
 					"path": "node_modules/postcss/lib/postcss.mjs",
 					"kind": "import-statement",
 					"original": "postcss"
-				},
-				{
-					"path": "node_modules/hastscript/index.js",
-					"kind": "import-statement",
-					"original": "hastscript"
-				},
-				{
-					"path": "node_modules/hastscript/index.js",
-					"kind": "import-statement",
-					"original": "hastscript"
-				},
-				{
-					"path": "node_modules/hastscript/index.js",
-					"kind": "import-statement",
-					"original": "hastscript"
 				},
 				{
 					"path": "node_modules/postcss/lib/postcss.mjs",
@@ -6506,11 +8251,6 @@
 					"path": "node_modules/@ctrl/tinycolor/dist/module/public_api.js",
 					"kind": "import-statement",
 					"original": "@ctrl/tinycolor"
-				},
-				{
-					"path": "node_modules/hastscript/index.js",
-					"kind": "import-statement",
-					"original": "hastscript"
 				},
 				{
 					"path": "<runtime>",
@@ -6546,8 +8286,49 @@
 			],
 			"format": "esm"
 		},
+		"node_modules/@expressive-code/core/dist/hast.js": {
+			"bytes": 3266,
+			"imports": [
+				{
+					"path": "node_modules/hast-util-to-html/index.js",
+					"kind": "import-statement",
+					"original": "hast-util-to-html"
+				},
+				{
+					"path": "node_modules/hast-util-to-text/index.js",
+					"kind": "import-statement",
+					"original": "hast-util-to-text"
+				},
+				{
+					"path": "node_modules/hast-util-select/index.js",
+					"kind": "import-statement",
+					"original": "hast-util-select"
+				},
+				{
+					"path": "node_modules/unist-util-visit/index.js",
+					"kind": "import-statement",
+					"original": "unist-util-visit"
+				},
+				{
+					"path": "node_modules/unist-util-visit-parents/index.js",
+					"kind": "import-statement",
+					"original": "unist-util-visit-parents"
+				},
+				{
+					"path": "node_modules/hastscript/index.js",
+					"kind": "import-statement",
+					"original": "hastscript"
+				},
+				{
+					"path": "node_modules/postcss/lib/postcss.mjs",
+					"kind": "import-statement",
+					"original": "postcss"
+				}
+			],
+			"format": "esm"
+		},
 		"node_modules/@expressive-code/plugin-text-markers/dist/index.js": {
-			"bytes": 22698,
+			"bytes": 22739,
 			"imports": [
 				{
 					"path": "node_modules/@expressive-code/core/dist/index.js",
@@ -6565,9 +8346,9 @@
 					"original": "@expressive-code/core"
 				},
 				{
-					"path": "node_modules/hastscript/index.js",
+					"path": "node_modules/@expressive-code/core/dist/hast.js",
 					"kind": "import-statement",
-					"original": "hastscript"
+					"original": "@expressive-code/core/hast"
 				},
 				{
 					"path": "<runtime>",
@@ -6577,407 +8358,8 @@
 			],
 			"format": "esm"
 		},
-		"node_modules/direction/index.js": {
-			"bytes": 739,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/hast-util-to-string/index.js": {
-			"bytes": 1412,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/unist-util-is/lib/index.js": {
-			"bytes": 7946,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/unist-util-is/index.js": {
-			"bytes": 640,
-			"imports": [
-				{
-					"path": "node_modules/unist-util-is/lib/index.js",
-					"kind": "import-statement",
-					"original": "./lib/index.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/unist-util-visit-parents/lib/color.browser.js": {
-			"bytes": 90,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/unist-util-visit-parents/lib/index.js": {
-			"bytes": 7406,
-			"imports": [
-				{
-					"path": "node_modules/unist-util-is/index.js",
-					"kind": "import-statement",
-					"original": "unist-util-is"
-				},
-				{
-					"path": "node_modules/unist-util-visit-parents/lib/color.browser.js",
-					"kind": "import-statement",
-					"original": "./color.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/unist-util-visit-parents/index.js": {
-			"bytes": 108,
-			"imports": [
-				{
-					"path": "node_modules/unist-util-visit-parents/lib/index.js",
-					"kind": "import-statement",
-					"original": "./lib/index.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/unist-util-visit/lib/index.js": {
-			"bytes": 5467,
-			"imports": [
-				{
-					"path": "node_modules/unist-util-visit-parents/index.js",
-					"kind": "import-statement",
-					"original": "unist-util-visit-parents"
-				},
-				{
-					"path": "node_modules/unist-util-visit-parents/index.js",
-					"kind": "import-statement",
-					"original": "unist-util-visit-parents"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/unist-util-visit/index.js": {
-			"bytes": 101,
-			"imports": [
-				{
-					"path": "node_modules/unist-util-visit/lib/index.js",
-					"kind": "import-statement",
-					"original": "./lib/index.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hast-util-select/lib/enter-state.js": {
-			"bytes": 4308,
-			"imports": [
-				{
-					"path": "node_modules/direction/index.js",
-					"kind": "import-statement",
-					"original": "direction"
-				},
-				{
-					"path": "node_modules/hast-util-to-string/index.js",
-					"kind": "import-statement",
-					"original": "hast-util-to-string"
-				},
-				{
-					"path": "node_modules/property-information/index.js",
-					"kind": "import-statement",
-					"original": "property-information"
-				},
-				{
-					"path": "node_modules/unist-util-visit/index.js",
-					"kind": "import-statement",
-					"original": "unist-util-visit"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hast-util-has-property/lib/index.js": {
-			"bytes": 928,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/hast-util-has-property/index.js": {
-			"bytes": 43,
-			"imports": [
-				{
-					"path": "node_modules/hast-util-has-property/lib/index.js",
-					"kind": "import-statement",
-					"original": "./lib/index.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/zwitch/index.js": {
-			"bytes": 3787,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/hast-util-select/lib/attribute.js": {
-			"bytes": 5332,
-			"imports": [
-				{
-					"path": "node_modules/comma-separated-tokens/index.js",
-					"kind": "import-statement",
-					"original": "comma-separated-tokens"
-				},
-				{
-					"path": "node_modules/hast-util-has-property/index.js",
-					"kind": "import-statement",
-					"original": "hast-util-has-property"
-				},
-				{
-					"path": "node_modules/property-information/index.js",
-					"kind": "import-statement",
-					"original": "property-information"
-				},
-				{
-					"path": "node_modules/space-separated-tokens/index.js",
-					"kind": "import-statement",
-					"original": "space-separated-tokens"
-				},
-				{
-					"path": "node_modules/zwitch/index.js",
-					"kind": "import-statement",
-					"original": "zwitch"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hast-util-select/lib/class-name.js": {
-			"bytes": 588,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/hast-util-select/lib/id.js": {
-			"bytes": 342,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/hast-util-select/lib/name.js": {
-			"bytes": 342,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/bcp-47-match/index.js": {
-			"bytes": 5963,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/hast-util-whitespace/index.js": {
-			"bytes": 891,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/nth-check/lib/esm/parse.js": {
-			"bytes": 2239,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/boolbase/index.js": {
-			"bytes": 125,
-			"imports": [],
-			"format": "cjs"
-		},
-		"node_modules/nth-check/lib/esm/compile.js": {
-			"bytes": 3320,
-			"imports": [
-				{
-					"path": "node_modules/boolbase/index.js",
-					"kind": "import-statement",
-					"original": "boolbase"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/nth-check/lib/esm/index.js": {
-			"bytes": 1655,
-			"imports": [
-				{
-					"path": "node_modules/nth-check/lib/esm/parse.js",
-					"kind": "import-statement",
-					"original": "./parse.js"
-				},
-				{
-					"path": "node_modules/nth-check/lib/esm/compile.js",
-					"kind": "import-statement",
-					"original": "./compile.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hast-util-select/lib/pseudo.js": {
-			"bytes": 15189,
-			"imports": [
-				{
-					"path": "node_modules/bcp-47-match/index.js",
-					"kind": "import-statement",
-					"original": "bcp-47-match"
-				},
-				{
-					"path": "node_modules/comma-separated-tokens/index.js",
-					"kind": "import-statement",
-					"original": "comma-separated-tokens"
-				},
-				{
-					"path": "node_modules/hast-util-has-property/index.js",
-					"kind": "import-statement",
-					"original": "hast-util-has-property"
-				},
-				{
-					"path": "node_modules/hast-util-whitespace/index.js",
-					"kind": "import-statement",
-					"original": "hast-util-whitespace"
-				},
-				{
-					"path": "node_modules/nth-check/lib/esm/index.js",
-					"kind": "import-statement",
-					"original": "nth-check"
-				},
-				{
-					"path": "node_modules/zwitch/index.js",
-					"kind": "import-statement",
-					"original": "zwitch"
-				},
-				{
-					"path": "node_modules/hast-util-select/lib/walk.js",
-					"kind": "import-statement",
-					"original": "./walk.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hast-util-select/lib/test.js": {
-			"bytes": 967,
-			"imports": [
-				{
-					"path": "node_modules/hast-util-select/lib/attribute.js",
-					"kind": "import-statement",
-					"original": "./attribute.js"
-				},
-				{
-					"path": "node_modules/hast-util-select/lib/class-name.js",
-					"kind": "import-statement",
-					"original": "./class-name.js"
-				},
-				{
-					"path": "node_modules/hast-util-select/lib/id.js",
-					"kind": "import-statement",
-					"original": "./id.js"
-				},
-				{
-					"path": "node_modules/hast-util-select/lib/name.js",
-					"kind": "import-statement",
-					"original": "./name.js"
-				},
-				{
-					"path": "node_modules/hast-util-select/lib/pseudo.js",
-					"kind": "import-statement",
-					"original": "./pseudo.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hast-util-select/lib/walk.js": {
-			"bytes": 7550,
-			"imports": [
-				{
-					"path": "node_modules/hast-util-select/lib/enter-state.js",
-					"kind": "import-statement",
-					"original": "./enter-state.js"
-				},
-				{
-					"path": "node_modules/hast-util-select/lib/test.js",
-					"kind": "import-statement",
-					"original": "./test.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/css-selector-parser/lib/utils.js": {
-			"bytes": 3027,
-			"imports": [],
-			"format": "cjs"
-		},
-		"node_modules/css-selector-parser/lib/parser-context.js": {
-			"bytes": 11102,
-			"imports": [
-				{
-					"path": "node_modules/css-selector-parser/lib/utils.js",
-					"kind": "require-call",
-					"original": "./utils"
-				}
-			],
-			"format": "cjs"
-		},
-		"node_modules/css-selector-parser/lib/render.js": {
-			"bytes": 3394,
-			"imports": [
-				{
-					"path": "node_modules/css-selector-parser/lib/utils.js",
-					"kind": "require-call",
-					"original": "./utils"
-				}
-			],
-			"format": "cjs"
-		},
-		"node_modules/css-selector-parser/lib/index.js": {
-			"bytes": 4341,
-			"imports": [
-				{
-					"path": "node_modules/css-selector-parser/lib/parser-context.js",
-					"kind": "require-call",
-					"original": "./parser-context"
-				},
-				{
-					"path": "node_modules/css-selector-parser/lib/render.js",
-					"kind": "require-call",
-					"original": "./render"
-				}
-			],
-			"format": "cjs"
-		},
-		"node_modules/hast-util-select/lib/parse.js": {
-			"bytes": 647,
-			"imports": [
-				{
-					"path": "node_modules/css-selector-parser/lib/index.js",
-					"kind": "import-statement",
-					"original": "css-selector-parser"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hast-util-select/lib/index.js": {
-			"bytes": 3411,
-			"imports": [
-				{
-					"path": "node_modules/property-information/index.js",
-					"kind": "import-statement",
-					"original": "property-information"
-				},
-				{
-					"path": "node_modules/hast-util-select/lib/walk.js",
-					"kind": "import-statement",
-					"original": "./walk.js"
-				},
-				{
-					"path": "node_modules/hast-util-select/lib/parse.js",
-					"kind": "import-statement",
-					"original": "./parse.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hast-util-select/index.js": {
-			"bytes": 118,
-			"imports": [
-				{
-					"path": "node_modules/hast-util-select/lib/index.js",
-					"kind": "import-statement",
-					"original": "./lib/index.js"
-				}
-			],
-			"format": "esm"
-		},
 		"node_modules/@expressive-code/plugin-collapsible-sections/dist/index.js": {
-			"bytes": 8575,
+			"bytes": 8584,
 			"imports": [
 				{
 					"path": "node_modules/@expressive-code/core/dist/index.js",
@@ -6985,9 +8367,9 @@
 					"original": "@expressive-code/core"
 				},
 				{
-					"path": "node_modules/hast-util-select/index.js",
+					"path": "node_modules/@expressive-code/core/dist/hast.js",
 					"kind": "import-statement",
-					"original": "hast-util-select"
+					"original": "@expressive-code/core/hast"
 				},
 				{
 					"path": "node_modules/@expressive-code/core/dist/index.js",
@@ -6995,9 +8377,9 @@
 					"original": "@expressive-code/core"
 				},
 				{
-					"path": "node_modules/hastscript/index.js",
+					"path": "node_modules/@expressive-code/core/dist/hast.js",
 					"kind": "import-statement",
-					"original": "hastscript"
+					"original": "@expressive-code/core/hast"
 				},
 				{
 					"path": "node_modules/@expressive-code/core/dist/index.js",
@@ -7008,17 +8390,12 @@
 			"format": "esm"
 		},
 		"node_modules/@expressive-code/plugin-line-numbers/dist/index.js": {
-			"bytes": 2109,
+			"bytes": 2085,
 			"imports": [
 				{
-					"path": "node_modules/@expressive-code/core/dist/index.js",
+					"path": "node_modules/@expressive-code/core/dist/hast.js",
 					"kind": "import-statement",
-					"original": "@expressive-code/core"
-				},
-				{
-					"path": "node_modules/hastscript/index.js",
-					"kind": "import-statement",
-					"original": "hastscript"
+					"original": "@expressive-code/core/hast"
 				},
 				{
 					"path": "node_modules/@expressive-code/core/dist/index.js",
@@ -7029,7 +8406,7 @@
 			"format": "esm"
 		},
 		"node_modules/@expressive-code/plugin-frames/dist/index.js": {
-			"bytes": 23274,
+			"bytes": 23337,
 			"imports": [
 				{
 					"path": "node_modules/@expressive-code/core/dist/index.js",
@@ -7037,9 +8414,9 @@
 					"original": "@expressive-code/core"
 				},
 				{
-					"path": "node_modules/hastscript/index.js",
+					"path": "node_modules/@expressive-code/core/dist/hast.js",
 					"kind": "import-statement",
-					"original": "hastscript"
+					"original": "@expressive-code/core/hast"
 				},
 				{
 					"path": "node_modules/@expressive-code/core/dist/index.js",
@@ -7050,7 +8427,7 @@
 			"format": "esm"
 		},
 		"src/themes/ObsidianTheme.ts": {
-			"bytes": 17432,
+			"bytes": 17553,
 			"imports": [
 				{
 					"path": "shiki",
@@ -7061,7 +8438,7 @@
 			"format": "esm"
 		},
 		"src/themes/ThemeMapper.ts": {
-			"bytes": 2509,
+			"bytes": 2626,
 			"imports": [
 				{
 					"path": "node_modules/shiki/dist/index.mjs",
@@ -7072,345 +8449,6 @@
 					"path": "src/themes/ObsidianTheme.ts",
 					"kind": "import-statement",
 					"original": "src/themes/ObsidianTheme"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/html-void-elements/index.js": {
-			"bytes": 355,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/stringify-entities/lib/core.js": {
-			"bytes": 2250,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/stringify-entities/lib/util/to-hexadecimal.js": {
-			"bytes": 393,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/stringify-entities/lib/util/to-decimal.js": {
-			"bytes": 357,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/character-entities-legacy/index.js": {
-			"bytes": 1316,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/character-entities-html4/index.js": {
-			"bytes": 3908,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/stringify-entities/lib/constant/dangerous.js": {
-			"bytes": 290,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/stringify-entities/lib/util/to-named.js": {
-			"bytes": 1237,
-			"imports": [
-				{
-					"path": "node_modules/character-entities-legacy/index.js",
-					"kind": "import-statement",
-					"original": "character-entities-legacy"
-				},
-				{
-					"path": "node_modules/character-entities-html4/index.js",
-					"kind": "import-statement",
-					"original": "character-entities-html4"
-				},
-				{
-					"path": "node_modules/stringify-entities/lib/constant/dangerous.js",
-					"kind": "import-statement",
-					"original": "../constant/dangerous.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/stringify-entities/lib/util/format-smart.js": {
-			"bytes": 2478,
-			"imports": [
-				{
-					"path": "node_modules/stringify-entities/lib/util/to-hexadecimal.js",
-					"kind": "import-statement",
-					"original": "./to-hexadecimal.js"
-				},
-				{
-					"path": "node_modules/stringify-entities/lib/util/to-decimal.js",
-					"kind": "import-statement",
-					"original": "./to-decimal.js"
-				},
-				{
-					"path": "node_modules/stringify-entities/lib/util/to-named.js",
-					"kind": "import-statement",
-					"original": "./to-named.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/stringify-entities/lib/util/format-basic.js": {
-			"bytes": 192,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/stringify-entities/lib/index.js": {
-			"bytes": 961,
-			"imports": [
-				{
-					"path": "node_modules/stringify-entities/lib/core.js",
-					"kind": "import-statement",
-					"original": "./core.js"
-				},
-				{
-					"path": "node_modules/stringify-entities/lib/util/format-smart.js",
-					"kind": "import-statement",
-					"original": "./util/format-smart.js"
-				},
-				{
-					"path": "node_modules/stringify-entities/lib/util/format-basic.js",
-					"kind": "import-statement",
-					"original": "./util/format-basic.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/stringify-entities/index.js": {
-			"bytes": 160,
-			"imports": [
-				{
-					"path": "node_modules/stringify-entities/lib/index.js",
-					"kind": "import-statement",
-					"original": "./lib/index.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hast-util-to-html/lib/handle/comment.js": {
-			"bytes": 1149,
-			"imports": [
-				{
-					"path": "node_modules/stringify-entities/index.js",
-					"kind": "import-statement",
-					"original": "stringify-entities"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hast-util-to-html/lib/handle/doctype.js": {
-			"bytes": 670,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/ccount/index.js": {
-			"bytes": 619,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/hast-util-to-html/lib/omission/util/siblings.js": {
-			"bytes": 991,
-			"imports": [
-				{
-					"path": "node_modules/hast-util-whitespace/index.js",
-					"kind": "import-statement",
-					"original": "hast-util-whitespace"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hast-util-to-html/lib/omission/omission.js": {
-			"bytes": 688,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/hast-util-to-html/lib/omission/closing.js": {
-			"bytes": 9340,
-			"imports": [
-				{
-					"path": "node_modules/hast-util-whitespace/index.js",
-					"kind": "import-statement",
-					"original": "hast-util-whitespace"
-				},
-				{
-					"path": "node_modules/hast-util-to-html/lib/omission/util/siblings.js",
-					"kind": "import-statement",
-					"original": "./util/siblings.js"
-				},
-				{
-					"path": "node_modules/hast-util-to-html/lib/omission/omission.js",
-					"kind": "import-statement",
-					"original": "./omission.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hast-util-to-html/lib/omission/opening.js": {
-			"bytes": 3503,
-			"imports": [
-				{
-					"path": "node_modules/hast-util-whitespace/index.js",
-					"kind": "import-statement",
-					"original": "hast-util-whitespace"
-				},
-				{
-					"path": "node_modules/hast-util-to-html/lib/omission/util/siblings.js",
-					"kind": "import-statement",
-					"original": "./util/siblings.js"
-				},
-				{
-					"path": "node_modules/hast-util-to-html/lib/omission/closing.js",
-					"kind": "import-statement",
-					"original": "./closing.js"
-				},
-				{
-					"path": "node_modules/hast-util-to-html/lib/omission/omission.js",
-					"kind": "import-statement",
-					"original": "./omission.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hast-util-to-html/lib/handle/element.js": {
-			"bytes": 7594,
-			"imports": [
-				{
-					"path": "node_modules/ccount/index.js",
-					"kind": "import-statement",
-					"original": "ccount"
-				},
-				{
-					"path": "node_modules/comma-separated-tokens/index.js",
-					"kind": "import-statement",
-					"original": "comma-separated-tokens"
-				},
-				{
-					"path": "node_modules/property-information/index.js",
-					"kind": "import-statement",
-					"original": "property-information"
-				},
-				{
-					"path": "node_modules/space-separated-tokens/index.js",
-					"kind": "import-statement",
-					"original": "space-separated-tokens"
-				},
-				{
-					"path": "node_modules/stringify-entities/index.js",
-					"kind": "import-statement",
-					"original": "stringify-entities"
-				},
-				{
-					"path": "node_modules/hast-util-to-html/lib/omission/opening.js",
-					"kind": "import-statement",
-					"original": "../omission/opening.js"
-				},
-				{
-					"path": "node_modules/hast-util-to-html/lib/omission/closing.js",
-					"kind": "import-statement",
-					"original": "../omission/closing.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hast-util-to-html/lib/handle/text.js": {
-			"bytes": 970,
-			"imports": [
-				{
-					"path": "node_modules/stringify-entities/index.js",
-					"kind": "import-statement",
-					"original": "stringify-entities"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hast-util-to-html/lib/handle/raw.js": {
-			"bytes": 659,
-			"imports": [
-				{
-					"path": "node_modules/hast-util-to-html/lib/handle/text.js",
-					"kind": "import-statement",
-					"original": "./text.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hast-util-to-html/lib/handle/root.js": {
-			"bytes": 539,
-			"imports": [],
-			"format": "esm"
-		},
-		"node_modules/hast-util-to-html/lib/handle/index.js": {
-			"bytes": 1123,
-			"imports": [
-				{
-					"path": "node_modules/zwitch/index.js",
-					"kind": "import-statement",
-					"original": "zwitch"
-				},
-				{
-					"path": "node_modules/hast-util-to-html/lib/handle/comment.js",
-					"kind": "import-statement",
-					"original": "./comment.js"
-				},
-				{
-					"path": "node_modules/hast-util-to-html/lib/handle/doctype.js",
-					"kind": "import-statement",
-					"original": "./doctype.js"
-				},
-				{
-					"path": "node_modules/hast-util-to-html/lib/handle/element.js",
-					"kind": "import-statement",
-					"original": "./element.js"
-				},
-				{
-					"path": "node_modules/hast-util-to-html/lib/handle/raw.js",
-					"kind": "import-statement",
-					"original": "./raw.js"
-				},
-				{
-					"path": "node_modules/hast-util-to-html/lib/handle/root.js",
-					"kind": "import-statement",
-					"original": "./root.js"
-				},
-				{
-					"path": "node_modules/hast-util-to-html/lib/handle/text.js",
-					"kind": "import-statement",
-					"original": "./text.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hast-util-to-html/lib/index.js": {
-			"bytes": 3164,
-			"imports": [
-				{
-					"path": "node_modules/property-information/index.js",
-					"kind": "import-statement",
-					"original": "property-information"
-				},
-				{
-					"path": "node_modules/html-void-elements/index.js",
-					"kind": "import-statement",
-					"original": "html-void-elements"
-				},
-				{
-					"path": "node_modules/hast-util-to-html/lib/handle/index.js",
-					"kind": "import-statement",
-					"original": "./handle/index.js"
-				}
-			],
-			"format": "esm"
-		},
-		"node_modules/hast-util-to-html/index.js": {
-			"bytes": 283,
-			"imports": [
-				{
-					"path": "node_modules/hast-util-to-html/lib/index.js",
-					"kind": "import-statement",
-					"original": "./lib/index.js"
 				}
 			],
 			"format": "esm"
@@ -7432,7 +8470,7 @@
 			"format": "esm"
 		},
 		"src/codemirror/Cm6_Util.ts": {
-			"bytes": 927,
+			"bytes": 1334,
 			"imports": [
 				{
 					"path": "@codemirror/state",
@@ -7448,8 +8486,13 @@
 			"format": "esm"
 		},
 		"src/codemirror/Cm6_ViewPlugin.ts": {
-			"bytes": 4668,
+			"bytes": 6551,
 			"imports": [
+				{
+					"path": "src/main.ts",
+					"kind": "import-statement",
+					"original": "src/main"
+				},
 				{
 					"path": "@codemirror/view",
 					"kind": "import-statement",
@@ -7537,7 +8580,7 @@
 			"format": "esm"
 		},
 		"src/themes/ECTheme.ts": {
-			"bytes": 5156,
+			"bytes": 5130,
 			"imports": [
 				{
 					"path": "@expressive-code/core",
@@ -7553,7 +8596,7 @@
 			"format": "esm"
 		},
 		"src/main.ts": {
-			"bytes": 7394,
+			"bytes": 9089,
 			"imports": [
 				{
 					"path": "obsidian",
@@ -7680,7 +8723,7 @@
 					"bytesInOutput": 16079
 				},
 				"node_modules/shiki/dist/langs/actionscript-3.mjs": {
-					"bytesInOutput": 13214
+					"bytesInOutput": 13280
 				},
 				"node_modules/shiki/dist/langs/ada.mjs": {
 					"bytesInOutput": 42787
@@ -7701,7 +8744,7 @@
 					"bytesInOutput": 530
 				},
 				"node_modules/shiki/dist/langs/angular-template-blocks.mjs": {
-					"bytesInOutput": 1182
+					"bytesInOutput": 1243
 				},
 				"node_modules/shiki/dist/langs/angular-html.mjs": {
 					"bytesInOutput": 941
@@ -7713,7 +8756,7 @@
 					"bytesInOutput": 1171
 				},
 				"node_modules/shiki/dist/langs/angular-inline-template.mjs": {
-					"bytesInOutput": 991
+					"bytesInOutput": 1115
 				},
 				"node_modules/shiki/dist/langs/angular-ts.mjs": {
 					"bytesInOutput": 175184
@@ -7742,20 +8785,128 @@
 				"node_modules/shiki/dist/langs/ara.mjs": {
 					"bytesInOutput": 6590
 				},
-				"node_modules/shiki/dist/langs/asm.mjs": {
-					"bytesInOutput": 37958
+				"node_modules/shiki/dist/langs/yaml.mjs": {
+					"bytesInOutput": 10238
 				},
-				"node_modules/shiki/dist/langs/typescript.mjs": {
-					"bytesInOutput": 175002
+				"node_modules/shiki/dist/langs/csv.mjs": {
+					"bytesInOutput": 1063
 				},
-				"node_modules/shiki/dist/langs/stylus.mjs": {
-					"bytesInOutput": 29688
+				"node_modules/shiki/dist/langs/c.mjs": {
+					"bytesInOutput": 67620
+				},
+				"node_modules/shiki/dist/langs/clojure.mjs": {
+					"bytesInOutput": 6161
+				},
+				"node_modules/shiki/dist/langs/coffee.mjs": {
+					"bytesInOutput": 25610
+				},
+				"node_modules/shiki/dist/langs/regexp.mjs": {
+					"bytesInOutput": 7487
+				},
+				"node_modules/shiki/dist/langs/glsl.mjs": {
+					"bytesInOutput": 3843
+				},
+				"node_modules/shiki/dist/langs/sql.mjs": {
+					"bytesInOutput": 22758
+				},
+				"node_modules/shiki/dist/langs/cpp-macro.mjs": {
+					"bytesInOutput": 225333
+				},
+				"node_modules/shiki/dist/langs/cpp.mjs": {
+					"bytesInOutput": 402977
+				},
+				"node_modules/shiki/dist/langs/csharp.mjs": {
+					"bytesInOutput": 79028
+				},
+				"node_modules/shiki/dist/langs/diff.mjs": {
+					"bytesInOutput": 2407
+				},
+				"node_modules/shiki/dist/langs/docker.mjs": {
+					"bytesInOutput": 1543
+				},
+				"node_modules/shiki/dist/langs/elixir.mjs": {
+					"bytesInOutput": 16267
+				},
+				"node_modules/shiki/dist/langs/elm.mjs": {
+					"bytesInOutput": 10064
+				},
+				"node_modules/shiki/dist/langs/erlang.mjs": {
+					"bytesInOutput": 33108
+				},
+				"node_modules/shiki/dist/langs/go.mjs": {
+					"bytesInOutput": 43655
+				},
+				"node_modules/shiki/dist/langs/groovy.mjs": {
+					"bytesInOutput": 17726
+				},
+				"node_modules/shiki/dist/langs/haskell.mjs": {
+					"bytesInOutput": 39243
+				},
+				"node_modules/shiki/dist/langs/jsx.mjs": {
+					"bytesInOutput": 170855
+				},
+				"node_modules/shiki/dist/langs/python.mjs": {
+					"bytesInOutput": 70786
+				},
+				"node_modules/shiki/dist/langs/r.mjs": {
+					"bytesInOutput": 34056
+				},
+				"node_modules/shiki/dist/langs/julia.mjs": {
+					"bytesInOutput": 42245
+				},
+				"node_modules/shiki/dist/langs/kotlin.mjs": {
+					"bytesInOutput": 7947
+				},
+				"node_modules/shiki/dist/langs/less.mjs": {
+					"bytesInOutput": 76378
+				},
+				"node_modules/shiki/dist/langs/make.mjs": {
+					"bytesInOutput": 8162
+				},
+				"node_modules/shiki/dist/langs/objective-c.mjs": {
+					"bytesInOutput": 102060
+				},
+				"node_modules/shiki/dist/langs/ocaml.mjs": {
+					"bytesInOutput": 60359
+				},
+				"node_modules/shiki/dist/langs/perl.mjs": {
+					"bytesInOutput": 39947
+				},
+				"node_modules/shiki/dist/langs/shellscript.mjs": {
+					"bytesInOutput": 38526
+				},
+				"node_modules/shiki/dist/langs/lua.mjs": {
+					"bytesInOutput": 13854
+				},
+				"node_modules/shiki/dist/langs/ruby.mjs": {
+					"bytesInOutput": 34268
+				},
+				"node_modules/shiki/dist/langs/rust.mjs": {
+					"bytesInOutput": 16005
 				},
 				"node_modules/shiki/dist/langs/sass.mjs": {
 					"bytesInOutput": 8543
 				},
-				"node_modules/shiki/dist/langs/less.mjs": {
-					"bytesInOutput": 76364
+				"node_modules/shiki/dist/langs/scala.mjs": {
+					"bytesInOutput": 26132
+				},
+				"node_modules/shiki/dist/langs/swift.mjs": {
+					"bytesInOutput": 90654
+				},
+				"node_modules/shiki/dist/langs/toml.mjs": {
+					"bytesInOutput": 5939
+				},
+				"node_modules/shiki/dist/langs/typescript.mjs": {
+					"bytesInOutput": 175002
+				},
+				"node_modules/shiki/dist/langs/asciidoc.mjs": {
+					"bytesInOutput": 83951
+				},
+				"node_modules/shiki/dist/langs/asm.mjs": {
+					"bytesInOutput": 37958
+				},
+				"node_modules/shiki/dist/langs/stylus.mjs": {
+					"bytesInOutput": 29688
 				},
 				"node_modules/shiki/dist/langs/postcss.mjs": {
 					"bytesInOutput": 5982
@@ -7764,7 +8915,7 @@
 					"bytesInOutput": 168608
 				},
 				"node_modules/shiki/dist/langs/astro.mjs": {
-					"bytesInOutput": 22880
+					"bytesInOutput": 22989
 				},
 				"node_modules/shiki/dist/langs/awk.mjs": {
 					"bytesInOutput": 4994
@@ -7785,58 +8936,34 @@
 					"bytesInOutput": 4511
 				},
 				"node_modules/shiki/dist/langs/bicep.mjs": {
-					"bytesInOutput": 3890
-				},
-				"node_modules/shiki/dist/langs/sql.mjs": {
-					"bytesInOutput": 22758
+					"bytesInOutput": 3895
 				},
 				"node_modules/shiki/dist/langs/blade.mjs": {
 					"bytesInOutput": 98588
-				},
-				"node_modules/shiki/dist/langs/c.mjs": {
-					"bytesInOutput": 67620
 				},
 				"node_modules/shiki/dist/langs/cadence.mjs": {
 					"bytesInOutput": 9919
 				},
 				"node_modules/shiki/dist/langs/clarity.mjs": {
-					"bytesInOutput": 13239
-				},
-				"node_modules/shiki/dist/langs/clojure.mjs": {
-					"bytesInOutput": 6161
+					"bytesInOutput": 13340
 				},
 				"node_modules/shiki/dist/langs/cmake.mjs": {
 					"bytesInOutput": 10153
 				},
 				"node_modules/shiki/dist/langs/cobol.mjs": {
-					"bytesInOutput": 38001
+					"bytesInOutput": 38226
+				},
+				"node_modules/shiki/dist/langs/codeowners.mjs": {
+					"bytesInOutput": 509
 				},
 				"node_modules/shiki/dist/langs/codeql.mjs": {
 					"bytesInOutput": 32109
 				},
-				"node_modules/shiki/dist/langs/coffee.mjs": {
-					"bytesInOutput": 25610
-				},
-				"node_modules/shiki/dist/langs/glsl.mjs": {
-					"bytesInOutput": 3843
-				},
-				"node_modules/shiki/dist/langs/cpp-macro.mjs": {
-					"bytesInOutput": 225313
-				},
-				"node_modules/shiki/dist/langs/cpp.mjs": {
-					"bytesInOutput": 402957
-				},
-				"node_modules/shiki/dist/langs/shellscript.mjs": {
-					"bytesInOutput": 31596
+				"node_modules/shiki/dist/langs/common-lisp.mjs": {
+					"bytesInOutput": 23276
 				},
 				"node_modules/shiki/dist/langs/crystal.mjs": {
 					"bytesInOutput": 30495
-				},
-				"node_modules/shiki/dist/langs/csharp.mjs": {
-					"bytesInOutput": 79000
-				},
-				"node_modules/shiki/dist/langs/csv.mjs": {
-					"bytesInOutput": 1063
 				},
 				"node_modules/shiki/dist/langs/cue.mjs": {
 					"bytesInOutput": 15186
@@ -7848,40 +8975,37 @@
 					"bytesInOutput": 38513
 				},
 				"node_modules/shiki/dist/langs/dart.mjs": {
-					"bytesInOutput": 6508
+					"bytesInOutput": 6670
 				},
 				"node_modules/shiki/dist/langs/dax.mjs": {
 					"bytesInOutput": 5346
 				},
-				"node_modules/shiki/dist/langs/diff.mjs": {
-					"bytesInOutput": 2407
-				},
-				"node_modules/shiki/dist/langs/docker.mjs": {
-					"bytesInOutput": 1543
+				"node_modules/shiki/dist/langs/desktop.mjs": {
+					"bytesInOutput": 1831
 				},
 				"node_modules/shiki/dist/langs/dream-maker.mjs": {
 					"bytesInOutput": 9570
 				},
-				"node_modules/shiki/dist/langs/elixir.mjs": {
-					"bytesInOutput": 16267
+				"node_modules/shiki/dist/langs/html-derivative.mjs": {
+					"bytesInOutput": 847
 				},
-				"node_modules/shiki/dist/langs/elm.mjs": {
-					"bytesInOutput": 10064
+				"node_modules/shiki/dist/langs/edge.mjs": {
+					"bytesInOutput": 2025
 				},
-				"node_modules/shiki/dist/langs/lua.mjs": {
-					"bytesInOutput": 13839
-				},
-				"node_modules/shiki/dist/langs/ruby.mjs": {
-					"bytesInOutput": 34268
+				"node_modules/shiki/dist/langs/emacs-lisp.mjs": {
+					"bytesInOutput": 807665
 				},
 				"node_modules/shiki/dist/langs/erb.mjs": {
 					"bytesInOutput": 1912
 				},
-				"node_modules/shiki/dist/langs/erlang.mjs": {
-					"bytesInOutput": 26985
+				"node_modules/shiki/dist/langs/fennel.mjs": {
+					"bytesInOutput": 4507
 				},
 				"node_modules/shiki/dist/langs/fish.mjs": {
 					"bytesInOutput": 5042
+				},
+				"node_modules/shiki/dist/langs/fluent.mjs": {
+					"bytesInOutput": 3344
 				},
 				"node_modules/shiki/dist/langs/fortran-free-form.mjs": {
 					"bytesInOutput": 89212
@@ -7890,19 +9014,22 @@
 					"bytesInOutput": 992
 				},
 				"node_modules/shiki/dist/langs/markdown.mjs": {
-					"bytesInOutput": 50829
+					"bytesInOutput": 50844
 				},
 				"node_modules/shiki/dist/langs/fsharp.mjs": {
-					"bytesInOutput": 22968
+					"bytesInOutput": 23039
 				},
 				"node_modules/shiki/dist/langs/gdshader.mjs": {
 					"bytesInOutput": 5754
 				},
 				"node_modules/shiki/dist/langs/gdscript.mjs": {
-					"bytesInOutput": 15410
+					"bytesInOutput": 17048
 				},
 				"node_modules/shiki/dist/langs/gdresource.mjs": {
 					"bytesInOutput": 4826
+				},
+				"node_modules/shiki/dist/langs/genie.mjs": {
+					"bytesInOutput": 3076
 				},
 				"node_modules/shiki/dist/langs/gherkin.mjs": {
 					"bytesInOutput": 19223
@@ -7914,7 +9041,7 @@
 					"bytesInOutput": 879
 				},
 				"node_modules/shiki/dist/langs/gleam.mjs": {
-					"bytesInOutput": 2435
+					"bytesInOutput": 2461
 				},
 				"node_modules/shiki/dist/langs/glimmer-js.mjs": {
 					"bytesInOutput": 18218
@@ -7925,17 +9052,8 @@
 				"node_modules/shiki/dist/langs/gnuplot.mjs": {
 					"bytesInOutput": 15757
 				},
-				"node_modules/shiki/dist/langs/go.mjs": {
-					"bytesInOutput": 41549
-				},
-				"node_modules/shiki/dist/langs/jsx.mjs": {
-					"bytesInOutput": 170855
-				},
 				"node_modules/shiki/dist/langs/graphql.mjs": {
 					"bytesInOutput": 16495
-				},
-				"node_modules/shiki/dist/langs/groovy.mjs": {
-					"bytesInOutput": 17726
 				},
 				"node_modules/shiki/dist/langs/hack.mjs": {
 					"bytesInOutput": 79854
@@ -7943,17 +9061,14 @@
 				"node_modules/shiki/dist/langs/haml.mjs": {
 					"bytesInOutput": 7461
 				},
-				"node_modules/shiki/dist/langs/yaml.mjs": {
-					"bytesInOutput": 10105
-				},
 				"node_modules/shiki/dist/langs/handlebars.mjs": {
 					"bytesInOutput": 11033
 				},
-				"node_modules/shiki/dist/langs/haskell.mjs": {
-					"bytesInOutput": 39243
+				"node_modules/shiki/dist/langs/haxe.mjs": {
+					"bytesInOutput": 32020
 				},
 				"node_modules/shiki/dist/langs/hcl.mjs": {
-					"bytesInOutput": 10685
+					"bytesInOutput": 10696
 				},
 				"node_modules/shiki/dist/langs/hjson.mjs": {
 					"bytesInOutput": 11609
@@ -7961,11 +9076,14 @@
 				"node_modules/shiki/dist/langs/hlsl.mjs": {
 					"bytesInOutput": 7189
 				},
-				"node_modules/shiki/dist/langs/html-derivative.mjs": {
-					"bytesInOutput": 847
-				},
 				"node_modules/shiki/dist/langs/http.mjs": {
 					"bytesInOutput": 3903
+				},
+				"node_modules/shiki/dist/langs/hxml.mjs": {
+					"bytesInOutput": 1714
+				},
+				"node_modules/shiki/dist/langs/hy.mjs": {
+					"bytesInOutput": 3128
 				},
 				"node_modules/shiki/dist/langs/imba.mjs": {
 					"bytesInOutput": 47147
@@ -7997,44 +9115,26 @@
 				"node_modules/shiki/dist/langs/jssm.mjs": {
 					"bytesInOutput": 2765
 				},
-				"node_modules/shiki/dist/langs/python.mjs": {
-					"bytesInOutput": 70786
-				},
-				"node_modules/shiki/dist/langs/r.mjs": {
-					"bytesInOutput": 34056
-				},
-				"node_modules/shiki/dist/langs/julia.mjs": {
-					"bytesInOutput": 38550
-				},
-				"node_modules/shiki/dist/langs/kotlin.mjs": {
-					"bytesInOutput": 7947
-				},
 				"node_modules/shiki/dist/langs/kusto.mjs": {
-					"bytesInOutput": 19054
+					"bytesInOutput": 19413
 				},
 				"node_modules/shiki/dist/langs/tex.mjs": {
-					"bytesInOutput": 7838
-				},
-				"node_modules/shiki/dist/langs/rust.mjs": {
-					"bytesInOutput": 16001
-				},
-				"node_modules/shiki/dist/langs/scala.mjs": {
-					"bytesInOutput": 26132
+					"bytesInOutput": 8709
 				},
 				"node_modules/shiki/dist/langs/latex.mjs": {
-					"bytesInOutput": 38752
+					"bytesInOutput": 52072
 				},
 				"node_modules/shiki/dist/langs/liquid.mjs": {
 					"bytesInOutput": 14764
 				},
-				"node_modules/shiki/dist/langs/lisp.mjs": {
-					"bytesInOutput": 13730
+				"node_modules/shiki/dist/langs/log.mjs": {
+					"bytesInOutput": 2524
 				},
 				"node_modules/shiki/dist/langs/logo.mjs": {
 					"bytesInOutput": 3119
 				},
-				"node_modules/shiki/dist/langs/make.mjs": {
-					"bytesInOutput": 8162
+				"node_modules/shiki/dist/langs/luau.mjs": {
+					"bytesInOutput": 11591
 				},
 				"node_modules/shiki/dist/langs/marko.mjs": {
 					"bytesInOutput": 17521
@@ -8049,13 +9149,13 @@
 					"bytesInOutput": 118326
 				},
 				"node_modules/shiki/dist/langs/mermaid.mjs": {
-					"bytesInOutput": 18733
+					"bytesInOutput": 26380
 				},
 				"node_modules/shiki/dist/langs/mojo.mjs": {
-					"bytesInOutput": 69994
+					"bytesInOutput": 69955
 				},
 				"node_modules/shiki/dist/langs/move.mjs": {
-					"bytesInOutput": 15409
+					"bytesInOutput": 17462
 				},
 				"node_modules/shiki/dist/langs/narrat.mjs": {
 					"bytesInOutput": 3356
@@ -8070,31 +9170,25 @@
 					"bytesInOutput": 20726
 				},
 				"node_modules/shiki/dist/langs/nix.mjs": {
-					"bytesInOutput": 13622
+					"bytesInOutput": 13665
 				},
 				"node_modules/shiki/dist/langs/nushell.mjs": {
-					"bytesInOutput": 17741
-				},
-				"node_modules/shiki/dist/langs/objective-c.mjs": {
-					"bytesInOutput": 102060
+					"bytesInOutput": 17769
 				},
 				"node_modules/shiki/dist/langs/objective-cpp.mjs": {
 					"bytesInOutput": 164654
 				},
-				"node_modules/shiki/dist/langs/ocaml.mjs": {
-					"bytesInOutput": 60359
-				},
 				"node_modules/shiki/dist/langs/pascal.mjs": {
-					"bytesInOutput": 3864
-				},
-				"node_modules/shiki/dist/langs/perl.mjs": {
-					"bytesInOutput": 39947
+					"bytesInOutput": 3924
 				},
 				"node_modules/shiki/dist/langs/php.mjs": {
 					"bytesInOutput": 103153
 				},
 				"node_modules/shiki/dist/langs/plsql.mjs": {
 					"bytesInOutput": 8005
+				},
+				"node_modules/shiki/dist/langs/po.mjs": {
+					"bytesInOutput": 2993
 				},
 				"node_modules/shiki/dist/langs/powerquery.mjs": {
 					"bytesInOutput": 5325
@@ -8120,11 +9214,23 @@
 				"node_modules/shiki/dist/langs/purescript.mjs": {
 					"bytesInOutput": 15077
 				},
+				"node_modules/shiki/dist/langs/qml.mjs": {
+					"bytesInOutput": 4784
+				},
+				"node_modules/shiki/dist/langs/qmldir.mjs": {
+					"bytesInOutput": 910
+				},
+				"node_modules/shiki/dist/langs/qss.mjs": {
+					"bytesInOutput": 7454
+				},
+				"node_modules/shiki/dist/langs/racket.mjs": {
+					"bytesInOutput": 101468
+				},
 				"node_modules/shiki/dist/langs/raku.mjs": {
 					"bytesInOutput": 10050
 				},
 				"node_modules/shiki/dist/langs/razor.mjs": {
-					"bytesInOutput": 23166
+					"bytesInOutput": 23405
 				},
 				"node_modules/shiki/dist/langs/reg.mjs": {
 					"bytesInOutput": 2171
@@ -8156,6 +9262,9 @@
 				"node_modules/shiki/dist/langs/solidity.mjs": {
 					"bytesInOutput": 14505
 				},
+				"node_modules/shiki/dist/langs/soy.mjs": {
+					"bytesInOutput": 6048
+				},
 				"node_modules/shiki/dist/langs/turtle.mjs": {
 					"bytesInOutput": 3387
 				},
@@ -8174,11 +9283,11 @@
 				"node_modules/shiki/dist/langs/svelte.mjs": {
 					"bytesInOutput": 15270
 				},
-				"node_modules/shiki/dist/langs/swift.mjs": {
-					"bytesInOutput": 90627
-				},
 				"node_modules/shiki/dist/langs/system-verilog.mjs": {
-					"bytesInOutput": 17878
+					"bytesInOutput": 23869
+				},
+				"node_modules/shiki/dist/langs/systemd.mjs": {
+					"bytesInOutput": 7291
 				},
 				"node_modules/shiki/dist/langs/tasl.mjs": {
 					"bytesInOutput": 3056
@@ -8186,20 +9295,29 @@
 				"node_modules/shiki/dist/langs/tcl.mjs": {
 					"bytesInOutput": 4541
 				},
-				"node_modules/shiki/dist/langs/terraform.mjs": {
-					"bytesInOutput": 12031
+				"node_modules/shiki/dist/langs/templ.mjs": {
+					"bytesInOutput": 22214
 				},
-				"node_modules/shiki/dist/langs/toml.mjs": {
-					"bytesInOutput": 5939
+				"node_modules/shiki/dist/langs/terraform.mjs": {
+					"bytesInOutput": 12100
+				},
+				"node_modules/shiki/dist/langs/tsv.mjs": {
+					"bytesInOutput": 659
 				},
 				"node_modules/shiki/dist/langs/twig.mjs": {
 					"bytesInOutput": 19939
+				},
+				"node_modules/shiki/dist/langs/typespec.mjs": {
+					"bytesInOutput": 25248
 				},
 				"node_modules/shiki/dist/langs/typst.mjs": {
 					"bytesInOutput": 7645
 				},
 				"node_modules/shiki/dist/langs/v.mjs": {
 					"bytesInOutput": 12160
+				},
+				"node_modules/shiki/dist/langs/vala.mjs": {
+					"bytesInOutput": 3102
 				},
 				"node_modules/shiki/dist/langs/vb.mjs": {
 					"bytesInOutput": 5816
@@ -8226,13 +9344,13 @@
 					"bytesInOutput": 825
 				},
 				"node_modules/shiki/dist/langs/vue.mjs": {
-					"bytesInOutput": 16019
+					"bytesInOutput": 16623
 				},
 				"node_modules/shiki/dist/langs/vue-html.mjs": {
 					"bytesInOutput": 7768
 				},
 				"node_modules/shiki/dist/langs/vyper.mjs": {
-					"bytesInOutput": 93241
+					"bytesInOutput": 76268
 				},
 				"node_modules/shiki/dist/langs/wasm.mjs": {
 					"bytesInOutput": 14532
@@ -8243,17 +9361,20 @@
 				"node_modules/shiki/dist/langs/wgsl.mjs": {
 					"bytesInOutput": 5924
 				},
-				"node_modules/shiki/dist/langs/wolfram.mjs": {
-					"bytesInOutput": 264359
-				},
 				"node_modules/shiki/dist/langs/xsl.mjs": {
 					"bytesInOutput": 1235
+				},
+				"node_modules/shiki/dist/langs/wikitext.mjs": {
+					"bytesInOutput": 52015
+				},
+				"node_modules/shiki/dist/langs/wolfram.mjs": {
+					"bytesInOutput": 264359
 				},
 				"node_modules/shiki/dist/langs/zenscript.mjs": {
 					"bytesInOutput": 3958
 				},
 				"node_modules/shiki/dist/langs/zig.mjs": {
-					"bytesInOutput": 4563
+					"bytesInOutput": 4925
 				},
 				"node_modules/@shikijs/core/dist/wasm-inlined.mjs": {
 					"bytesInOutput": 622297
@@ -8271,16 +9392,16 @@
 					"bytesInOutput": 14532
 				},
 				"node_modules/shiki/dist/themes/catppuccin-frappe.mjs": {
-					"bytesInOutput": 43398
+					"bytesInOutput": 44219
 				},
 				"node_modules/shiki/dist/themes/catppuccin-latte.mjs": {
-					"bytesInOutput": 43394
+					"bytesInOutput": 44215
 				},
 				"node_modules/shiki/dist/themes/catppuccin-macchiato.mjs": {
-					"bytesInOutput": 43401
+					"bytesInOutput": 44222
 				},
 				"node_modules/shiki/dist/themes/catppuccin-mocha.mjs": {
-					"bytesInOutput": 43393
+					"bytesInOutput": 44214
 				},
 				"node_modules/shiki/dist/themes/dark-plus.mjs": {
 					"bytesInOutput": 8496
@@ -8309,23 +9430,26 @@
 				"node_modules/shiki/dist/themes/houston.mjs": {
 					"bytesInOutput": 33933
 				},
+				"node_modules/shiki/dist/themes/laserwave.mjs": {
+					"bytesInOutput": 11372
+				},
 				"node_modules/shiki/dist/themes/light-plus.mjs": {
 					"bytesInOutput": 9357
 				},
 				"node_modules/shiki/dist/themes/material-theme.mjs": {
-					"bytesInOutput": 18104
+					"bytesInOutput": 18096
 				},
 				"node_modules/shiki/dist/themes/material-theme-darker.mjs": {
-					"bytesInOutput": 18118
+					"bytesInOutput": 18110
 				},
 				"node_modules/shiki/dist/themes/material-theme-lighter.mjs": {
-					"bytesInOutput": 18123
+					"bytesInOutput": 18115
 				},
 				"node_modules/shiki/dist/themes/material-theme-ocean.mjs": {
-					"bytesInOutput": 18118
+					"bytesInOutput": 18110
 				},
 				"node_modules/shiki/dist/themes/material-theme-palenight.mjs": {
-					"bytesInOutput": 18124
+					"bytesInOutput": 18116
 				},
 				"node_modules/shiki/dist/themes/min-dark.mjs": {
 					"bytesInOutput": 6144
@@ -8344,6 +9468,9 @@
 				},
 				"node_modules/shiki/dist/themes/one-dark-pro.mjs": {
 					"bytesInOutput": 31710
+				},
+				"node_modules/shiki/dist/themes/one-light.mjs": {
+					"bytesInOutput": 24017
 				},
 				"node_modules/shiki/dist/themes/poimandres.mjs": {
 					"bytesInOutput": 32847
@@ -8366,6 +9493,9 @@
 				"node_modules/shiki/dist/themes/slack-ochin.mjs": {
 					"bytesInOutput": 9120
 				},
+				"node_modules/shiki/dist/themes/snazzy-light.mjs": {
+					"bytesInOutput": 19778
+				},
 				"node_modules/shiki/dist/themes/solarized-dark.mjs": {
 					"bytesInOutput": 6542
 				},
@@ -8382,13 +9512,16 @@
 					"bytesInOutput": 12300
 				},
 				"node_modules/shiki/dist/themes/vitesse-black.mjs": {
-					"bytesInOutput": 12984
+					"bytesInOutput": 13064
 				},
 				"node_modules/shiki/dist/themes/vitesse-dark.mjs": {
-					"bytesInOutput": 13069
+					"bytesInOutput": 13146
 				},
 				"node_modules/shiki/dist/themes/vitesse-light.mjs": {
-					"bytesInOutput": 12926
+					"bytesInOutput": 13003
+				},
+				"node_modules/boolbase/index.js": {
+					"bytesInOutput": 97
 				},
 				"node_modules/picocolors/picocolors.browser.js": {
 					"bytesInOutput": 374
@@ -8460,10 +9593,10 @@
 					"bytesInOutput": 27432
 				},
 				"node_modules/@jspm/core/nodelibs/browser/chunk-44e51b61.js": {
-					"bytesInOutput": 63350
+					"bytesInOutput": 63340
 				},
 				"node_modules/@jspm/core/nodelibs/browser/assert.js": {
-					"bytesInOutput": 39573
+					"bytesInOutput": 39577
 				},
 				"node_modules/@jspm/core/nodelibs/browser/util.js": {
 					"bytesInOutput": 604
@@ -8484,10 +9617,10 @@
 					"bytesInOutput": 15661
 				},
 				"node_modules/@jspm/core/nodelibs/browser/buffer.js": {
-					"bytesInOutput": 27806
+					"bytesInOutput": 27807
 				},
 				"node-modules-polyfills:fs": {
-					"bytesInOutput": 65284
+					"bytesInOutput": 65289
 				},
 				"node-modules-polyfills-commonjs:fs": {
 					"bytesInOutput": 1646
@@ -8634,7 +9767,7 @@
 					"bytesInOutput": 3203
 				},
 				"node_modules/postcss-selector-parser/dist/parser.js": {
-					"bytesInOutput": 18024
+					"bytesInOutput": 18158
 				},
 				"node_modules/postcss-selector-parser/dist/processor.js": {
 					"bytesInOutput": 1798
@@ -8654,32 +9787,17 @@
 				"node_modules/postcss-nested/index.js": {
 					"bytesInOutput": 3385
 				},
-				"node_modules/boolbase/index.js": {
-					"bytesInOutput": 97
-				},
-				"node_modules/css-selector-parser/lib/utils.js": {
-					"bytesInOutput": 1433
-				},
-				"node_modules/css-selector-parser/lib/parser-context.js": {
-					"bytesInOutput": 3180
-				},
-				"node_modules/css-selector-parser/lib/render.js": {
-					"bytesInOutput": 1276
-				},
-				"node_modules/css-selector-parser/lib/index.js": {
-					"bytesInOutput": 2161
-				},
 				"src/main.ts": {
-					"bytesInOutput": 3303
+					"bytesInOutput": 4191
 				},
 				"node_modules/shiki/dist/langs.mjs": {
-					"bytesInOutput": 15227
+					"bytesInOutput": 17441
 				},
 				"node_modules/shiki/dist/chunks/wasm-dynamic.mjs": {
 					"bytesInOutput": 76
 				},
 				"node_modules/shiki/dist/themes.mjs": {
-					"bytesInOutput": 4768
+					"bytesInOutput": 5082
 				},
 				"node_modules/@shikijs/core/dist/types.mjs": {
 					"bytesInOutput": 149
@@ -8688,13 +9806,16 @@
 					"bytesInOutput": 45598
 				},
 				"node_modules/@shikijs/core/dist/index.mjs": {
-					"bytesInOutput": 62713
+					"bytesInOutput": 66752
 				},
 				"node_modules/shiki/dist/bundle-full.mjs": {
-					"bytesInOutput": 146
+					"bytesInOutput": 181
 				},
 				"node_modules/shiki/dist/index.mjs": {
 					"bytesInOutput": 0
+				},
+				"node_modules/html-void-elements/index.js": {
+					"bytesInOutput": 162
 				},
 				"node_modules/property-information/lib/util/schema.js": {
 					"bytesInOutput": 154
@@ -8736,7 +9857,7 @@
 					"bytesInOutput": 912
 				},
 				"node_modules/property-information/lib/html.js": {
-					"bytesInOutput": 4200
+					"bytesInOutput": 4246
 				},
 				"node_modules/property-information/lib/svg.js": {
 					"bytesInOutput": 10134
@@ -8747,176 +9868,17 @@
 				"node_modules/property-information/index.js": {
 					"bytesInOutput": 65
 				},
-				"node_modules/hast-util-parse-selector/lib/index.js": {
-					"bytesInOutput": 324
-				},
-				"node_modules/hast-util-parse-selector/index.js": {
-					"bytesInOutput": 0
-				},
-				"node_modules/space-separated-tokens/index.js": {
-					"bytesInOutput": 120
-				},
-				"node_modules/comma-separated-tokens/index.js": {
-					"bytesInOutput": 310
-				},
-				"node_modules/hastscript/lib/core.js": {
-					"bytesInOutput": 1969
-				},
-				"node_modules/hastscript/lib/html.js": {
-					"bytesInOutput": 20
-				},
-				"node_modules/hastscript/lib/index.js": {
-					"bytesInOutput": 0
-				},
-				"node_modules/hastscript/lib/svg-case-sensitive-tag-names.js": {
-					"bytesInOutput": 560
-				},
-				"node_modules/hastscript/lib/svg.js": {
-					"bytesInOutput": 21
-				},
-				"node_modules/hastscript/index.js": {
-					"bytesInOutput": 0
-				},
-				"node_modules/postcss/lib/postcss.mjs": {
-					"bytesInOutput": 574
-				},
-				"node_modules/@expressive-code/core/dist/index.js": {
-					"bytesInOutput": 83196
-				},
-				"node_modules/@ctrl/tinycolor/dist/module/util.js": {
-					"bytesInOutput": 609
-				},
-				"node_modules/@ctrl/tinycolor/dist/module/conversion.js": {
-					"bytesInOutput": 1992
-				},
-				"node_modules/@ctrl/tinycolor/dist/module/css-color-names.js": {
-					"bytesInOutput": 2959
-				},
-				"node_modules/@ctrl/tinycolor/dist/module/format-input.js": {
-					"bytesInOutput": 2197
-				},
-				"node_modules/@ctrl/tinycolor/dist/module/index.js": {
-					"bytesInOutput": 6527
-				},
-				"node_modules/@ctrl/tinycolor/dist/module/readability.js": {
-					"bytesInOutput": 151
-				},
-				"node_modules/@expressive-code/plugin-shiki/dist/index.js": {
-					"bytesInOutput": 2889
-				},
-				"node_modules/@expressive-code/plugin-text-markers/dist/index.js": {
-					"bytesInOutput": 11251
-				},
-				"node_modules/direction/index.js": {
-					"bytesInOutput": 321
-				},
-				"node_modules/hast-util-to-string/index.js": {
-					"bytesInOutput": 233
-				},
-				"node_modules/unist-util-is/lib/index.js": {
-					"bytesInOutput": 687
-				},
-				"node_modules/unist-util-is/index.js": {
-					"bytesInOutput": 0
-				},
-				"node_modules/unist-util-visit-parents/lib/index.js": {
-					"bytesInOutput": 756
-				},
-				"node_modules/unist-util-visit-parents/index.js": {
-					"bytesInOutput": 0
-				},
-				"node_modules/unist-util-visit/lib/index.js": {
-					"bytesInOutput": 179
-				},
-				"node_modules/unist-util-visit/index.js": {
-					"bytesInOutput": 0
-				},
-				"node_modules/hast-util-select/lib/enter-state.js": {
-					"bytesInOutput": 1261
-				},
-				"node_modules/hast-util-has-property/lib/index.js": {
-					"bytesInOutput": 232
-				},
-				"node_modules/hast-util-has-property/index.js": {
-					"bytesInOutput": 0
-				},
 				"node_modules/zwitch/index.js": {
 					"bytesInOutput": 278
 				},
-				"node_modules/hast-util-select/lib/attribute.js": {
-					"bytesInOutput": 1290
-				},
-				"node_modules/hast-util-select/lib/class-name.js": {
-					"bytesInOutput": 152
-				},
-				"node_modules/hast-util-select/lib/id.js": {
-					"bytesInOutput": 64
-				},
-				"node_modules/hast-util-select/lib/name.js": {
-					"bytesInOutput": 63
-				},
-				"node_modules/bcp-47-match/index.js": {
-					"bytesInOutput": 940
-				},
-				"node_modules/hast-util-whitespace/index.js": {
-					"bytesInOutput": 135
-				},
-				"node_modules/nth-check/lib/esm/parse.js": {
-					"bytesInOutput": 618
-				},
-				"node_modules/nth-check/lib/esm/compile.js": {
-					"bytesInOutput": 267
-				},
-				"node_modules/nth-check/lib/esm/index.js": {
-					"bytesInOutput": 32
-				},
-				"node_modules/hast-util-select/lib/pseudo.js": {
-					"bytesInOutput": 3908
-				},
-				"node_modules/hast-util-select/lib/test.js": {
-					"bytesInOutput": 158
-				},
-				"node_modules/hast-util-select/lib/walk.js": {
-					"bytesInOutput": 1874
-				},
-				"node_modules/hast-util-select/lib/parse.js": {
-					"bytesInOutput": 314
-				},
-				"node_modules/hast-util-select/lib/index.js": {
-					"bytesInOutput": 375
-				},
-				"node_modules/hast-util-select/index.js": {
-					"bytesInOutput": 0
-				},
-				"node_modules/@expressive-code/plugin-collapsible-sections/dist/index.js": {
-					"bytesInOutput": 5345
-				},
-				"node_modules/@expressive-code/plugin-line-numbers/dist/index.js": {
-					"bytesInOutput": 1184
-				},
-				"node_modules/@expressive-code/plugin-frames/dist/index.js": {
-					"bytesInOutput": 16215
-				},
-				"src/themes/ObsidianTheme.ts": {
-					"bytesInOutput": 14016
-				},
-				"src/themes/ThemeMapper.ts": {
-					"bytesInOutput": 1166
-				},
-				"src/CodeBlock.ts": {
-					"bytesInOutput": 1030
-				},
-				"node_modules/html-void-elements/index.js": {
-					"bytesInOutput": 192
-				},
 				"node_modules/stringify-entities/lib/core.js": {
-					"bytesInOutput": 555
+					"bytesInOutput": 663
 				},
 				"node_modules/stringify-entities/lib/util/to-hexadecimal.js": {
-					"bytesInOutput": 124
+					"bytesInOutput": 134
 				},
 				"node_modules/stringify-entities/lib/util/to-decimal.js": {
-					"bytesInOutput": 96
+					"bytesInOutput": 106
 				},
 				"node_modules/character-entities-legacy/index.js": {
 					"bytesInOutput": 839
@@ -8928,7 +9890,7 @@
 					"bytesInOutput": 63
 				},
 				"node_modules/stringify-entities/lib/util/to-named.js": {
-					"bytesInOutput": 285
+					"bytesInOutput": 297
 				},
 				"node_modules/stringify-entities/lib/util/format-smart.js": {
 					"bytesInOutput": 341
@@ -8937,7 +9899,7 @@
 					"bytesInOutput": 59
 				},
 				"node_modules/hast-util-to-html/lib/handle/comment.js": {
-					"bytesInOutput": 295
+					"bytesInOutput": 317
 				},
 				"node_modules/hast-util-to-html/lib/handle/doctype.js": {
 					"bytesInOutput": 119
@@ -8945,23 +9907,35 @@
 				"node_modules/ccount/index.js": {
 					"bytesInOutput": 172
 				},
+				"node_modules/comma-separated-tokens/index.js": {
+					"bytesInOutput": 310
+				},
+				"node_modules/space-separated-tokens/index.js": {
+					"bytesInOutput": 120
+				},
+				"node_modules/hast-util-whitespace/lib/index.js": {
+					"bytesInOutput": 144
+				},
+				"node_modules/hast-util-whitespace/index.js": {
+					"bytesInOutput": 0
+				},
 				"node_modules/hast-util-to-html/lib/omission/util/siblings.js": {
-					"bytesInOutput": 151
+					"bytesInOutput": 154
 				},
 				"node_modules/hast-util-to-html/lib/omission/omission.js": {
 					"bytesInOutput": 117
 				},
 				"node_modules/hast-util-to-html/lib/omission/closing.js": {
-					"bytesInOutput": 2377
+					"bytesInOutput": 2245
 				},
 				"node_modules/hast-util-to-html/lib/omission/opening.js": {
-					"bytesInOutput": 936
+					"bytesInOutput": 944
 				},
 				"node_modules/hast-util-to-html/lib/handle/element.js": {
-					"bytesInOutput": 2272
+					"bytesInOutput": 2274
 				},
 				"node_modules/hast-util-to-html/lib/handle/text.js": {
-					"bytesInOutput": 183
+					"bytesInOutput": 193
 				},
 				"node_modules/hast-util-to-html/lib/handle/raw.js": {
 					"bytesInOutput": 78
@@ -8970,19 +9944,187 @@
 					"bytesInOutput": 37
 				},
 				"node_modules/hast-util-to-html/lib/handle/index.js": {
-					"bytesInOutput": 245
+					"bytesInOutput": 253
 				},
 				"node_modules/hast-util-to-html/lib/index.js": {
-					"bytesInOutput": 1133
+					"bytesInOutput": 1143
 				},
 				"node_modules/hast-util-to-html/index.js": {
 					"bytesInOutput": 0
 				},
+				"node_modules/unist-util-is/lib/index.js": {
+					"bytesInOutput": 764
+				},
+				"node_modules/unist-util-is/index.js": {
+					"bytesInOutput": 0
+				},
+				"node_modules/css-selector-parser/dist/mjs/indexes.js": {
+					"bytesInOutput": 363
+				},
+				"node_modules/css-selector-parser/dist/mjs/pseudo-signatures.js": {
+					"bytesInOutput": 771
+				},
+				"node_modules/css-selector-parser/dist/mjs/syntax-definitions.js": {
+					"bytesInOutput": 3185
+				},
+				"node_modules/css-selector-parser/dist/mjs/utils.js": {
+					"bytesInOutput": 385
+				},
+				"node_modules/css-selector-parser/dist/mjs/parser.js": {
+					"bytesInOutput": 8873
+				},
+				"node_modules/css-selector-parser/dist/mjs/index.js": {
+					"bytesInOutput": 0
+				},
+				"node_modules/css-selector-parser/dist/mjs/ast.js": {
+					"bytesInOutput": 1182
+				},
+				"node_modules/hast-util-select/lib/parse.js": {
+					"bytesInOutput": 150
+				},
+				"node_modules/direction/index.js": {
+					"bytesInOutput": 321
+				},
+				"node_modules/hast-util-to-string/lib/index.js": {
+					"bytesInOutput": 233
+				},
+				"node_modules/hast-util-to-string/index.js": {
+					"bytesInOutput": 0
+				},
+				"node_modules/unist-util-visit-parents/lib/index.js": {
+					"bytesInOutput": 824
+				},
+				"node_modules/unist-util-visit-parents/index.js": {
+					"bytesInOutput": 0
+				},
+				"node_modules/unist-util-visit/lib/index.js": {
+					"bytesInOutput": 205
+				},
+				"node_modules/unist-util-visit/index.js": {
+					"bytesInOutput": 0
+				},
+				"node_modules/hast-util-select/lib/enter-state.js": {
+					"bytesInOutput": 1241
+				},
+				"node_modules/hast-util-select/lib/attribute.js": {
+					"bytesInOutput": 672
+				},
+				"node_modules/hast-util-select/lib/class-name.js": {
+					"bytesInOutput": 79
+				},
+				"node_modules/hast-util-select/lib/id.js": {
+					"bytesInOutput": 49
+				},
+				"node_modules/hast-util-select/lib/name.js": {
+					"bytesInOutput": 43
+				},
+				"node_modules/bcp-47-match/index.js": {
+					"bytesInOutput": 940
+				},
+				"node_modules/hast-util-has-property/lib/index.js": {
+					"bytesInOutput": 132
+				},
+				"node_modules/hast-util-has-property/index.js": {
+					"bytesInOutput": 0
+				},
+				"node_modules/nth-check/lib/esm/parse.js": {
+					"bytesInOutput": 618
+				},
+				"node_modules/nth-check/lib/esm/compile.js": {
+					"bytesInOutput": 267
+				},
+				"node_modules/nth-check/lib/esm/index.js": {
+					"bytesInOutput": 32
+				},
+				"node_modules/hast-util-select/lib/pseudo.js": {
+					"bytesInOutput": 3758
+				},
+				"node_modules/hast-util-select/lib/test.js": {
+					"bytesInOutput": 388
+				},
+				"node_modules/hast-util-select/lib/walk.js": {
+					"bytesInOutput": 1801
+				},
+				"node_modules/hast-util-select/lib/index.js": {
+					"bytesInOutput": 365
+				},
+				"node_modules/hast-util-select/index.js": {
+					"bytesInOutput": 0
+				},
+				"node_modules/hast-util-parse-selector/lib/index.js": {
+					"bytesInOutput": 324
+				},
+				"node_modules/hast-util-parse-selector/index.js": {
+					"bytesInOutput": 0
+				},
+				"node_modules/hastscript/lib/create-h.js": {
+					"bytesInOutput": 2062
+				},
+				"node_modules/hastscript/lib/svg-case-sensitive-tag-names.js": {
+					"bytesInOutput": 560
+				},
+				"node_modules/hastscript/lib/index.js": {
+					"bytesInOutput": 37
+				},
+				"node_modules/hastscript/index.js": {
+					"bytesInOutput": 0
+				},
+				"node_modules/postcss/lib/postcss.mjs": {
+					"bytesInOutput": 574
+				},
+				"node_modules/@expressive-code/core/dist/index.js": {
+					"bytesInOutput": 84548
+				},
+				"node_modules/@ctrl/tinycolor/dist/module/util.js": {
+					"bytesInOutput": 608
+				},
+				"node_modules/@ctrl/tinycolor/dist/module/conversion.js": {
+					"bytesInOutput": 2350
+				},
+				"node_modules/@ctrl/tinycolor/dist/module/css-color-names.js": {
+					"bytesInOutput": 2959
+				},
+				"node_modules/@ctrl/tinycolor/dist/module/format-input.js": {
+					"bytesInOutput": 2304
+				},
+				"node_modules/@ctrl/tinycolor/dist/module/index.js": {
+					"bytesInOutput": 5213
+				},
+				"node_modules/@ctrl/tinycolor/dist/module/readability.js": {
+					"bytesInOutput": 151
+				},
+				"node_modules/@expressive-code/plugin-shiki/dist/index.js": {
+					"bytesInOutput": 2889
+				},
+				"node_modules/@expressive-code/core/dist/hast.js": {
+					"bytesInOutput": 1060
+				},
+				"node_modules/@expressive-code/plugin-text-markers/dist/index.js": {
+					"bytesInOutput": 11243
+				},
+				"node_modules/@expressive-code/plugin-collapsible-sections/dist/index.js": {
+					"bytesInOutput": 5345
+				},
+				"node_modules/@expressive-code/plugin-line-numbers/dist/index.js": {
+					"bytesInOutput": 1184
+				},
+				"node_modules/@expressive-code/plugin-frames/dist/index.js": {
+					"bytesInOutput": 16262
+				},
+				"src/themes/ObsidianTheme.ts": {
+					"bytesInOutput": 14123
+				},
+				"src/themes/ThemeMapper.ts": {
+					"bytesInOutput": 1254
+				},
+				"src/CodeBlock.ts": {
+					"bytesInOutput": 1030
+				},
 				"src/codemirror/Cm6_ViewPlugin.ts": {
-					"bytesInOutput": 1571
+					"bytesInOutput": 2189
 				},
 				"src/codemirror/Cm6_Util.ts": {
-					"bytesInOutput": 197
+					"bytesInOutput": 323
 				},
 				"src/settings/Settings.ts": {
 					"bytesInOutput": 74
@@ -9000,10 +10142,10 @@
 					"bytesInOutput": 465
 				},
 				"src/themes/ECTheme.ts": {
-					"bytesInOutput": 3688
+					"bytesInOutput": 3662
 				}
 			},
-			"bytes": 7624224
+			"bytes": 8944517
 		}
 	}
 }

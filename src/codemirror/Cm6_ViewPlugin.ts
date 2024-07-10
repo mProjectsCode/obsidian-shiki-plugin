@@ -57,11 +57,11 @@ export function createCm6Plugin(plugin: ShikiPlugin): ViewPlugin<any> {
 						if (props.has('inline-code')) {
 							const content = Cm6_Util.getContent(view.state, node.from, node.to);
 
-							if (content.startsWith('{')) {
+							if (content.startsWith('{') && plugin.settings.inlineHighlighting) {
 								const match = content.match(SHIKI_INLINE_REGEX); // format: `{lang} code`
 								if (match) {
 									// if there is selection overlap, the user has the inline code block selected, so we don't want to highlight it
-									if (Cm6_Util.checkSelectionAndRangeOverlap(view.state.selection, node.from, node.to)) {
+									if (Cm6_Util.checkSelectionAndRangeOverlap(view.state.selection, node.from - 1, node.to + 1)) {
 										this.removeDecoration(node.from, node.to);
 										return;
 									}

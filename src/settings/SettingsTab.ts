@@ -42,6 +42,16 @@ export class ShikiSettingsTab extends PluginSettingTab {
 			});
 
 		new Setting(this.containerEl)
+			.setName('Inline Syntax Highlighting')
+			.setDesc('Enables syntax highlighting for inline code blocks via `{lang} code`.')
+			.addToggle(toggle => {
+				toggle.setValue(this.plugin.settings.inlineHighlighting).onChange(async value => {
+					this.plugin.settings.inlineHighlighting = value;
+					await this.plugin.saveSettings();
+				});
+			});
+
+		new Setting(this.containerEl)
 			.setName('Excluded Languages')
 			.setDesc('Configure language to exclude. RESTART REQUIRED AFTER CHANGES.')
 			.addButton(button => {
