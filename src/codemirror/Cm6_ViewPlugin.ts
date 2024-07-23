@@ -1,11 +1,12 @@
 import type ShikiPlugin from 'src/main';
 import { SHIKI_INLINE_REGEX } from 'src/main';
 import { Decoration, type DecorationSet, type EditorView, ViewPlugin, type ViewUpdate } from '@codemirror/view';
-import { type Range } from '@codemirror/state';
+import { type EditorState, type Range } from '@codemirror/state';
 import { type SyntaxNode } from '@lezer/common';
 import { syntaxTree } from '@codemirror/language';
 import { Cm6_Util } from 'src/codemirror/Cm6_Util';
 import { type ThemedToken } from 'shiki';
+import { editorLivePreviewField } from 'obsidian';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createCm6Plugin(plugin: ShikiPlugin): ViewPlugin<any> {
@@ -33,10 +34,16 @@ export function createCm6Plugin(plugin: ShikiPlugin): ViewPlugin<any> {
 				}
 			}
 
+			isLivePreview(state: EditorState): boolean {
+				// @ts-ignore some strange private field not being assignable
+				return state.field(editorLivePreviewField);
+			}
+
 			/**
 			 * Updates all the widgets by traversing the syntax tree.
 			 *
 			 * @param view
+			 * @param docChanged
 			 */
 			updateWidgets(view: EditorView, docChanged: boolean = true): void {
 				let lang = '';
@@ -60,10 +67,12 @@ export function createCm6Plugin(plugin: ShikiPlugin): ViewPlugin<any> {
 							if (content.startsWith('{') && plugin.settings.inlineHighlighting) {
 								const match = content.match(SHIKI_INLINE_REGEX); // format: `{lang} code`
 								if (match) {
-									// if there is selection overlap, the user has the inline code block selected, so we don't want to highlight it
-									if (Cm6_Util.checkSelectionAndRangeOverlap(view.state.selection, node.from - 1, node.to + 1)) {
+									const hasSelectionOverlap = Cm6_Util.checkSelectionAndRangeOverlap(view.state.selection, node.from - 1, node.to + 1);
+
+									// if there is selection overlap, the user has the inline code block selected, so we don't want to hide the language tag.
+									// For this we just remove the decorations and rebuild them with the language tag visible.
+									if (hasSelectionOverlap) {
 										this.removeDecoration(node.from, node.to);
-										return;
 									}
 									const hideTo = node.from + match[1].length + 3; // hide `{lang} `
 
@@ -72,7 +81,9 @@ export function createCm6Plugin(plugin: ShikiPlugin): ViewPlugin<any> {
 
 										this.removeDecoration(node.from, node.to);
 										// add the decoration that hides the language tag
-										decorations.unshift(Decoration.replace({}).range(node.from, hideTo));
+										if (this.isLivePreview(view.state) && !hasSelectionOverlap) {
+											decorations.unshift(Decoration.replace({}).range(node.from, hideTo));
+										}
 										// add the highlight decorations
 										this.addDecoration(node.from, node.to, decorations);
 									} catch (e) {
@@ -157,14 +168,10 @@ export function createCm6Plugin(plugin: ShikiPlugin): ViewPlugin<any> {
 			addDecoration(from: number, to: number, newDecorations: Range<Decoration>[]): void {
 				// check if the decoration already exists and only add it if it does not exist
 				if (Cm6_Util.existsDecorationBetween(this.decorations, from, to)) {
-					console.log('exists');
-
 					return;
 				}
 
 				if (newDecorations.length === 0) {
-					console.log('empty');
-
 					return;
 				}
 
