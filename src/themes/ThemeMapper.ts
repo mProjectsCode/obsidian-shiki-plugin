@@ -17,7 +17,13 @@ export class ThemeMapper {
 	}
 
 	async getThemeForEC(): Promise<ThemeRegistration> {
-		if (this.plugin.loadedSettings.theme !== 'obsidian-theme') {
+		if (this.plugin.loadedSettings.theme.toLowerCase().endsWith('.json')) {
+			let theme = this.plugin.customThemes.find(theme => theme.id === this.plugin.loadedSettings.theme);
+			if (theme?.jsonData) {
+				return theme.jsonData;
+			}
+		}
+		else if (this.plugin.loadedSettings.theme !== 'obsidian-theme') {
 			return (await bundledThemes[this.plugin.loadedSettings.theme as BundledTheme]()).default;
 		}
 
@@ -43,7 +49,13 @@ export class ThemeMapper {
 	}
 
 	async getTheme(): Promise<ThemeRegistration> {
-		if (this.plugin.loadedSettings.theme !== 'obsidian-theme') {
+		if (this.plugin.loadedSettings.theme.toLowerCase().endsWith('.json')) {
+			let theme = this.plugin.customThemes.find(theme => theme.id === this.plugin.loadedSettings.theme);
+			if (theme?.jsonData) {
+				return theme.jsonData;
+			}
+		}
+		else if (this.plugin.loadedSettings.theme !== 'obsidian-theme') {
 			return (await bundledThemes[this.plugin.loadedSettings.theme as BundledTheme]()).default;
 		}
 

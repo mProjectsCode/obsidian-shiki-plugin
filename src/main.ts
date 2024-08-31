@@ -15,6 +15,13 @@ import { filterHighlightAllPlugin } from 'src/PrismPlugin';
 import { LoadedLanguage } from 'src/LoadedLanguage';
 import { getECTheme } from 'src/themes/ECTheme';
 
+interface CustomTheme {
+	id: string;
+	displayName: string;
+	type: string;
+	jsonData: Record<string, unknown>;
+  }
+
 // some languages break obsidian's `registerMarkdownCodeBlockProcessor`, so we blacklist them
 const languageNameBlacklist = new Set(['c++', 'c#', 'f#', 'mermaid']);
 
@@ -38,7 +45,10 @@ export default class ShikiPlugin extends Plugin {
 	// @ts-expect-error TS2564
 	loadedSettings: Settings;
 
+	customThemes: CustomTheme[] = [];
+
 	async onload(): Promise<void> {
+		await this.loadCustomThemes();
 		await this.loadSettings();
 
 		this.loadedSettings = structuredClone(this.settings);
@@ -77,6 +87,38 @@ export default class ShikiPlugin extends Plugin {
 		);
 
 		await this.registerPrismPlugin();
+	}
+
+	async loadCustomThemes(): Promise<void> {
+
+		// @ts-expect-error TS2339
+		const themePath = this.app.vault.adapter.path.join(this.app.vault.configDir, 'plugins', this.manifest.id, 'themes');
+
+		if (! await this.app.vault.adapter.exists(themePath)) {
+			console.warn(`Path to custom themes does not exist: ${themePath}`);
+		} else {
+			const themeList = await this.app.vault.adapter.list(themePath);
+			const themeFiles = themeList.files.filter(f => f.toLowerCase().endsWith('.json'));
+
+			for (let themeFile of themeFiles) {
+				try {
+					// not all theme files have proper metadata; some contain invalid JSON
+					const theme = JSON.parse(await this.app.vault.adapter.read(themeFile));
+					const baseName = themeFile.substring(`${themePath}/`.length);
+					const displayName = theme.displayName ?? theme.name ?? baseName;
+					theme.name = baseName;
+					theme.type = theme.type ?? 'both';
+					this.customThemes.push({
+						id: baseName,
+						displayName: displayName,
+						type: theme.type,
+						jsonData: theme
+					});
+				} catch(err) {
+					console.warn(`Unable to load custom theme file: ${themeFile}`, err);
+				}
+			}
+		}
 	}
 
 	async loadLanguages(): Promise<void> {

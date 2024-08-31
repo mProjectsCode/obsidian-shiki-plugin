@@ -1,4 +1,4 @@
-import { PluginSettingTab, Setting } from 'obsidian';
+import { PluginSettingTab, Setting, Platform } from 'obsidian';
 import type ShikiPlugin from 'src/main';
 import { StringSelectModal } from 'src/settings/StringSelectModal';
 import { bundledThemesInfo } from 'shiki';
@@ -15,8 +15,16 @@ export class ShikiSettingsTab extends PluginSettingTab {
 	display(): void {
 		this.containerEl.empty();
 
-		const themes = Object.fromEntries(bundledThemesInfo.map(theme => [theme.id, `${theme.displayName} (${theme.type})`]));
-		themes['obsidian-theme'] = 'Obsidian built-in (both)';
+		// sort custom themes by their display name
+		this.plugin.customThemes.sort((a, b) => a.displayName.localeCompare(b.displayName));
+
+		const customThemes = Object.fromEntries(this.plugin.customThemes.map(theme => [theme.id, `${theme.displayName} (${theme.type})`]));
+		const builtInThemes = Object.fromEntries(bundledThemesInfo.map(theme => [theme.id, `${theme.displayName} (${theme.type})`]));
+		const themes = {
+			'obsidian-theme': 'Obsidian built-in (both)',
+			...customThemes,
+			...builtInThemes
+		};
 
 		new Setting(this.containerEl)
 			.setName('Theme')
@@ -28,6 +36,20 @@ export class ShikiSettingsTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			});
+
+		if (Platform.isDesktopApp) {
+			new Setting(this.containerEl)
+				.setName('Custom themes')
+				.setDesc('Click to open the folder where you can add your custom JSON theme files. RESTART REQUIRED AFTER CHANGES.')
+				.addButton(button => {
+					button.setButtonText('Custom themes...').onClick(() => {
+						// @ts-expect-error TS2339
+						const themePath = this.plugin.app.vault.adapter.path.join(this.plugin.app.vault.configDir, 'plugins', this.plugin.manifest.id, 'themes');
+						// @ts-expect-error TS2339
+						this.plugin.app.openWithDefaultApp(themePath);
+					});
+				});
+		}
 
 		new Setting(this.containerEl)
 			.setName('Prefer theme colors')

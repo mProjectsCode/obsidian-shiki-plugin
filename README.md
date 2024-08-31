@@ -32,6 +32,10 @@ Some inline code `{jsx} <button role="button" />`.
 
 This feature can be turned off in the settings.
 
+### Custom Themes
+
+This plugin comes with a [wide variety of themes](https://expressive-code.com/guides/themes/#using-bundled-themes) bundled in. In addition, it supports custom JSON theme files compatible with VS Code. Simply place your custom JSON theme files in the plugin's `themes` folder, which can be accessed from the settings. The custom themes will show up in the Theme dropdown after restarting Obsidian.
+
 ## Code Block Configuration
 
 To configure the code block you add the configuration options on the same line as the opening triple backticks.
