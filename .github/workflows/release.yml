@@ -26,8 +26,6 @@ jobs:
                   bun install
                   bun run build
                   mkdir ${{ env.PLUGIN_NAME }}
-                  mkdir ${{ env.PLUGIN_NAME }}/themes
-                  touch ${{ env.PLUGIN_NAME }}/themes/place custom themes here
                   cp main.js manifest.json styles.css ${{ env.PLUGIN_NAME }}
                   zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
                   ls

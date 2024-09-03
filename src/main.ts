@@ -1,4 +1,4 @@
-import { loadPrism, Plugin, TFile } from 'obsidian';
+import { loadPrism, Plugin, TFile, Notice, normalizePath } from 'obsidian';
 import { bundledLanguages, getHighlighter, type ThemedToken, type Highlighter, type TokensResult } from 'shiki';
 import { ExpressiveCodeEngine, ExpressiveCodeTheme } from '@expressive-code/core';
 import { pluginShiki } from '@expressive-code/plugin-shiki';
@@ -16,11 +16,12 @@ import { LoadedLanguage } from 'src/LoadedLanguage';
 import { getECTheme } from 'src/themes/ECTheme';
 
 interface CustomTheme {
-	id: string;
+	name: string;
 	displayName: string;
 	type: string;
-	jsonData: Record<string, unknown>;
-  }
+	colors?: Record<string, unknown>[];
+	tokenColors?: Record<string, unknown>[];
+}
 
 // some languages break obsidian's `registerMarkdownCodeBlockProcessor`, so we blacklist them
 const languageNameBlacklist = new Set(['c++', 'c#', 'f#', 'mermaid']);
@@ -48,8 +49,8 @@ export default class ShikiPlugin extends Plugin {
 	customThemes: CustomTheme[] = [];
 
 	async onload(): Promise<void> {
-		await this.loadCustomThemes();
 		await this.loadSettings();
+		await this.loadCustomThemes();
 
 		this.loadedSettings = structuredClone(this.settings);
 
@@ -90,34 +91,40 @@ export default class ShikiPlugin extends Plugin {
 	}
 
 	async loadCustomThemes(): Promise<void> {
+		// custom themes are disabled unless users specify a folder for them in plugin settings
+		if (!this.settings.customThemeFolder) return;
 
-		// @ts-expect-error TS2339
-		const themePath = this.app.vault.adapter.path.join(this.app.vault.configDir, 'plugins', this.manifest.id, 'themes');
+		const themeFolder = normalizePath(this.settings.customThemeFolder);
+		if (!(await this.app.vault.adapter.exists(themeFolder))) {
+			new Notice(`${this.manifest.name}\nUnable to open custom themes folder: ${themeFolder}`, 5000);
+			return;
+		}
 
-		if (! await this.app.vault.adapter.exists(themePath)) {
-			console.warn(`Path to custom themes does not exist: ${themePath}`);
-		} else {
-			const themeList = await this.app.vault.adapter.list(themePath);
-			const themeFiles = themeList.files.filter(f => f.toLowerCase().endsWith('.json'));
+		const themeList = await this.app.vault.adapter.list(themeFolder);
+		const themeFiles = themeList.files.filter(f => f.toLowerCase().endsWith('.json'));
 
-			for (let themeFile of themeFiles) {
-				try {
-					// not all theme files have proper metadata; some contain invalid JSON
-					const theme = JSON.parse(await this.app.vault.adapter.read(themeFile));
-					const baseName = themeFile.substring(`${themePath}/`.length);
-					const displayName = theme.displayName ?? theme.name ?? baseName;
-					theme.name = baseName;
-					theme.type = theme.type ?? 'both';
-					this.customThemes.push({
-						id: baseName,
-						displayName: displayName,
-						type: theme.type,
-						jsonData: theme
-					});
-				} catch(err) {
-					console.warn(`Unable to load custom theme file: ${themeFile}`, err);
+		for (const themeFile of themeFiles) {
+			const baseName = themeFile.substring(`${themeFolder}/`.length);
+			try {
+				// validate that theme file JSON can be parsed and contains colors at a minimum
+				const theme = JSON.parse(await this.app.vault.adapter.read(themeFile)) as CustomTheme;
+				if (!theme.colors && !theme.tokenColors) {
+					throw Error('Invalid JSON theme file.');
 				}
+				// what metadata is available in the theme file depends on how it was created
+				theme.displayName = theme.displayName ?? theme.name ?? baseName;
+				theme.name = baseName;
+				theme.type = theme.type ?? 'both';
+				this.customThemes.push(theme);
+			} catch (e) {
+				new Notice(`${this.manifest.name}\nUnable to load custom theme: ${themeFile}`, 5000);
+				console.warn(`Unable to load custom theme: ${themeFile}`, e);
 			}
+		}
+
+		// if the user's set theme cannot be loaded (e.g. it was deleted), fall back to default theme
+		if (!this.customThemes.find(theme => theme.name === this.settings.theme)) {
+			this.settings.theme = DEFAULT_SETTINGS.theme;
 		}
 	}
 
