@@ -49,7 +49,7 @@ export class ShikiSettingsTab extends PluginSettingTab {
 							await this.plugin.saveSettings();
 						})
 						.then(textbox => {
-							textbox.inputEl.style.width = '250px';
+							textbox.inputEl.addClass('shiki-custom-theme-folder');
 						});
 				})
 				.addExtraButton(button => {
