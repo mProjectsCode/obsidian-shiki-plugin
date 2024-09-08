@@ -15,10 +15,7 @@ export class ShikiSettingsTab extends PluginSettingTab {
 	display(): void {
 		this.containerEl.empty();
 
-		// sort custom themes by their display name
-		this.plugin.customThemes.sort((a, b) => a.displayName.localeCompare(b.displayName));
-
-		const customThemes = Object.fromEntries(this.plugin.customThemes.map(theme => [theme.name, `${theme.displayName} (${theme.type})`]));
+		const customThemes = Object.fromEntries(this.plugin.highlighter.customThemes.map(theme => [theme.name, `${theme.displayName} (${theme.type})`]));
 		const builtInThemes = Object.fromEntries(bundledThemesInfo.map(theme => [theme.id, `${theme.displayName} (${theme.type})`]));
 		const themes = {
 			'obsidian-theme': 'Obsidian built-in (both)',
@@ -27,8 +24,22 @@ export class ShikiSettingsTab extends PluginSettingTab {
 		};
 
 		new Setting(this.containerEl)
+			.setName('Reload Highlighter')
+			.setDesc('Reload the syntax highlighter. REQUIRED AFTER SETTINGS CHANGES.')
+			.addButton(button => {
+				button
+					.setCta()
+					.setButtonText('Reload Highlighter')
+					.onClick(async () => {
+						button.setDisabled(true);
+						await this.plugin.reloadHighlighter();
+						button.setDisabled(false);
+					});
+			});
+
+		new Setting(this.containerEl)
 			.setName('Theme')
-			.setDesc('Select the theme for the code blocks. RESTART REQUIRED AFTER CHANGES.')
+			.setDesc('Select the theme for the code blocks.')
 			.addDropdown(dropdown => {
 				dropdown.addOptions(themes);
 				dropdown.setValue(this.plugin.settings.theme).onChange(async value => {
@@ -40,7 +51,7 @@ export class ShikiSettingsTab extends PluginSettingTab {
 		if (Platform.isDesktopApp) {
 			new Setting(this.containerEl)
 				.setName('Custom themes folder location')
-				.setDesc('Folder relative to your Vault where custom JSON theme files are located. RESTART REQUIRED AFTER CHANGES.')
+				.setDesc('Folder relative to your Vault where custom JSON theme files are located.')
 				.addText(textbox => {
 					textbox
 						.setValue(this.plugin.settings.customThemeFolder)
@@ -69,9 +80,7 @@ export class ShikiSettingsTab extends PluginSettingTab {
 
 		new Setting(this.containerEl)
 			.setName('Prefer theme colors')
-			.setDesc(
-				'When enabled the plugin will prefer theme colors over CSS variables for things like the code block background. RESTART REQUIRED AFTER CHANGES.',
-			)
+			.setDesc('When enabled the plugin will prefer theme colors over CSS variables for things like the code block background.')
 			.addToggle(toggle => {
 				toggle.setValue(this.plugin.settings.preferThemeColors).onChange(async value => {
 					this.plugin.settings.preferThemeColors = value;
@@ -89,12 +98,14 @@ export class ShikiSettingsTab extends PluginSettingTab {
 				});
 			});
 
+		new Setting(this.containerEl).setHeading().setName('Language Settings').setDesc('Configure language settings. RESTART REQUIRED AFTER CHANGES.');
+
 		new Setting(this.containerEl)
 			.setName('Excluded Languages')
-			.setDesc('Configure language to exclude. RESTART REQUIRED AFTER CHANGES.')
+			.setDesc('Configure language to exclude.')
 			.addButton(button => {
 				button.setButtonText('Add Language Rule').onClick(() => {
-					const modal = new StringSelectModal(this.plugin, Array.from(this.plugin.loadedLanguages.keys()), language => {
+					const modal = new StringSelectModal(this.plugin, Array.from(this.plugin.highlighter.loadedLanguages.keys()), language => {
 						this.plugin.settings.disabledLanguages.push(language);
 						void this.plugin.saveSettings();
 						this.display();

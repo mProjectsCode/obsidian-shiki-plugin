@@ -8486,7 +8486,7 @@
 			"format": "esm"
 		},
 		"src/codemirror/Cm6_ViewPlugin.ts": {
-			"bytes": 6551,
+			"bytes": 7037,
 			"imports": [
 				{
 					"path": "src/main.ts",
@@ -8522,12 +8522,17 @@
 					"path": "shiki",
 					"kind": "import-statement",
 					"external": true
+				},
+				{
+					"path": "obsidian",
+					"kind": "import-statement",
+					"external": true
 				}
 			],
 			"format": "esm"
 		},
 		"src/settings/Settings.ts": {
-			"bytes": 229,
+			"bytes": 286,
 			"imports": [],
 			"format": "esm"
 		},
@@ -8543,7 +8548,7 @@
 			"format": "esm"
 		},
 		"src/settings/SettingsTab.ts": {
-			"bytes": 2366,
+			"bytes": 2747,
 			"imports": [
 				{
 					"path": "obsidian",
@@ -8702,6 +8707,11 @@
 				},
 				{
 					"path": "@codemirror/language",
+					"kind": "require-call",
+					"external": true
+				},
+				{
+					"path": "obsidian",
 					"kind": "require-call",
 					"external": true
 				},
@@ -10121,16 +10131,16 @@
 					"bytesInOutput": 1030
 				},
 				"src/codemirror/Cm6_ViewPlugin.ts": {
-					"bytesInOutput": 2189
+					"bytesInOutput": 2280
 				},
 				"src/codemirror/Cm6_Util.ts": {
 					"bytesInOutput": 323
 				},
 				"src/settings/Settings.ts": {
-					"bytesInOutput": 74
+					"bytesInOutput": 96
 				},
 				"src/settings/SettingsTab.ts": {
-					"bytesInOutput": 1607
+					"bytesInOutput": 1923
 				},
 				"src/settings/StringSelectModal.ts": {
 					"bytesInOutput": 216
@@ -10145,7 +10155,7 @@
 					"bytesInOutput": 3662
 				}
 			},
-			"bytes": 8944517
+			"bytes": 8944946
 		}
 	}
 }

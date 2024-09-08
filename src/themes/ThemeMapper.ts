@@ -17,8 +17,8 @@ export class ThemeMapper {
 	}
 
 	async getThemeForEC(): Promise<ThemeRegistration> {
-		if (this.plugin.loadedSettings.theme.toLowerCase().endsWith('.json')) {
-			return this.plugin.customThemes.find(theme => theme.name === this.plugin.loadedSettings.theme) as ThemeRegistration;
+		if (this.plugin.loadedSettings.theme.endsWith('.json')) {
+			return this.plugin.highlighter.customThemes.find(theme => theme.name === this.plugin.loadedSettings.theme) as ThemeRegistration;
 		} else if (this.plugin.loadedSettings.theme !== 'obsidian-theme') {
 			return (await bundledThemes[this.plugin.loadedSettings.theme as BundledTheme]()).default;
 		}
@@ -45,8 +45,8 @@ export class ThemeMapper {
 	}
 
 	async getTheme(): Promise<ThemeRegistration> {
-		if (this.plugin.loadedSettings.theme.toLowerCase().endsWith('.json')) {
-			return this.plugin.customThemes.find(theme => theme.name === this.plugin.loadedSettings.theme) as ThemeRegistration;
+		if (this.plugin.loadedSettings.theme.endsWith('.json')) {
+			return this.plugin.highlighter.customThemes.find(theme => theme.name === this.plugin.loadedSettings.theme) as ThemeRegistration;
 		} else if (this.plugin.loadedSettings.theme !== 'obsidian-theme') {
 			return (await bundledThemes[this.plugin.loadedSettings.theme as BundledTheme]()).default;
 		}
@@ -54,6 +54,9 @@ export class ThemeMapper {
 		return OBSIDIAN_THEME;
 	}
 
+	/**
+	 * Maps a color or CSS variable to a hex color.
+	 */
 	mapColor(color: string): string {
 		if (this.mapping.has(color)) {
 			return this.mapping.get(color)!;
@@ -65,6 +68,9 @@ export class ThemeMapper {
 		}
 	}
 
+	/**
+	 * Maps the placeholder colors in the AST to CSS variables.
+	 */
 	fixAST(ast: hast_util_to_html_lib_types.Parents): hast_util_to_html_lib_types.Parents {
 		if (this.plugin.loadedSettings.theme !== 'obsidian-theme') {
 			return ast;

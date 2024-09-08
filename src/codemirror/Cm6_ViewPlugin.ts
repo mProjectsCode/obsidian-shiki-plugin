@@ -8,15 +8,21 @@ import { Cm6_Util } from 'src/codemirror/Cm6_Util';
 import { type ThemedToken } from 'shiki';
 import { editorLivePreviewField } from 'obsidian';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function createCm6Plugin(plugin: ShikiPlugin): ViewPlugin<any> {
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export function createCm6Plugin(plugin: ShikiPlugin) {
 	return ViewPlugin.fromClass(
-		class {
+		class Cm6ViewPlugin {
 			decorations: DecorationSet;
+			view: EditorView;
 
 			constructor(view: EditorView) {
+				this.view = view;
 				this.decorations = Decoration.none;
 				this.updateWidgets(view);
+
+				plugin.updateCm6Plugin = (): void => {
+					this.forceUpdate();
+				};
 			}
 
 			/**
@@ -30,8 +36,15 @@ export function createCm6Plugin(plugin: ShikiPlugin): ViewPlugin<any> {
 
 				// we handle doc changes and selection changes here
 				if (update.docChanged || update.selectionSet) {
+					this.view = update.view;
 					this.updateWidgets(update.view, update.docChanged);
 				}
+			}
+
+			forceUpdate(): void {
+				this.updateWidgets(this.view);
+
+				this.view.dispatch(this.view.state.update({}));
 			}
 
 			isLivePreview(state: EditorState): boolean {

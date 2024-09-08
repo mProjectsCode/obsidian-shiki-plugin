@@ -1,6 +1,5 @@
 import { type MarkdownPostProcessorContext, MarkdownRenderChild } from 'obsidian';
 import type ShikiPlugin from 'src/main';
-import { toHtml } from 'hast-util-to-html';
 
 export class CodeBlock extends MarkdownRenderChild {
 	plugin: ShikiPlugin;
@@ -42,16 +41,7 @@ export class CodeBlock extends MarkdownRenderChild {
 	}
 
 	private async render(metaString: string): Promise<void> {
-		const renderResult = await this.plugin.ec.render({
-			code: this.source,
-			language: this.language,
-			meta: metaString,
-		});
-
-		const ast = this.plugin.themeMapper.fixAST(renderResult.renderedGroupAst);
-
-		// yes, this is innerHTML, but we trust hast
-		this.containerEl.innerHTML = toHtml(ast);
+		await this.plugin.highlighter.renderWithEc(this.source, this.language, metaString, this.containerEl);
 	}
 
 	public async rerenderOnNoteChange(): Promise<void> {
@@ -64,6 +54,10 @@ export class CodeBlock extends MarkdownRenderChild {
 			this.cachedMetaString = newMetaString;
 			await this.render(newMetaString);
 		}
+	}
+
+	public async forceRerender(): Promise<void> {
+		await this.render(this.cachedMetaString);
 	}
 
 	public onload(): void {

@@ -1,69 +1,32 @@
-import { loadPrism, Plugin, TFile, Notice, normalizePath } from 'obsidian';
-import { bundledLanguages, getHighlighter, type ThemedToken, type Highlighter, type TokensResult } from 'shiki';
-import { ExpressiveCodeEngine, ExpressiveCodeTheme } from '@expressive-code/core';
-import { pluginShiki } from '@expressive-code/plugin-shiki';
-import { pluginTextMarkers } from '@expressive-code/plugin-text-markers';
-import { pluginCollapsibleSections } from '@expressive-code/plugin-collapsible-sections';
-import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
-import { pluginFrames } from '@expressive-code/plugin-frames';
-import { ThemeMapper } from 'src/themes/ThemeMapper';
+import { loadPrism, Plugin, TFile, type MarkdownPostProcessor } from 'obsidian';
+import { type ThemedToken, type TokensResult } from 'shiki';
 import { CodeBlock } from 'src/CodeBlock';
 import { createCm6Plugin } from 'src/codemirror/Cm6_ViewPlugin';
 import { DEFAULT_SETTINGS, type Settings } from 'src/settings/Settings';
 import { ShikiSettingsTab } from 'src/settings/SettingsTab';
 import { filterHighlightAllPlugin } from 'src/PrismPlugin';
-import { LoadedLanguage } from 'src/LoadedLanguage';
-import { getECTheme } from 'src/themes/ECTheme';
-
-interface CustomTheme {
-	name: string;
-	displayName: string;
-	type: string;
-	colors?: Record<string, unknown>[];
-	tokenColors?: Record<string, unknown>[];
-}
-
-// some languages break obsidian's `registerMarkdownCodeBlockProcessor`, so we blacklist them
-const languageNameBlacklist = new Set(['c++', 'c#', 'f#', 'mermaid']);
+import { CodeHighlighter } from 'src/Highlighter';
 
 export const SHIKI_INLINE_REGEX = /^\{([^\s]+)\} (.*)/i; // format: `{lang} code`
 
 export default class ShikiPlugin extends Plugin {
-	// @ts-expect-error TS2564
-	themeMapper: ThemeMapper;
-	// @ts-expect-error TS2564
-	ec: ExpressiveCodeEngine;
-	// @ts-expect-error TS2564
-	ecElements: HTMLElement[];
-	// @ts-expect-error TS2564
-	activeCodeBlocks: Map<string, CodeBlock[]>;
-	// @ts-expect-error TS2564
-	loadedLanguages: Map<string, LoadedLanguage>;
-	// @ts-expect-error TS2564
-	shiki: Highlighter;
-	// @ts-expect-error TS2564
-	settings: Settings;
-	// @ts-expect-error TS2564
-	loadedSettings: Settings;
+	highlighter!: CodeHighlighter;
+	activeCodeBlocks!: Map<string, CodeBlock[]>;
+	settings!: Settings;
+	loadedSettings!: Settings;
+	updateCm6Plugin!: () => void;
 
-	customThemes: CustomTheme[] = [];
+	codeBlockProcessors: MarkdownPostProcessor[] = [];
 
 	async onload(): Promise<void> {
 		await this.loadSettings();
-		await this.loadCustomThemes();
-
 		this.loadedSettings = structuredClone(this.settings);
-
 		this.addSettingTab(new ShikiSettingsTab(this));
 
-		this.themeMapper = new ThemeMapper(this);
+		this.highlighter = new CodeHighlighter(this);
+		await this.highlighter.load();
+
 		this.activeCodeBlocks = new Map();
-		this.loadedLanguages = new Map();
-
-		await this.loadLanguages();
-
-		await this.loadEC();
-		await this.loadShiki();
 
 		this.registerInlineCodeProcessor();
 		this.registerCodeBlockProcessors();
@@ -90,125 +53,20 @@ export default class ShikiPlugin extends Plugin {
 		await this.registerPrismPlugin();
 	}
 
-	async loadCustomThemes(): Promise<void> {
-		// custom themes are disabled unless users specify a folder for them in plugin settings
-		if (!this.settings.customThemeFolder) return;
+	async reloadHighlighter(): Promise<void> {
+		await this.highlighter.unload();
 
-		const themeFolder = normalizePath(this.settings.customThemeFolder);
-		if (!(await this.app.vault.adapter.exists(themeFolder))) {
-			new Notice(`${this.manifest.name}\nUnable to open custom themes folder: ${themeFolder}`, 5000);
-			return;
-		}
+		this.loadedSettings = structuredClone(this.settings);
 
-		const themeList = await this.app.vault.adapter.list(themeFolder);
-		const themeFiles = themeList.files.filter(f => f.toLowerCase().endsWith('.json'));
+		await this.highlighter.load();
 
-		for (const themeFile of themeFiles) {
-			const baseName = themeFile.substring(`${themeFolder}/`.length);
-			try {
-				// validate that theme file JSON can be parsed and contains colors at a minimum
-				const theme = JSON.parse(await this.app.vault.adapter.read(themeFile)) as CustomTheme;
-				if (!theme.colors && !theme.tokenColors) {
-					throw Error('Invalid JSON theme file.');
-				}
-				// what metadata is available in the theme file depends on how it was created
-				theme.displayName = theme.displayName ?? theme.name ?? baseName;
-				theme.name = baseName;
-				theme.type = theme.type ?? 'both';
-				this.customThemes.push(theme);
-			} catch (e) {
-				new Notice(`${this.manifest.name}\nUnable to load custom theme: ${themeFile}`, 5000);
-				console.warn(`Unable to load custom theme: ${themeFile}`, e);
+		for (const [_, codeBlocks] of this.activeCodeBlocks) {
+			for (const codeBlock of codeBlocks) {
+				await codeBlock.forceRerender();
 			}
 		}
 
-		// if the user's set theme cannot be loaded (e.g. it was deleted), fall back to default theme
-		if (!this.customThemes.find(theme => theme.name === this.settings.theme)) {
-			this.settings.theme = DEFAULT_SETTINGS.theme;
-		}
-	}
-
-	async loadLanguages(): Promise<void> {
-		for (const [shikiLanguage, registration] of Object.entries(bundledLanguages)) {
-			// the last element of the array is seemingly the most recent version of the language
-			const language = (await registration()).default.at(-1);
-			const shikiLanguageName = shikiLanguage as keyof typeof bundledLanguages;
-
-			if (language === undefined) {
-				continue;
-			}
-
-			for (const alias of [language.name, ...(language.aliases ?? [])]) {
-				if (languageNameBlacklist.has(alias)) {
-					continue;
-				}
-
-				if (!this.loadedLanguages.has(alias)) {
-					const newLanguage = new LoadedLanguage(alias);
-					newLanguage.addLanguage(shikiLanguageName);
-
-					this.loadedLanguages.set(alias, newLanguage);
-				}
-
-				this.loadedLanguages.get(alias)!.addLanguage(shikiLanguageName);
-			}
-		}
-
-		for (const [alias, language] of this.loadedLanguages) {
-			if (language.languages.length === 1) {
-				language.setDefaultLanguage(language.languages[0]);
-			} else {
-				const defaultLanguage = language.languages.find(lang => lang === alias);
-				if (defaultLanguage !== undefined) {
-					language.setDefaultLanguage(defaultLanguage);
-				} else {
-					console.warn(`No default language found for ${alias}, using the first language in the list`);
-					language.setDefaultLanguage(language.languages[0]);
-				}
-			}
-		}
-
-		for (const disabledLanguage of this.loadedSettings.disabledLanguages) {
-			this.loadedLanguages.delete(disabledLanguage);
-		}
-	}
-
-	async loadEC(): Promise<void> {
-		this.ec = new ExpressiveCodeEngine({
-			themes: [new ExpressiveCodeTheme(await this.themeMapper.getThemeForEC())],
-			plugins: [
-				pluginShiki({
-					langs: Object.values(bundledLanguages),
-				}),
-				pluginCollapsibleSections(),
-				pluginTextMarkers(),
-				pluginLineNumbers(),
-				pluginFrames(),
-			],
-			styleOverrides: getECTheme(this.loadedSettings),
-			minSyntaxHighlightingColorContrast: 0,
-			themeCssRoot: 'div.expressive-code',
-			defaultProps: {
-				showLineNumbers: false,
-			},
-		});
-
-		this.ecElements = [];
-
-		const styles = (await this.ec.getBaseStyles()) + (await this.ec.getThemeStyles());
-		this.ecElements.push(document.head.createEl('style', { text: styles }));
-
-		const jsModules = await this.ec.getJsModules();
-		for (const jsModule of jsModules) {
-			this.ecElements.push(document.head.createEl('script', { attr: { type: 'module' }, text: jsModule }));
-		}
-	}
-
-	async loadShiki(): Promise<void> {
-		this.shiki = await getHighlighter({
-			themes: [await this.themeMapper.getTheme()],
-			langs: Object.keys(bundledLanguages),
-		});
+		this.updateCm6Plugin();
 	}
 
 	async registerPrismPlugin(): Promise<void> {
@@ -222,7 +80,7 @@ export default class ShikiPlugin extends Plugin {
 	}
 
 	registerCodeBlockProcessors(): void {
-		for (const [alias, language] of this.loadedLanguages) {
+		for (const [alias, language] of this.highlighter.loadedLanguages) {
 			try {
 				this.registerMarkdownCodeBlockProcessor(
 					alias,
@@ -248,12 +106,12 @@ export default class ShikiPlugin extends Plugin {
 	}
 
 	registerInlineCodeProcessor(): void {
-		this.registerMarkdownPostProcessor(async (el, ctx) => {
+		this.registerMarkdownPostProcessor((el, ctx) => {
 			const inlineCodes = el.findAll(':not(pre) > code');
 			for (let codeElm of inlineCodes) {
 				let match = codeElm.textContent?.match(SHIKI_INLINE_REGEX); // format: `{lang} code`
 				if (match) {
-					const highlight = await this.getHighlightTokens(match[2], match[1]);
+					const highlight = this.getHighlightTokens(match[2], match[1]);
 					const tokens = highlight?.tokens.flat(1);
 					if (!tokens?.length) {
 						continue;
@@ -271,14 +129,7 @@ export default class ShikiPlugin extends Plugin {
 	}
 
 	onunload(): void {
-		this.unloadEC();
-	}
-
-	unloadEC(): void {
-		for (const el of this.ecElements) {
-			el.remove();
-		}
-		this.ecElements = [];
+		this.highlighter.unload();
 	}
 
 	addActiveCodeBlock(codeBlock: CodeBlock): void {
@@ -303,13 +154,13 @@ export default class ShikiPlugin extends Plugin {
 	}
 
 	getHighlightTokens(code: string, lang: string): TokensResult | undefined {
-		const shikiLanguage = this.loadedLanguages.get(lang);
+		const shikiLanguage = this.highlighter.loadedLanguages.get(lang);
 
 		if (shikiLanguage === undefined) {
 			return undefined;
 		}
 
-		return this.shiki.codeToTokens(code, {
+		return this.highlighter.shiki.codeToTokens(code, {
 			lang: shikiLanguage.getDefaultLanguage(),
 			theme: this.settings.theme,
 		});
