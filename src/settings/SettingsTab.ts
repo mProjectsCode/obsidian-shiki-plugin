@@ -1,4 +1,4 @@
-import { PluginSettingTab, Setting } from 'obsidian';
+import { PluginSettingTab, Setting, Platform, Notice, normalizePath } from 'obsidian';
 import type ShikiPlugin from 'src/main';
 import { StringSelectModal } from 'src/settings/StringSelectModal';
 import { bundledThemesInfo } from 'shiki';
@@ -15,8 +15,16 @@ export class ShikiSettingsTab extends PluginSettingTab {
 	display(): void {
 		this.containerEl.empty();
 
-		const themes = Object.fromEntries(bundledThemesInfo.map(theme => [theme.id, `${theme.displayName} (${theme.type})`]));
-		themes['obsidian-theme'] = 'Obsidian built-in (both)';
+		// sort custom themes by their display name
+		this.plugin.customThemes.sort((a, b) => a.displayName.localeCompare(b.displayName));
+
+		const customThemes = Object.fromEntries(this.plugin.customThemes.map(theme => [theme.name, `${theme.displayName} (${theme.type})`]));
+		const builtInThemes = Object.fromEntries(bundledThemesInfo.map(theme => [theme.id, `${theme.displayName} (${theme.type})`]));
+		const themes = {
+			'obsidian-theme': 'Obsidian built-in (both)',
+			...customThemes,
+			...builtInThemes,
+		};
 
 		new Setting(this.containerEl)
 			.setName('Theme')
@@ -28,6 +36,36 @@ export class ShikiSettingsTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			});
+
+		if (Platform.isDesktopApp) {
+			new Setting(this.containerEl)
+				.setName('Custom themes folder location')
+				.setDesc('Folder relative to your Vault where custom JSON theme files are located. RESTART REQUIRED AFTER CHANGES.')
+				.addText(textbox => {
+					textbox
+						.setValue(this.plugin.settings.customThemeFolder)
+						.onChange(async value => {
+							this.plugin.settings.customThemeFolder = value;
+							await this.plugin.saveSettings();
+						})
+						.then(textbox => {
+							textbox.inputEl.addClass('shiki-custom-theme-folder');
+						});
+				})
+				.addExtraButton(button => {
+					button
+						.setIcon('folder-open')
+						.setTooltip('Open custom themes folder')
+						.onClick(async () => {
+							const themeFolder = normalizePath(this.plugin.settings.customThemeFolder);
+							if (await this.app.vault.adapter.exists(themeFolder)) {
+								this.plugin.app.openWithDefaultApp(themeFolder);
+							} else {
+								new Notice(`Unable to open custom themes folder: ${themeFolder}`, 5000);
+							}
+						});
+				});
+		}
 
 		new Setting(this.containerEl)
 			.setName('Prefer theme colors')

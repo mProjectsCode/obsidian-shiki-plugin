@@ -91,3 +91,8 @@ span.shiki-italic {
 span.shiki-ul {
 	text-decoration: underline;
 }
+
+/* Settings tab  */
+.setting-item-control input.shiki-custom-theme-folder {
+	min-width: 250px;
+}
