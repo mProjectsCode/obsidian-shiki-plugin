@@ -48,34 +48,64 @@ export class ShikiSettingsTab extends PluginSettingTab {
 				});
 			});
 
+		const customThemeFolderSetting = new Setting(this.containerEl)
+			.setName('Custom themes folder location')
+			.setDesc('Folder relative to your Vault where custom JSON theme files are located.')
+			.addText(textbox => {
+				textbox
+					.setValue(this.plugin.settings.customThemeFolder)
+					.onChange(async value => {
+						this.plugin.settings.customThemeFolder = value;
+						await this.plugin.saveSettings();
+					})
+					.then(textbox => {
+						textbox.inputEl.addClass('shiki-custom-theme-folder');
+					});
+			});
+
+		const customLanguageFolderSetting = new Setting(this.containerEl)
+			.setName('Custom languages folder location')
+			.setDesc('Folder relative to your Vault where custom JSON language files are located. RESTART REQUIRED AFTER CHANGES.')
+			.addText(textbox => {
+				textbox
+					.setValue(this.plugin.settings.customLanguageFolder)
+					.onChange(async value => {
+						this.plugin.settings.customLanguageFolder = value;
+						await this.plugin.saveSettings();
+					})
+					.then(textbox => {
+						textbox.inputEl.addClass('shiki-custom-language-folder');
+					});
+			});
+
 		if (Platform.isDesktopApp) {
-			new Setting(this.containerEl)
-				.setName('Custom themes folder location')
-				.setDesc('Folder relative to your Vault where custom JSON theme files are located.')
-				.addText(textbox => {
-					textbox
-						.setValue(this.plugin.settings.customThemeFolder)
-						.onChange(async value => {
-							this.plugin.settings.customThemeFolder = value;
-							await this.plugin.saveSettings();
-						})
-						.then(textbox => {
-							textbox.inputEl.addClass('shiki-custom-theme-folder');
-						});
-				})
-				.addExtraButton(button => {
-					button
-						.setIcon('folder-open')
-						.setTooltip('Open custom themes folder')
-						.onClick(async () => {
-							const themeFolder = normalizePath(this.plugin.settings.customThemeFolder);
-							if (await this.app.vault.adapter.exists(themeFolder)) {
-								this.plugin.app.openWithDefaultApp(themeFolder);
-							} else {
-								new Notice(`Unable to open custom themes folder: ${themeFolder}`, 5000);
-							}
-						});
-				});
+			customThemeFolderSetting.addExtraButton(button => {
+				button
+					.setIcon('folder-open')
+					.setTooltip('Open custom themes folder')
+					.onClick(async () => {
+						const themeFolder = normalizePath(this.plugin.settings.customThemeFolder);
+						if (await this.app.vault.adapter.exists(themeFolder)) {
+							this.plugin.app.openWithDefaultApp(themeFolder);
+						} else {
+							new Notice(`Unable to open custom themes folder: ${themeFolder}`, 5000);
+						}
+					});
+			});
+
+			customLanguageFolderSetting.addExtraButton(button => {
+				button
+					.setIcon('folder-open')
+					.setTooltip('Open custom languages folder')
+					.onClick(async () => {
+						const languageFolder = normalizePath(this.plugin.settings.customLanguageFolder);
+						if (await this.app.vault.adapter.exists(languageFolder)) {
+							this.plugin.app.openWithDefaultApp(languageFolder);
+						} else {
+							new Notice(`Unable to open custom languages folder: ${languageFolder}`, 5000);
+						}
+					});
+			});
 		}
 
 		new Setting(this.containerEl)
@@ -105,7 +135,7 @@ export class ShikiSettingsTab extends PluginSettingTab {
 			.setDesc('Configure language to exclude.')
 			.addButton(button => {
 				button.setButtonText('Add Language Rule').onClick(() => {
-					const modal = new StringSelectModal(this.plugin, Array.from(this.plugin.highlighter.loadedLanguages.keys()), language => {
+					const modal = new StringSelectModal(this.plugin, this.plugin.highlighter.loadedLanguages, language => {
 						this.plugin.settings.disabledLanguages.push(language);
 						void this.plugin.saveSettings();
 						this.display();

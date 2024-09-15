@@ -1,5 +1,5 @@
 import { loadPrism, Plugin, TFile, type MarkdownPostProcessor } from 'obsidian';
-import { type ThemedToken, type TokensResult } from 'shiki';
+import { type BundledLanguage, type ThemedToken, type TokensResult } from 'shiki';
 import { CodeBlock } from 'src/CodeBlock';
 import { createCm6Plugin } from 'src/codemirror/Cm6_ViewPlugin';
 import { DEFAULT_SETTINGS, type Settings } from 'src/settings/Settings';
@@ -80,27 +80,27 @@ export default class ShikiPlugin extends Plugin {
 	}
 
 	registerCodeBlockProcessors(): void {
-		for (const [alias, language] of this.highlighter.loadedLanguages) {
+		for (const language of this.highlighter.obsidianSafeLanguageNames()) {
 			try {
 				this.registerMarkdownCodeBlockProcessor(
-					alias,
+					language,
 					async (source, el, ctx) => {
 						// this is so that we leave the hidden frontmatter code block in reading mode alone
-						if (alias === 'yaml' && ctx.frontmatter) {
+						if (language === 'yaml' && ctx.frontmatter) {
 							const sectionInfo = ctx.getSectionInfo(el);
 							if (sectionInfo && sectionInfo.lineStart === 0) {
 								el.addClass('shiki-hide-in-reading-mode');
 							}
 						}
 
-						const codeBlock = new CodeBlock(this, el, source, language.getDefaultLanguage(), alias, ctx);
+						const codeBlock = new CodeBlock(this, el, source, language, ctx);
 
 						ctx.addChild(codeBlock);
 					},
 					-1,
 				);
 			} catch (e) {
-				console.warn(`Failed to register code block processor for ${alias}`, e);
+				console.warn(`Failed to register code block processor for ${language}`, e);
 			}
 		}
 	}
@@ -154,14 +154,12 @@ export default class ShikiPlugin extends Plugin {
 	}
 
 	getHighlightTokens(code: string, lang: string): TokensResult | undefined {
-		const shikiLanguage = this.highlighter.loadedLanguages.get(lang);
-
-		if (shikiLanguage === undefined) {
+		if (!this.highlighter.obsidianSafeLanguageNames().includes(lang)) {
 			return undefined;
 		}
 
 		return this.highlighter.shiki.codeToTokens(code, {
-			lang: shikiLanguage.getDefaultLanguage(),
+			lang: lang as BundledLanguage,
 			theme: this.settings.theme,
 		});
 	}

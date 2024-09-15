@@ -5,17 +5,15 @@ export class CodeBlock extends MarkdownRenderChild {
 	plugin: ShikiPlugin;
 	source: string;
 	language: string;
-	languageName: string;
 	ctx: MarkdownPostProcessorContext;
 	cachedMetaString: string;
 
-	constructor(plugin: ShikiPlugin, containerEl: HTMLElement, source: string, language: string, languageName: string, ctx: MarkdownPostProcessorContext) {
+	constructor(plugin: ShikiPlugin, containerEl: HTMLElement, source: string, language: string, ctx: MarkdownPostProcessorContext) {
 		super(containerEl);
 
 		this.plugin = plugin;
 		this.source = source;
 		this.language = language;
-		this.languageName = languageName;
 		this.ctx = ctx;
 		this.cachedMetaString = '';
 	}
@@ -31,7 +29,7 @@ export class CodeBlock extends MarkdownRenderChild {
 		const startLine = lines[sectionInfo.lineStart];
 
 		// regexp to match the text after the code block language
-		const regex = new RegExp('^[^`~]*?(```+|~~~+)' + this.languageName + ' (.*)', 'g');
+		const regex = new RegExp('^[^`~]*?(```+|~~~+)' + this.language + ' (.*)', 'g');
 		const match = regex.exec(startLine);
 		if (match !== null) {
 			return match[2];

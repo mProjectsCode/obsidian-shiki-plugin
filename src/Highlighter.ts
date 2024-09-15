@@ -1,7 +1,6 @@
 import { ExpressiveCodeEngine, ExpressiveCodeTheme } from '@expressive-code/core';
 import type ShikiPlugin from 'src/main';
-import { LoadedLanguage } from 'src/LoadedLanguage';
-import { bundledLanguages, createHighlighter, type Highlighter } from 'shiki/index.mjs';
+import { bundledLanguages, createHighlighter, type DynamicImportLanguageRegistration, type LanguageRegistration, type Highlighter } from 'shiki/index.mjs';
 import { ThemeMapper } from 'src/themes/ThemeMapper';
 import { pluginShiki } from '@expressive-code/plugin-shiki';
 import { pluginCollapsibleSections } from '@expressive-code/plugin-collapsible-sections';
@@ -30,9 +29,10 @@ export class CodeHighlighter {
 
 	ec!: ExpressiveCodeEngine;
 	ecElements!: HTMLElement[];
-	loadedLanguages!: Map<string, LoadedLanguage>;
+	loadedLanguages!: string[];
 	shiki!: Highlighter;
 	customThemes!: CustomTheme[];
+	customLanguages!: LanguageRegistration[];
 
 	constructor(plugin: ShikiPlugin) {
 		this.plugin = plugin;
@@ -41,61 +41,45 @@ export class CodeHighlighter {
 
 	async load(): Promise<void> {
 		await this.loadCustomThemes();
-
-		await this.loadLanguages();
+		await this.loadCustomLanguages();
 
 		await this.loadEC();
 		await this.loadShiki();
+
+		this.loadedLanguages = this.shiki.getLoadedLanguages();
 	}
 
 	async unload(): Promise<void> {
 		this.unloadEC();
 	}
 
-	async loadLanguages(): Promise<void> {
-		this.loadedLanguages = new Map();
+	async loadCustomLanguages(): Promise<void> {
+		this.customLanguages = [];
 
-		for (const [shikiLanguage, registration] of Object.entries(bundledLanguages)) {
-			// the last element of the array is seemingly the most recent version of the language
-			const language = (await registration()).default.at(-1);
-			const shikiLanguageName = shikiLanguage as keyof typeof bundledLanguages;
+		if (!this.plugin.loadedSettings.customLanguageFolder) return;
 
-			if (language === undefined) {
-				continue;
-			}
-
-			for (const alias of [language.name, ...(language.aliases ?? [])]) {
-				if (languageNameBlacklist.has(alias)) {
-					continue;
-				}
-
-				if (!this.loadedLanguages.has(alias)) {
-					const newLanguage = new LoadedLanguage(alias);
-					newLanguage.addLanguage(shikiLanguageName);
-
-					this.loadedLanguages.set(alias, newLanguage);
-				}
-
-				this.loadedLanguages.get(alias)!.addLanguage(shikiLanguageName);
-			}
+		const languageFolder = normalizePath(this.plugin.loadedSettings.customLanguageFolder);
+		if (!(await this.plugin.app.vault.adapter.exists(languageFolder))) {
+			new Notice(`${this.plugin.manifest.name}\nUnable to open custom languages folder: ${languageFolder}`, 5000);
+			return;
 		}
 
-		for (const [alias, language] of this.loadedLanguages) {
-			if (language.languages.length === 1) {
-				language.setDefaultLanguage(language.languages[0]);
-			} else {
-				const defaultLanguage = language.languages.find(lang => lang === alias);
-				if (defaultLanguage !== undefined) {
-					language.setDefaultLanguage(defaultLanguage);
-				} else {
-					console.warn(`No default language found for ${alias}, using the first language in the list`);
-					language.setDefaultLanguage(language.languages[0]);
-				}
-			}
-		}
+		const languageList = await this.plugin.app.vault.adapter.list(languageFolder);
+		const languageFiles = languageList.files.filter(f => f.toLowerCase().endsWith('.json'));
 
-		for (const disabledLanguage of this.plugin.loadedSettings.disabledLanguages) {
-			this.loadedLanguages.delete(disabledLanguage);
+		for (const languageFile of languageFiles) {
+			try {
+				const language = JSON.parse(await this.plugin.app.vault.adapter.read(languageFile)) as LanguageRegistration;
+				// validate that language file JSON can be parsed and contains at a minimum a scopeName
+				if (!language.name) {
+					throw Error('Invalid JSON language file is missing a name property.');
+				}
+
+				this.customLanguages.push(language);
+			} catch (e) {
+				new Notice(`${this.plugin.manifest.name}\nUnable to load custom language: ${languageFile}`, 5000);
+				console.warn(`Unable to load custom language: ${languageFile}`, e);
+			}
 		}
 	}
 
@@ -150,7 +134,7 @@ export class CodeHighlighter {
 			themes: [new ExpressiveCodeTheme(await this.themeMapper.getThemeForEC())],
 			plugins: [
 				pluginShiki({
-					langs: Object.values(bundledLanguages),
+					langs: this.getLoadedLanguageRegistrations(),
 				}),
 				pluginCollapsibleSections(),
 				pluginTextMarkers(),
@@ -186,7 +170,7 @@ export class CodeHighlighter {
 	async loadShiki(): Promise<void> {
 		this.shiki = await createHighlighter({
 			themes: [await this.themeMapper.getTheme()],
-			langs: Object.keys(bundledLanguages),
+			langs: this.getLoadedLanguageRegistrations(),
 		});
 	}
 
@@ -205,5 +189,13 @@ export class CodeHighlighter {
 		});
 
 		container.innerHTML = toHtml(this.themeMapper.fixAST(result.renderedGroupAst));
+	}
+
+	getLoadedLanguageRegistrations(): (DynamicImportLanguageRegistration | LanguageRegistration)[] {
+		return [...Object.values(bundledLanguages), ...this.customLanguages];
+	}
+
+	obsidianSafeLanguageNames(): string[] {
+		return this.loadedLanguages.filter(lang => !languageNameBlacklist.has(lang));
 	}
 }
