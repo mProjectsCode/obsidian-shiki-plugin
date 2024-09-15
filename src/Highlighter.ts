@@ -198,7 +198,7 @@ export class CodeHighlighter {
 	 * All languages that are safe to use with Obsidian's `registerMarkdownCodeBlockProcessor`.
 	 */
 	obsidianSafeLanguageNames(): string[] {
-		return this.loadedLanguages.filter(lang => !languageNameBlacklist.has(lang));
+		return this.loadedLanguages.filter(lang => !languageNameBlacklist.has(lang) && !this.plugin.loadedSettings.disabledLanguages.includes(lang));
 	}
 
 	/**
