@@ -1,6 +1,15 @@
 import { ExpressiveCodeEngine, ExpressiveCodeTheme } from '@expressive-code/core';
 import type ShikiPlugin from 'src/main';
-import { bundledLanguages, createHighlighter, type DynamicImportLanguageRegistration, type LanguageRegistration, type Highlighter } from 'shiki/index.mjs';
+import {
+	bundledLanguages,
+	createHighlighter,
+	type DynamicImportLanguageRegistration,
+	type LanguageRegistration,
+	type Highlighter,
+	type TokensResult,
+	type BundledLanguage,
+	type ThemedToken,
+} from 'shiki/index.mjs';
 import { ThemeMapper } from 'src/themes/ThemeMapper';
 import { pluginShiki } from '@expressive-code/plugin-shiki';
 import { pluginCollapsibleSections } from '@expressive-code/plugin-collapsible-sections';
@@ -179,6 +188,20 @@ export class CodeHighlighter {
 	}
 
 	/**
+	 * Returns a list of languages registrations that need to be loaded into Shiki and EC.
+	 */
+	getLoadedLanguageRegistrations(): (DynamicImportLanguageRegistration | LanguageRegistration)[] {
+		return [...Object.values(bundledLanguages), ...this.customLanguages];
+	}
+
+	/**
+	 * All languages that are safe to use with Obsidian's `registerMarkdownCodeBlockProcessor`.
+	 */
+	obsidianSafeLanguageNames(): string[] {
+		return this.loadedLanguages.filter(lang => !languageNameBlacklist.has(lang));
+	}
+
+	/**
 	 * Highlights code with EC and renders it to the passed container element.
 	 */
 	async renderWithEc(code: string, language: string, meta: string, container: HTMLElement): Promise<void> {
@@ -191,11 +214,36 @@ export class CodeHighlighter {
 		container.innerHTML = toHtml(this.themeMapper.fixAST(result.renderedGroupAst));
 	}
 
-	getLoadedLanguageRegistrations(): (DynamicImportLanguageRegistration | LanguageRegistration)[] {
-		return [...Object.values(bundledLanguages), ...this.customLanguages];
+	getHighlightTokens(code: string, lang: string): TokensResult | undefined {
+		if (!this.obsidianSafeLanguageNames().includes(lang)) {
+			return undefined;
+		}
+
+		return this.shiki.codeToTokens(code, {
+			lang: lang as BundledLanguage,
+			theme: this.plugin.settings.theme,
+		});
 	}
 
-	obsidianSafeLanguageNames(): string[] {
-		return this.loadedLanguages.filter(lang => !languageNameBlacklist.has(lang));
+	tokenToSpan(token: ThemedToken, parent: HTMLElement): void {
+		const tokenStyle = this.getTokenStyle(token);
+		parent.createSpan({
+			text: token.content,
+			cls: tokenStyle.classes.join(' '),
+			attr: { style: tokenStyle.style },
+		});
+	}
+
+	getTokenStyle(token: ThemedToken): { style: string; classes: string[] } {
+		const fontStyle = token.fontStyle ?? 0;
+
+		return {
+			style: `color: ${token.color}`,
+			classes: [
+				(fontStyle & 1) !== 0 ? 'shiki-italic' : undefined,
+				(fontStyle & 2) !== 0 ? 'shiki-bold' : undefined,
+				(fontStyle & 4) !== 0 ? 'shiki-ul' : undefined,
+			].filter(Boolean) as string[],
+		};
 	}
 }

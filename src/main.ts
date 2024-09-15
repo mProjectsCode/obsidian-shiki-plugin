@@ -1,5 +1,4 @@
 import { loadPrism, Plugin, TFile, type MarkdownPostProcessor } from 'obsidian';
-import { type BundledLanguage, type ThemedToken, type TokensResult } from 'shiki';
 import { CodeBlock } from 'src/CodeBlock';
 import { createCm6Plugin } from 'src/codemirror/Cm6_ViewPlugin';
 import { DEFAULT_SETTINGS, type Settings } from 'src/settings/Settings';
@@ -111,7 +110,7 @@ export default class ShikiPlugin extends Plugin {
 			for (let codeElm of inlineCodes) {
 				let match = codeElm.textContent?.match(SHIKI_INLINE_REGEX); // format: `{lang} code`
 				if (match) {
-					const highlight = this.getHighlightTokens(match[2], match[1]);
+					const highlight = this.highlighter.getHighlightTokens(match[2], match[1]);
 					const tokens = highlight?.tokens.flat(1);
 					if (!tokens?.length) {
 						continue;
@@ -121,7 +120,7 @@ export default class ShikiPlugin extends Plugin {
 					codeElm.addClass('shiki-inline');
 
 					for (let token of tokens) {
-						this.tokenToSpan(token, codeElm);
+						this.highlighter.tokenToSpan(token, codeElm);
 					}
 				}
 			}
@@ -151,39 +150,6 @@ export default class ShikiPlugin extends Plugin {
 				this.activeCodeBlocks.get(filePath)!.splice(index, 1);
 			}
 		}
-	}
-
-	getHighlightTokens(code: string, lang: string): TokensResult | undefined {
-		if (!this.highlighter.obsidianSafeLanguageNames().includes(lang)) {
-			return undefined;
-		}
-
-		return this.highlighter.shiki.codeToTokens(code, {
-			lang: lang as BundledLanguage,
-			theme: this.settings.theme,
-		});
-	}
-
-	tokenToSpan(token: ThemedToken, parent: HTMLElement): void {
-		const tokenStyle = this.getTokenStyle(token);
-		parent.createSpan({
-			text: token.content,
-			cls: tokenStyle.classes.join(' '),
-			attr: { style: tokenStyle.style },
-		});
-	}
-
-	getTokenStyle(token: ThemedToken): { style: string; classes: string[] } {
-		let fontStyle = token.fontStyle ?? 0;
-
-		return {
-			style: `color: ${token.color}`,
-			classes: [
-				(fontStyle & 1) !== 0 ? 'shiki-italic' : undefined,
-				(fontStyle & 2) !== 0 ? 'shiki-bold' : undefined,
-				(fontStyle & 4) !== 0 ? 'shiki-ul' : undefined,
-			].filter(Boolean) as string[],
-		};
 	}
 
 	async loadSettings(): Promise<void> {

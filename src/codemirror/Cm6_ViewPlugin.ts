@@ -202,7 +202,7 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 			 * @param content
 			 */
 			buildDecorations(from: number, to: number, language: string, content: string): Range<Decoration>[] {
-				const highlight = plugin.getHighlightTokens(content, language);
+				const highlight = plugin.highlighter.getHighlightTokens(content, language);
 
 				if (!highlight) {
 					return [];
@@ -216,7 +216,7 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 					const token = tokens[i];
 					const nextToken: ThemedToken | undefined = tokens[i + 1];
 
-					const tokenStyle = plugin.getTokenStyle(token);
+					const tokenStyle = plugin.highlighter.getTokenStyle(token);
 
 					decorations.push(
 						Decoration.mark({
