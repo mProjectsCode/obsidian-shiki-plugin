@@ -129,7 +129,7 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 						}
 
 						if (props.has('HyperMD-codeblock-end')) {
-							if (state.length > 0) {
+							if (state.length > 0 && lang !== '') {
 								const start = state[0].from;
 								const end = state[state.length - 1].to;
 
@@ -202,6 +202,10 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 			 * @param content
 			 */
 			buildDecorations(from: number, to: number, language: string, content: string): Range<Decoration>[] {
+				if (language === '') {
+					return [];
+				}
+
 				const highlight = plugin.highlighter.getHighlightTokens(content, language);
 
 				if (!highlight) {

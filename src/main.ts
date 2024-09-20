@@ -84,11 +84,19 @@ export default class ShikiPlugin extends Plugin {
 				this.registerMarkdownCodeBlockProcessor(
 					language,
 					async (source, el, ctx) => {
+						// @ts-expect-error
+						const isReadingMode = ctx.containerEl.hasClass('markdown-preview-section') || ctx.containerEl.hasClass('markdown-preview-view');
+						// this seems to indicate whether we are in the pdf export mode
+						// sadly there is no section info in this mode
+						// thus we can't check if the codeblock is at the start of the note and thus frontmatter
+						// const isPdfExport = ctx.displayMode === true;
+
 						// this is so that we leave the hidden frontmatter code block in reading mode alone
-						if (language === 'yaml' && ctx.frontmatter) {
+						if (language === 'yaml' && isReadingMode && ctx.frontmatter) {
 							const sectionInfo = ctx.getSectionInfo(el);
+
 							if (sectionInfo && sectionInfo.lineStart === 0) {
-								el.addClass('shiki-hide-in-reading-mode');
+								return;
 							}
 						}
 
@@ -96,7 +104,7 @@ export default class ShikiPlugin extends Plugin {
 
 						ctx.addChild(codeBlock);
 					},
-					-1,
+					1000,
 				);
 			} catch (e) {
 				console.warn(`Failed to register code block processor for ${language}`, e);
