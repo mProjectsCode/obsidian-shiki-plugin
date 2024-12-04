@@ -104,7 +104,7 @@ Inline code
 
 `{jsx} <button role="button" />`
 
-```Odin
+```custom-odin
 package main
 
 import "core:fmt"

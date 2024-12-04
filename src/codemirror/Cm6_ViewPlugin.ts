@@ -125,7 +125,7 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 						if (props.has('HyperMD-codeblock-begin')) {
 							const content = Cm6_Util.getContent(view.state, node.from, node.to);
 
-							lang = content.match(/^```(\S+)/)?.[1] ?? '';
+							lang = (/^```(\S+)/.exec(content))?.[1] ?? '';
 						}
 
 						if (props.has('HyperMD-codeblock-end')) {

@@ -5,17 +5,17 @@ export function getECTheme(settings: Settings): ExpressiveCodeEngineConfig['styl
 	const useThemeColors = settings.preferThemeColors && settings.theme !== 'obsidian-theme';
 
 	const backgroundColor: UnresolvedStyleValue = ({ theme }: { theme: ExpressiveCodeTheme }): StyleValueOrValues =>
-		useThemeColors ? theme.colors['editor.background'] ?? 'var(--shiki-code-background)' : 'var(--shiki-code-background)';
+		useThemeColors ? (theme.colors['editor.background'] ?? 'var(--shiki-code-background)') : 'var(--shiki-code-background)';
 	const foregroundColor: UnresolvedStyleValue = ({ theme }: { theme: ExpressiveCodeTheme }): StyleValueOrValues =>
 		theme.colors['editor.foreground'] ?? 'var(--shiki-code-normal)';
 
 	const gutterBorderColor: UnresolvedStyleValue = ({ theme }: { theme: ExpressiveCodeTheme }): StyleValueOrValues =>
-		useThemeColors ? theme.colors['editorLineNumber.foreground'] ?? 'var(--shiki-gutter-border-color)' : 'var(--shiki-gutter-border-color)';
+		useThemeColors ? (theme.colors['editorLineNumber.foreground'] ?? 'var(--shiki-gutter-border-color)') : 'var(--shiki-gutter-border-color)';
 	const gutterTextColor: UnresolvedStyleValue = ({ theme }: { theme: ExpressiveCodeTheme }): StyleValueOrValues =>
-		useThemeColors ? theme.colors['editorLineNumber.foreground'] ?? 'var(--shiki-gutter-text-color)' : 'var(--shiki-gutter-text-color)';
+		useThemeColors ? (theme.colors['editorLineNumber.foreground'] ?? 'var(--shiki-gutter-text-color)') : 'var(--shiki-gutter-text-color)';
 	const gutterTextActiveColor: UnresolvedStyleValue = ({ theme }: { theme: ExpressiveCodeTheme }): StyleValueOrValues =>
 		useThemeColors
-			? (theme.colors['editorLineNumber.activeForeground'] || theme.colors['editorLineNumber.foreground']) ?? 'var(--shiki-gutter-text-color-highlight)'
+			? ((theme.colors['editorLineNumber.activeForeground'] || theme.colors['editorLineNumber.foreground']) ?? 'var(--shiki-gutter-text-color-highlight)')
 			: 'var(--shiki-gutter-text-color-highlight)';
 
 	return {

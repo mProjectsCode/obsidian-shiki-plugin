@@ -119,5 +119,5 @@ This plugin uses [shiki](https://shiki.style/), [Expressive Code](https://expres
 
 Special thanks to:
 
--   Hippo (hippotastic) for their work and support with Expressive Code
--   sailKite for CSS help and testing the plugin
+- Hippo (hippotastic) for their work and support with Expressive Code
+- sailKite for CSS help and testing the plugin

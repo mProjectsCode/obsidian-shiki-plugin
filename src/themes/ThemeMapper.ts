@@ -1,5 +1,4 @@
 import { type BundledTheme, bundledThemes, type ThemeRegistration } from 'shiki';
-import type * as hast_util_to_html_lib_types from 'hast-util-to-html/lib';
 import type * as hast_types from 'hast';
 import { OBSIDIAN_THEME } from 'src/themes/ObsidianTheme';
 import type ShikiPlugin from 'src/main';
@@ -71,7 +70,7 @@ export class ThemeMapper {
 	/**
 	 * Maps the placeholder colors in the AST to CSS variables.
 	 */
-	fixAST(ast: hast_util_to_html_lib_types.Parents): hast_util_to_html_lib_types.Parents {
+	fixAST(ast: hast_types.Parents): hast_types.Parents {
 		if (this.plugin.loadedSettings.theme !== 'obsidian-theme') {
 			return ast;
 		}

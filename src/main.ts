@@ -79,7 +79,9 @@ export default class ShikiPlugin extends Plugin {
 	}
 
 	registerCodeBlockProcessors(): void {
-		for (const language of this.highlighter.obsidianSafeLanguageNames()) {
+		const languages = this.highlighter.obsidianSafeLanguageNames();
+
+		for (const language of languages) {
 			try {
 				this.registerMarkdownCodeBlockProcessor(
 					language,
@@ -107,7 +109,7 @@ export default class ShikiPlugin extends Plugin {
 					1000,
 				);
 			} catch (e) {
-				console.warn(`Failed to register code block processor for ${language}`, e);
+				console.warn(`Failed to register code block processor for ${language}.`, e);
 			}
 		}
 	}

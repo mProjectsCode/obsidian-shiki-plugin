@@ -199,6 +199,7 @@ export class CodeHighlighter {
 	 */
 	obsidianSafeLanguageNames(): string[] {
 		return this.loadedLanguages.filter(lang => !languageNameBlacklist.has(lang) && !this.plugin.loadedSettings.disabledLanguages.includes(lang));
+		// .concat(this.customLanguages.map(lang => lang.name));
 	}
 
 	/**

@@ -12,7 +12,6 @@
 		"importHelpers": true,
 		"isolatedModules": true,
 		"lib": ["DOM", "ESNext"],
-		"types": ["svelte"],
 		"allowSyntheticDefaultImports": true
 	},
 	"include": ["src/**/*.ts", "tests/**/*.ts"]
