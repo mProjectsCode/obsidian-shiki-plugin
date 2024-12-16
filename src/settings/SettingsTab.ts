@@ -135,7 +135,7 @@ export class ShikiSettingsTab extends PluginSettingTab {
 			.setDesc('Configure language to exclude.')
 			.addButton(button => {
 				button.setButtonText('Add Language Rule').onClick(() => {
-					const modal = new StringSelectModal(this.plugin, this.plugin.highlighter.loadedLanguages, language => {
+					const modal = new StringSelectModal(this.plugin, this.plugin.highlighter.supportedLanguages, language => {
 						this.plugin.settings.disabledLanguages.push(language);
 						void this.plugin.saveSettings();
 						this.display();
