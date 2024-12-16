@@ -8,6 +8,15 @@ import { Cm6_Util } from 'src/codemirror/Cm6_Util';
 import { type ThemedToken } from 'shiki';
 import { editorLivePreviewField } from 'obsidian';
 
+interface DecoQueueNode {
+	from: number;
+	to: number;
+	lang: string;
+	content: string;
+	hideLang?: boolean;
+	hideTo?: number;
+}
+
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function createCm6Plugin(plugin: ShikiPlugin) {
 	return ViewPlugin.fromClass(
@@ -58,9 +67,10 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 			 * @param view
 			 * @param docChanged
 			 */
-			updateWidgets(view: EditorView, docChanged: boolean = true): void {
+			async updateWidgets(view: EditorView, docChanged: boolean = true): Promise<void> {
 				let lang = '';
 				let state: SyntaxNode[] = [];
+				let decoQueue: DecoQueueNode[] = [];
 
 				// const t1 = performance.now();
 
@@ -82,26 +92,14 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 								if (match) {
 									const hasSelectionOverlap = Cm6_Util.checkSelectionAndRangeOverlap(view.state.selection, node.from - 1, node.to + 1);
 
-									// if there is selection overlap, the user has the inline code block selected, so we don't want to hide the language tag.
-									// For this we just remove the decorations and rebuild them with the language tag visible.
-									if (hasSelectionOverlap) {
-										this.removeDecoration(node.from, node.to);
-									}
-									const hideTo = node.from + match[1].length + 3; // hide `{lang} `
-
-									try {
-										const decorations = this.buildDecorations(hideTo, node.to, match[1], match[2]);
-
-										this.removeDecoration(node.from, node.to);
-										// add the decoration that hides the language tag
-										if (this.isLivePreview(view.state) && !hasSelectionOverlap) {
-											decorations.unshift(Decoration.replace({}).range(node.from, hideTo));
-										}
-										// add the highlight decorations
-										this.addDecoration(node.from, node.to, decorations);
-									} catch (e) {
-										console.error(e);
-									}
+									decoQueue.push({
+										from: node.from,
+										to: node.to,
+										lang: match[1],
+										content: match[2],
+										hideLang: this.isLivePreview(view.state) && !hasSelectionOverlap,
+										hideTo: node.from + match[1].length + 3 // hide `{lang} `
+									});
 								}
 							} else {
 								// we don't want to highlight normal inline code blocks, thus we remove any of our decorations
@@ -133,17 +131,12 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 								const start = state[0].from;
 								const end = state[state.length - 1].to;
 
-								const content = Cm6_Util.getContent(view.state, start, end);
-
-								try {
-									const decorations = this.buildDecorations(start, end, lang, content);
-
-									// when we have the decorations, we first remove all existing decorations in the range and then add the new ones
-									this.removeDecoration(start, end);
-									this.addDecoration(start, end, decorations);
-								} catch (e) {
-									console.error(e);
-								}
+								decoQueue.push({
+									from: start,
+									to: end,
+									lang,
+									content: Cm6_Util.getContent(view.state, start, end)
+								});
 							}
 
 							lang = '';
@@ -152,6 +145,29 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 					},
 				});
 
+				for (const node of decoQueue) {
+					try {
+						if (node.hideTo) {  // inline decorations
+							const decorations = await this.buildDecorations(node.hideTo, node.to, node.lang, node.content);
+
+							this.removeDecoration(node.from, node.to);
+							// add the decoration that hides the language tag
+							if (node.hideLang) {
+								decorations.unshift(Decoration.replace({}).range(node.from, node.hideTo));
+							}
+							// add the highlight decorations
+							this.addDecoration(node.from, node.to, decorations);
+						} else {
+							const decorations = await this.buildDecorations(node.from, node.to, node.lang, node.content);
+
+							// when we have the decorations, we first remove all existing decorations in the range and then add the new ones
+							this.removeDecoration(node.from, node.to);
+							this.addDecoration(node.from, node.to, decorations);
+						}
+					} catch (e) {
+						console.error(e);
+					}
+				}
 				// console.log('Traversed syntax tree in', performance.now() - t1, 'ms');
 			}
 
@@ -201,12 +217,12 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 			 * @param language
 			 * @param content
 			 */
-			buildDecorations(from: number, to: number, language: string, content: string): Range<Decoration>[] {
+			async buildDecorations(from: number, to: number, language: string, content: string): Promise<Range<Decoration>[]> {
 				if (language === '') {
 					return [];
 				}
 
-				const highlight = plugin.highlighter.getHighlightTokens(content, language);
+				const highlight = await plugin.highlighter.getHighlightTokens(content, language);
 
 				if (!highlight) {
 					return [];
