@@ -146,7 +146,7 @@ export class CodeHighlighter {
 			themes: [new ExpressiveCodeTheme(await this.themeMapper.getThemeForEC())],
 			plugins: [
 				pluginShiki({
-					langs: [...this.customLanguages],
+					langs: this.customLanguages,
 				}),
 				pluginCollapsibleSections(),
 				pluginTextMarkers(),
@@ -182,19 +182,12 @@ export class CodeHighlighter {
 	async loadShiki(): Promise<void> {
 		this.shiki = await createHighlighter({
 			themes: [await this.themeMapper.getTheme()],
-			langs: [...this.customLanguages],
+			langs: this.customLanguages,
 		});
 	}
 
 	usesCustomTheme(): boolean {
 		return this.plugin.loadedSettings.theme.endsWith('.json');
-	}
-
-	/**
-	 * Returns a list of languages registrations that need to be loaded into Shiki and EC.
-	 */
-	getLoadedLanguageRegistrations(): (DynamicImportLanguageRegistration | LanguageRegistration)[] {
-		return [...Object.values(bundledLanguages), ...this.customLanguages];
 	}
 
 	/**

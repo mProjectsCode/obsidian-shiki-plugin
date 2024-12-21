@@ -147,23 +147,14 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 
 				for (const node of decoQueue) {
 					try {
-						if (node.hideTo) {  // inline decorations
-							const decorations = await this.buildDecorations(node.hideTo, node.to, node.lang, node.content);
-
-							this.removeDecoration(node.from, node.to);
+						const decorations = await this.buildDecorations(node.hideTo ?? node.from, node.to, node.lang, node.content);
+						this.removeDecoration(node.from, node.to);
+						if (node.hideLang) {
 							// add the decoration that hides the language tag
-							if (node.hideLang) {
-								decorations.unshift(Decoration.replace({}).range(node.from, node.hideTo));
-							}
-							// add the highlight decorations
-							this.addDecoration(node.from, node.to, decorations);
-						} else {
-							const decorations = await this.buildDecorations(node.from, node.to, node.lang, node.content);
-
-							// when we have the decorations, we first remove all existing decorations in the range and then add the new ones
-							this.removeDecoration(node.from, node.to);
-							this.addDecoration(node.from, node.to, decorations);
+							decorations.unshift(Decoration.replace({}).range(node.from, node.hideTo));
 						}
+						// add the highlight decorations
+						this.addDecoration(node.from, node.to, decorations);
 					} catch (e) {
 						console.error(e);
 					}
