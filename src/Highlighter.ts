@@ -216,9 +216,7 @@ export class CodeHighlighter {
 			return undefined;
 		}
 		// load bundled language ​​when needed
-		try {
-			this.shiki.getLanguage(lang);
-		} catch (e) {
+		if (!this.shiki.getLoadedLanguages().includes(lang)) {
 			await this.shiki.loadLanguage(lang as BundledLanguage);
 		}
 		return this.shiki.codeToTokens(code, {
