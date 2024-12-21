@@ -38,7 +38,7 @@ export class CodeHighlighter {
 
 	ec!: ExpressiveCodeEngine;
 	ecElements!: HTMLElement[];
-	loadedLanguages!: string[];
+	supportedLanguages!: string[];
 	shiki!: Highlighter;
 	customThemes!: CustomTheme[];
 	customLanguages!: LanguageRegistration[];
@@ -55,7 +55,10 @@ export class CodeHighlighter {
 		await this.loadEC();
 		await this.loadShiki();
 
-		this.loadedLanguages = this.shiki.getLoadedLanguages();
+		this.supportedLanguages = [
+			...Object.keys(bundledLanguages),
+			...this.customLanguages.map(i => i.name)
+		];
 	}
 
 	async unload(): Promise<void> {
@@ -143,7 +146,7 @@ export class CodeHighlighter {
 			themes: [new ExpressiveCodeTheme(await this.themeMapper.getThemeForEC())],
 			plugins: [
 				pluginShiki({
-					langs: this.getLoadedLanguageRegistrations(),
+					langs: this.customLanguages,
 				}),
 				pluginCollapsibleSections(),
 				pluginTextMarkers(),
@@ -179,7 +182,7 @@ export class CodeHighlighter {
 	async loadShiki(): Promise<void> {
 		this.shiki = await createHighlighter({
 			themes: [await this.themeMapper.getTheme()],
-			langs: this.getLoadedLanguageRegistrations(),
+			langs: this.customLanguages,
 		});
 	}
 
@@ -188,17 +191,10 @@ export class CodeHighlighter {
 	}
 
 	/**
-	 * Returns a list of languages registrations that need to be loaded into Shiki and EC.
-	 */
-	getLoadedLanguageRegistrations(): (DynamicImportLanguageRegistration | LanguageRegistration)[] {
-		return [...Object.values(bundledLanguages), ...this.customLanguages];
-	}
-
-	/**
 	 * All languages that are safe to use with Obsidian's `registerMarkdownCodeBlockProcessor`.
 	 */
 	obsidianSafeLanguageNames(): string[] {
-		return this.loadedLanguages.filter(lang => !languageNameBlacklist.has(lang) && !this.plugin.loadedSettings.disabledLanguages.includes(lang));
+		return this.supportedLanguages.filter(lang => !languageNameBlacklist.has(lang) && !this.plugin.loadedSettings.disabledLanguages.includes(lang));
 		// .concat(this.customLanguages.map(lang => lang.name));
 	}
 
@@ -215,11 +211,14 @@ export class CodeHighlighter {
 		container.innerHTML = toHtml(this.themeMapper.fixAST(result.renderedGroupAst));
 	}
 
-	getHighlightTokens(code: string, lang: string): TokensResult | undefined {
+	async getHighlightTokens(code: string, lang: string): Promise<TokensResult | undefined> {
 		if (!this.obsidianSafeLanguageNames().includes(lang)) {
 			return undefined;
 		}
-
+		// load bundled language ​​when needed
+		if (!this.shiki.getLoadedLanguages().includes(lang)) {
+			await this.shiki.loadLanguage(lang as BundledLanguage);
+		}
 		return this.shiki.codeToTokens(code, {
 			lang: lang as BundledLanguage,
 			theme: this.plugin.settings.theme,
