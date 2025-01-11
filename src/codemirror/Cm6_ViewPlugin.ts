@@ -243,7 +243,7 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 					return [];
 				}
 
-				const highlight = await plugin.highlighter.getHighlightTokens(content, language);
+				const highlight = await plugin.highlighter.getHighlightTokens(content, language.toLowerCase());
 
 				if (!highlight) {
 					return [];
