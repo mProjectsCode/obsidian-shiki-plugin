@@ -3,7 +3,6 @@ import type ShikiPlugin from 'src/main';
 import {
 	bundledLanguages,
 	createHighlighter,
-	type DynamicImportLanguageRegistration,
 	type LanguageRegistration,
 	type Highlighter,
 	type TokensResult,
@@ -55,10 +54,7 @@ export class CodeHighlighter {
 		await this.loadEC();
 		await this.loadShiki();
 
-		this.supportedLanguages = [
-			...Object.keys(bundledLanguages),
-			...this.customLanguages.map(i => i.name)
-		];
+		this.supportedLanguages = [...Object.keys(bundledLanguages), ...this.customLanguages.map(i => i.name)];
 	}
 
 	async unload(): Promise<void> {
@@ -215,7 +211,7 @@ export class CodeHighlighter {
 		if (!this.obsidianSafeLanguageNames().includes(lang)) {
 			return undefined;
 		}
-		// load bundled language ​​when needed
+		// load bundled language when needed
 		if (!this.shiki.getLoadedLanguages().includes(lang)) {
 			await this.shiki.loadLanguage(lang as BundledLanguage);
 		}

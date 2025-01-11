@@ -13,7 +13,7 @@ export default class ShikiPlugin extends Plugin {
 	activeCodeBlocks!: Map<string, CodeBlock[]>;
 	settings!: Settings;
 	loadedSettings!: Settings;
-	updateCm6Plugin!: () => void;
+	updateCm6Plugin!: () => Promise<void>;
 
 	codeBlockProcessors: MarkdownPostProcessor[] = [];
 
@@ -65,7 +65,7 @@ export default class ShikiPlugin extends Plugin {
 			}
 		}
 
-		this.updateCm6Plugin();
+		await this.updateCm6Plugin();
 	}
 
 	async registerPrismPlugin(): Promise<void> {

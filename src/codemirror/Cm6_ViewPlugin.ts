@@ -27,10 +27,10 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 			constructor(view: EditorView) {
 				this.view = view;
 				this.decorations = Decoration.none;
-				this.updateWidgets(view);
+				void this.updateWidgets(view);
 
-				plugin.updateCm6Plugin = (): void => {
-					this.forceUpdate();
+				plugin.updateCm6Plugin = (): Promise<void> => {
+					return this.forceUpdate();
 				};
 			}
 
@@ -46,12 +46,12 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 				// we handle doc changes and selection changes here
 				if (update.docChanged || update.selectionSet) {
 					this.view = update.view;
-					this.updateWidgets(update.view, update.docChanged);
+					void this.updateWidgets(update.view, update.docChanged);
 				}
 			}
 
-			forceUpdate(): void {
-				this.updateWidgets(this.view);
+			async forceUpdate(): Promise<void> {
+				await this.updateWidgets(this.view);
 
 				this.view.dispatch(this.view.state.update({}));
 			}
@@ -70,7 +70,7 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 			async updateWidgets(view: EditorView, docChanged: boolean = true): Promise<void> {
 				let lang = '';
 				let state: SyntaxNode[] = [];
-				let decoQueue: DecoQueueNode[] = [];
+				const decoQueue: DecoQueueNode[] = [];
 
 				// const t1 = performance.now();
 
@@ -98,7 +98,7 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 										lang: match[1],
 										content: match[2],
 										hideLang: this.isLivePreview(view.state) && !hasSelectionOverlap,
-										hideTo: node.from + match[1].length + 3 // hide `{lang} `
+										hideTo: node.from + match[1].length + 3, // hide `{lang} `
 									});
 								}
 							} else {
@@ -135,7 +135,7 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 									from: start,
 									to: end,
 									lang,
-									content: Cm6_Util.getContent(view.state, start, end)
+									content: Cm6_Util.getContent(view.state, start, end),
 								});
 							}
 
