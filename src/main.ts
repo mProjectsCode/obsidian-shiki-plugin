@@ -115,12 +115,12 @@ export default class ShikiPlugin extends Plugin {
 	}
 
 	registerInlineCodeProcessor(): void {
-		this.registerMarkdownPostProcessor((el, ctx) => {
+		this.registerMarkdownPostProcessor(async (el, ctx) => {
 			const inlineCodes = el.findAll(':not(pre) > code');
 			for (let codeElm of inlineCodes) {
 				let match = codeElm.textContent?.match(SHIKI_INLINE_REGEX); // format: `{lang} code`
 				if (match) {
-					const highlight = this.highlighter.getHighlightTokens(match[2], match[1]);
+					const highlight = await this.highlighter.getHighlightTokens(match[2], match[1]);
 					const tokens = highlight?.tokens.flat(1);
 					if (!tokens?.length) {
 						continue;
