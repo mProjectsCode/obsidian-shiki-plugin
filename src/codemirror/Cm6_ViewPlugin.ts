@@ -8,13 +8,27 @@ import { Cm6_Util } from 'src/codemirror/Cm6_Util';
 import { type ThemedToken } from 'shiki';
 import { editorLivePreviewField } from 'obsidian';
 
-interface DecoQueueNode {
+enum DecorationUpdateType {
+	Insert,
+	Remove,
+}
+
+type DecorationUpdate = InsertDecoration | RemoveDecoration;
+
+interface InsertDecoration {
+	type: DecorationUpdateType.Insert;
 	from: number;
 	to: number;
 	lang: string;
 	content: string;
 	hideLang?: boolean;
 	hideTo?: number;
+}
+
+interface RemoveDecoration {
+	type: DecorationUpdateType.Remove;
+	from: number;
+	to: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -30,7 +44,7 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 				void this.updateWidgets(view);
 
 				plugin.updateCm6Plugin = (): Promise<void> => {
-					return this.forceUpdate();
+					return this.updateWidgets(this.view);
 				};
 			}
 
@@ -50,12 +64,6 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 				}
 			}
 
-			async forceUpdate(): Promise<void> {
-				await this.updateWidgets(this.view);
-
-				this.view.dispatch(this.view.state.update({}));
-			}
-
 			isLivePreview(state: EditorState): boolean {
 				// @ts-ignore some strange private field not being assignable
 				return state.field(editorLivePreviewField);
@@ -70,7 +78,7 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 			async updateWidgets(view: EditorView, docChanged: boolean = true): Promise<void> {
 				let lang = '';
 				let state: SyntaxNode[] = [];
-				const decoQueue: DecoQueueNode[] = [];
+				const decorationUpdates: DecorationUpdate[] = [];
 
 				// const t1 = performance.now();
 
@@ -92,7 +100,8 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 								if (match) {
 									const hasSelectionOverlap = Cm6_Util.checkSelectionAndRangeOverlap(view.state.selection, node.from - 1, node.to + 1);
 
-									decoQueue.push({
+									decorationUpdates.push({
+										type: DecorationUpdateType.Insert,
 										from: node.from,
 										to: node.to,
 										lang: match[1],
@@ -123,7 +132,7 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 						if (props.has('HyperMD-codeblock-begin')) {
 							const content = Cm6_Util.getContent(view.state, node.from, node.to);
 
-							lang = /^```(\S+)/.exec(content)?.[1] ?? '';
+							lang = /^```\s*(\S+)/.exec(content)?.[1] ?? '';
 						}
 
 						if (props.has('HyperMD-codeblock-end')) {
@@ -131,11 +140,23 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 								const start = state[0].from;
 								const end = state[state.length - 1].to;
 
-								decoQueue.push({
+								decorationUpdates.push({
+									type: DecorationUpdateType.Insert,
 									from: start,
 									to: end,
 									lang,
 									content: Cm6_Util.getContent(view.state, start, end),
+								});
+							}
+
+							if (state.length > 0 && lang === '') {
+								const start = state[0].from;
+								const end = state[state.length - 1].to;
+
+								decorationUpdates.push({
+									type: DecorationUpdateType.Remove,
+									from: start,
+									to: end,
 								});
 							}
 
@@ -145,20 +166,29 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 					},
 				});
 
-				for (const node of decoQueue) {
+				for (const node of decorationUpdates) {
 					try {
-						const decorations = await this.buildDecorations(node.hideTo ?? node.from, node.to, node.lang, node.content);
-						this.removeDecoration(node.from, node.to);
-						if (node.hideLang) {
-							// add the decoration that hides the language tag
-							decorations.unshift(Decoration.replace({}).range(node.from, node.hideTo));
+						if (node.type === DecorationUpdateType.Remove) {
+							this.removeDecoration(node.from, node.to);
+						} else if (node.type === DecorationUpdateType.Insert) {
+							const decorations = await this.buildDecorations(node.hideTo ?? node.from, node.to, node.lang, node.content);
+							this.removeDecoration(node.from, node.to);
+							if (node.hideLang) {
+								// add the decoration that hides the language tag
+								decorations.unshift(Decoration.replace({}).range(node.from, node.hideTo));
+							}
+							// add the highlight decorations
+							this.addDecoration(node.from, node.to, decorations);
 						}
-						// add the highlight decorations
-						this.addDecoration(node.from, node.to, decorations);
 					} catch (e) {
 						console.error(e);
 					}
 				}
+
+				if (decorationUpdates.length > 0) {
+					this.view.dispatch(this.view.state.update({}));
+				}
+
 				// console.log('Traversed syntax tree in', performance.now() - t1, 'ms');
 			}
 
