@@ -5,6 +5,7 @@ export interface Settings {
 	theme: string;
 	preferThemeColors: boolean;
 	inlineHighlighting: boolean;
+	wrap: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -14,4 +15,5 @@ export const DEFAULT_SETTINGS: Settings = {
 	theme: 'obsidian-theme',
 	preferThemeColors: true,
 	inlineHighlighting: true,
+	wrap: true,
 };

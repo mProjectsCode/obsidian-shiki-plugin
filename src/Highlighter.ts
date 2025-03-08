@@ -154,6 +154,7 @@ export class CodeHighlighter {
 			themeCssRoot: 'div.expressive-code',
 			defaultProps: {
 				showLineNumbers: false,
+				wrap: this.plugin.loadedSettings.wrap
 			},
 		});
 
