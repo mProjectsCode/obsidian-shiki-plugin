@@ -128,6 +128,16 @@ export class ShikiSettingsTab extends PluginSettingTab {
 				});
 			});
 
+		new Setting(this.containerEl)
+			.setName('Wrap code blocks')
+			.setDesc('Wrap code blocks by default when enabled.')
+			.addToggle(toggle => {
+				toggle.setValue(this.plugin.settings.wrap).onChange(async value => {
+					this.plugin.settings.wrap = value;
+					await this.plugin.saveSettings();
+				});
+			});
+
 		new Setting(this.containerEl).setHeading().setName('Language Settings').setDesc('Configure language settings. RESTART REQUIRED AFTER CHANGES.');
 
 		new Setting(this.containerEl)
