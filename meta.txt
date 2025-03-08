@@ -7601,19 +7601,8 @@
 			],
 			"format": "esm"
 		},
-		"src/EcPlugins/languageBadge.ts": {
-			"bytes": 1268,
-			"imports": [
-				{
-					"path": "node_modules/@expressive-code/core/dist/index.js",
-					"kind": "import-statement",
-					"original": "@expressive-code/core"
-				}
-			],
-			"format": "esm"
-		},
 		"src/Highlighter.ts": {
-			"bytes": 8605,
+			"bytes": 8512,
 			"imports": [
 				{
 					"path": "node_modules/@expressive-code/core/dist/index.js",
@@ -7674,11 +7663,6 @@
 					"path": "node_modules/@expressive-code/core/dist/hast.js",
 					"kind": "import-statement",
 					"original": "@expressive-code/core/hast"
-				},
-				{
-					"path": "src/EcPlugins/languageBadge.ts",
-					"kind": "import-statement",
-					"original": "src/EcPlugins/languageBadge"
 				}
 			],
 			"format": "esm"
@@ -9264,13 +9248,10 @@
 					"bytesInOutput": 3662
 				},
 				"src/Highlighter.ts": {
-					"bytesInOutput": 4072
-				},
-				"src/EcPlugins/languageBadge.ts": {
-					"bytesInOutput": 917
+					"bytesInOutput": 4067
 				}
 			},
-			"bytes": 9808123
+			"bytes": 9807201
 		}
 	}
 }
