@@ -268,6 +268,22 @@ code>span.line.highlighted.error {
 code>span.line.highlighted.warning {
 	background-color: var(--vp-code-line-warning-color)
 }
+.has-focused code>span.line:not(.focused),
+.has-focused-lines code>span.line:not(.has-focus) {
+	filter:blur(.095rem);
+	opacity:.4;
+	transition:filter .35s,opacity .35s
+}
+.has-focused code>span.line:not(.focused),
+.has-focused-lines code>span.line:not(.has-focus) {
+	opacity:.7;
+	transition:filter .35s,opacity .35s
+}
+.has-focused:hover code>span.line:not(.focused),
+.has-focused-lines:hover code>span.line:not(.has-focus) {
+	filter:blur(0);
+	opacity:1
+}
 
 /* chore fix: keep color magin zero */
 code>span.line {
