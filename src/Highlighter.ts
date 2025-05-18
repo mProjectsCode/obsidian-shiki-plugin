@@ -8,7 +8,14 @@ import {
 	type TokensResult,
 	type BundledLanguage,
 	type ThemedToken,
-} from 'shiki/index.mjs';
+} from 'shiki';
+import {
+  transformerNotationDiff,
+  transformerNotationHighlight,
+  transformerNotationFocus,
+  transformerNotationErrorLevel,
+  transformerMetaHighlight,
+} from '@shikijs/transformers';
 import { ThemeMapper } from 'src/themes/ThemeMapper';
 import { pluginShiki } from '@expressive-code/plugin-shiki';
 import { pluginCollapsibleSections } from '@expressive-code/plugin-collapsible-sections';
@@ -179,6 +186,7 @@ export class CodeHighlighter {
 		this.shiki = await createHighlighter({
 			themes: [await this.themeMapper.getTheme()],
 			langs: this.customLanguages,
+
 		});
 	}
 
@@ -218,6 +226,9 @@ export class CodeHighlighter {
 		return this.shiki.codeToTokens(code, {
 			lang: lang as BundledLanguage,
 			theme: this.plugin.settings.theme,
+			//  transformers: [ // TODO Error，codeToToken have no transformer method (code2Html have)
+			//  	transformerNotationDiff(),
+			//  ]
 		});
 	}
 
