@@ -6,6 +6,15 @@ import { ShikiSettingsTab } from 'src/settings/SettingsTab';
 import { filterHighlightAllPlugin } from 'src/PrismPlugin';
 import { CodeHighlighter } from 'src/Highlighter';
 
+import {
+  transformerNotationDiff,
+  transformerNotationHighlight,
+  transformerNotationFocus,
+  transformerNotationErrorLevel,
+  transformerMetaHighlight,
+} from '@shikijs/transformers';
+import { codeToHtml } from 'shiki';
+
 export const SHIKI_INLINE_REGEX = /^\{([^\s]+)\} (.*)/i; // format: `{lang} code`
 
 export default class ShikiPlugin extends Plugin {
@@ -102,9 +111,23 @@ export default class ShikiPlugin extends Plugin {
 							}
 						}
 
-						const codeBlock = new CodeBlock(this, el, source, language, ctx);
+						const html:string = await codeToHtml(source, {
+							lang: language,
+							theme: this.settings.theme,
+							transformers: [
+								transformerNotationDiff(), 
+								transformerNotationDiff({ matchAlgorithm: 'v3' }),
+								transformerNotationHighlight(),
+								transformerNotationFocus(),
+								transformerNotationErrorLevel(),
+								transformerMetaHighlight(),
+							],
+						})
+						el.innerHTML = html
 
-						ctx.addChild(codeBlock);
+						// const codeBlock = new CodeBlock(this, el, source, language, ctx);
+
+						// ctx.addChild(codeBlock);
 					},
 					1000,
 				);

@@ -1,16 +1,5 @@
 {
 	"inputs": {
-		"src/CodeBlock.ts": {
-			"bytes": 2215,
-			"imports": [
-				{
-					"path": "obsidian",
-					"kind": "import-statement",
-					"external": true
-				}
-			],
-			"format": "esm"
-		},
 		"src/codemirror/Cm6_Util.ts": {
 			"bytes": 1334,
 			"imports": [
@@ -11812,7 +11801,7 @@
 			"format": "esm"
 		},
 		"src/Highlighter.ts": {
-			"bytes": 8214,
+			"bytes": 8543,
 			"imports": [
 				{
 					"path": "node_modules/@expressive-code/core/dist/index.js",
@@ -11823,6 +11812,11 @@
 					"path": "node_modules/shiki/dist/index.mjs",
 					"kind": "import-statement",
 					"original": "shiki"
+				},
+				{
+					"path": "@shikijs/transformers",
+					"kind": "import-statement",
+					"external": true
 				},
 				{
 					"path": "src/themes/ThemeMapper.ts",
@@ -11877,8 +11871,13 @@
 			],
 			"format": "esm"
 		},
+		"node_modules/@shikijs/transformers/dist/index.mjs": {
+			"bytes": 20611,
+			"imports": [],
+			"format": "esm"
+		},
 		"src/main.ts": {
-			"bytes": 5171,
+			"bytes": 5831,
 			"imports": [
 				{
 					"path": "obsidian",
@@ -11886,9 +11885,9 @@
 					"external": true
 				},
 				{
-					"path": "src/CodeBlock.ts",
+					"path": "src/CodeBlock",
 					"kind": "import-statement",
-					"original": "src/CodeBlock"
+					"external": true
 				},
 				{
 					"path": "src/codemirror/Cm6_ViewPlugin.ts",
@@ -11914,6 +11913,16 @@
 					"path": "src/Highlighter.ts",
 					"kind": "import-statement",
 					"original": "src/Highlighter"
+				},
+				{
+					"path": "node_modules/@shikijs/transformers/dist/index.mjs",
+					"kind": "import-statement",
+					"original": "@shikijs/transformers"
+				},
+				{
+					"path": "node_modules/shiki/dist/index.mjs",
+					"kind": "import-statement",
+					"original": "shiki"
 				}
 			],
 			"format": "esm"
@@ -11922,11 +11931,6 @@
 	"outputs": {
 		"main.js": {
 			"imports": [
-				{
-					"path": "obsidian",
-					"kind": "require-call",
-					"external": true
-				},
 				{
 					"path": "obsidian",
 					"kind": "require-call",
@@ -13950,10 +13954,7 @@
 					"bytesInOutput": 100
 				},
 				"src/main.ts": {
-					"bytesInOutput": 2585
-				},
-				"src/CodeBlock.ts": {
-					"bytesInOutput": 986
+					"bytesInOutput": 2677
 				},
 				"src/codemirror/Cm6_ViewPlugin.ts": {
 					"bytesInOutput": 2708
@@ -14220,7 +14221,7 @@
 					"bytesInOutput": 32
 				},
 				"node_modules/hast-util-select/lib/pseudo.js": {
-					"bytesInOutput": 3782
+					"bytesInOutput": 3796
 				},
 				"node_modules/hast-util-select/lib/test.js": {
 					"bytesInOutput": 388
@@ -14329,9 +14330,12 @@
 				},
 				"src/Highlighter.ts": {
 					"bytesInOutput": 4050
+				},
+				"node_modules/@shikijs/transformers/dist/index.mjs": {
+					"bytesInOutput": 4584
 				}
 			},
-			"bytes": 19037804
+			"bytes": 19041508
 		}
 	}
 }
