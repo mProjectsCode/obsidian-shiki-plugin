@@ -301,7 +301,7 @@ code>span.line {
 [overflow-auto=""] { overflow: auto; }
 [bg-transparent=""] { background-color: transparent; }
 /* [text-transparent=""] { color: transparent; } */
-[text-transparent=""] { color: #ffffff33; }
+[text-transparent=""] { color: #ffffff22; }
 [inset-0=""] { top: 0; right: 0; bottom: 0; left: 0; }
 [py-20px=""] { padding-top: 20px; padding-bottom: 20px; }
 [px-24px=""] { padding-top: 24px; padding-bottom: 24px; }
@@ -311,10 +311,23 @@ code>span.line {
 [carent-gray=""] {}
 [font-mono=""] {}
 
-/* keep same: pre & textare */
+/*
+ * keep same: pre & textare
+ * 
+ * It is necessary to ensure that the style of this part is not overwritten,
+ * Otherwise, `textarea` and `code` won't align
+ */
 .obsidian-shiki-plugin code, .obsidian-shiki-plugin textarea {
-  line-height: 24px;
-  padding: 12px 16px;
-  margin: 0;
-  border: 0;
+	line-height: 24px !important;
+	font-size: var(--code-size) !important;
+}
+.obsidian-shiki-plugin code {
+	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+}
+.obsidian-shiki-plugin pre, .obsidian-shiki-plugin textarea {
+	margin: 0 !important;
+	padding: 12px 16px !important;
+	border: 0 !important;
 }

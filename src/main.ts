@@ -111,10 +111,10 @@ export default class ShikiPlugin extends Plugin {
 							}
 						}
 
-						let option: 'pre'|'old'|'area' = 'pre' // TODO as a new setting option
+						let option: 'pre'|'old'|'textarea' = 'textarea' // TODO as a new setting option
 						
 						// @ts-ignore
-						if (option === 'area') {
+						if (option === 'textarea') {
 							// - div
 							//   - span
 							//     - pre
