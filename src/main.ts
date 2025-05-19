@@ -111,23 +111,60 @@ export default class ShikiPlugin extends Plugin {
 							}
 						}
 
-						const html:string = await codeToHtml(source, {
-							lang: language,
-							theme: this.settings.theme,
-							transformers: [
-								transformerNotationDiff(), 
-								transformerNotationDiff({ matchAlgorithm: 'v3' }),
-								transformerNotationHighlight(),
-								transformerNotationFocus(),
-								transformerNotationErrorLevel(),
-								transformerMetaHighlight(),
-							],
-						})
-						el.innerHTML = html
-
-						// const codeBlock = new CodeBlock(this, el, source, language, ctx);
-
-						// ctx.addChild(codeBlock);
+						let option: 'pre'|'old'|'area' = 'pre' // TODO as a new setting option
+						
+						// @ts-ignore
+						if (option === 'area') {
+							// - div
+							//   - span
+							//     - pre
+							// - textarea
+							const div = document.createElement('div'); el.appendChild(div); div.classList.add('obsidian-shiki-plugin')
+							div.setAttribute('relative', ''); div.setAttribute('min-h-100', ''); div.setAttribute('float-left', ''); div.setAttribute('min-w-full', ''); 
+							const span = document.createElement('span'); div.appendChild(span);
+							const textarea = document.createElement('textarea'); div.appendChild(textarea); textarea.classList.add('line-height-$vp-code-line-height', 'font-$vp-font-family-mono', 'text-size-$vp-code-font-size');
+							// 这些属性很奇怪，我抄了shiki.style上的属性。但支撑这些的，是许多类似 `[absolute=""]` 这样选择器的css
+							// 也许是为了方便样式覆盖
+							const attributes = {
+								'whitespace-pre': '',
+								'overflow-auto': '',
+								'w-full': '',
+								'h-full': '',
+								'font-mono': '',
+								'bg-transparent': '',
+								'absolute': '',
+								'inset-0': '',
+								'py-20px': '',
+								'px-24px': '',
+								'text-transparent': '',
+								'carent-gray': '',
+								'tab-4': '',
+								'resize-none': '',
+								'z-10': '',
+								'autocomplete': 'off',
+								'autocorrect': 'off',
+								'autocapitalize': 'none',
+								'spellcheck': 'false',
+							};
+							Object.entries(attributes).forEach(([key, val]) => {
+								textarea.setAttribute(key, val);
+							});
+							// async part
+							this.getPre(language, source).then(pre => span.innerHTML = pre);
+							textarea.value = source;
+							textarea.oninput = (ev) => {
+								const newValue = (ev.target as HTMLTextAreaElement).value
+								this.getPre(language, newValue).then(pre => span.innerHTML = pre);
+							}
+						}
+						// @ts-ignore
+						else if (option === 'pre') {
+							this.getPre(language, source).then(pre => el.innerHTML = pre);
+						}
+						else {
+							const codeBlock = new CodeBlock(this, el, source, language, ctx);
+							ctx.addChild(codeBlock);
+						}
 					},
 					1000,
 				);
@@ -135,6 +172,22 @@ export default class ShikiPlugin extends Plugin {
 				console.warn(`Failed to register code block processor for ${language}.`, e);
 			}
 		}
+	}
+
+	async getPre(language:string, source:string): Promise<string> {
+		const pre:string = await codeToHtml(source, {
+			lang: language,
+			theme: this.settings.theme,
+			transformers: [
+				transformerNotationDiff(), 
+				transformerNotationDiff({ matchAlgorithm: 'v3' }),
+				transformerNotationHighlight(),
+				transformerNotationFocus(),
+				transformerNotationErrorLevel(),
+				transformerMetaHighlight(),
+			],
+		})
+		return pre
 	}
 
 	registerInlineCodeProcessor(): void {

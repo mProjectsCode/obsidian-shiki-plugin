@@ -1,7 +1,18 @@
 {
 	"inputs": {
+		"src/CodeBlock.ts": {
+			"bytes": 2293,
+			"imports": [
+				{
+					"path": "obsidian",
+					"kind": "import-statement",
+					"external": true
+				}
+			],
+			"format": "esm"
+		},
 		"src/codemirror/Cm6_Util.ts": {
-			"bytes": 1334,
+			"bytes": 1392,
 			"imports": [
 				{
 					"path": "@codemirror/state",
@@ -17,7 +28,7 @@
 			"format": "esm"
 		},
 		"src/codemirror/Cm6_ViewPlugin.ts": {
-			"bytes": 8053,
+			"bytes": 8339,
 			"imports": [
 				{
 					"path": "src/main.ts",
@@ -63,12 +74,12 @@
 			"format": "esm"
 		},
 		"src/settings/Settings.ts": {
-			"bytes": 396,
+			"bytes": 413,
 			"imports": [],
 			"format": "esm"
 		},
 		"src/settings/StringSelectModal.ts": {
-			"bytes": 596,
+			"bytes": 622,
 			"imports": [
 				{
 					"path": "obsidian",
@@ -5147,7 +5158,7 @@
 			"format": "esm"
 		},
 		"src/settings/SettingsTab.ts": {
-			"bytes": 5561,
+			"bytes": 5721,
 			"imports": [
 				{
 					"path": "obsidian",
@@ -5168,7 +5179,7 @@
 			"format": "esm"
 		},
 		"src/PrismPlugin.ts": {
-			"bytes": 3493,
+			"bytes": 3615,
 			"imports": [],
 			"format": "esm"
 		},
@@ -7238,7 +7249,7 @@
 			"format": "esm"
 		},
 		"src/themes/ObsidianTheme.ts": {
-			"bytes": 17553,
+			"bytes": 18247,
 			"imports": [
 				{
 					"path": "shiki",
@@ -7249,7 +7260,7 @@
 			"format": "esm"
 		},
 		"src/themes/ThemeMapper.ts": {
-			"bytes": 3045,
+			"bytes": 3151,
 			"imports": [
 				{
 					"path": "node_modules/shiki/dist/index.mjs",
@@ -11785,7 +11796,7 @@
 			"format": "esm"
 		},
 		"src/themes/ECTheme.ts": {
-			"bytes": 5138,
+			"bytes": 5236,
 			"imports": [
 				{
 					"path": "@expressive-code/core",
@@ -11801,7 +11812,7 @@
 			"format": "esm"
 		},
 		"src/Highlighter.ts": {
-			"bytes": 8543,
+			"bytes": 8799,
 			"imports": [
 				{
 					"path": "node_modules/@expressive-code/core/dist/index.js",
@@ -11877,7 +11888,7 @@
 			"format": "esm"
 		},
 		"src/main.ts": {
-			"bytes": 5831,
+			"bytes": 8132,
 			"imports": [
 				{
 					"path": "obsidian",
@@ -11885,9 +11896,9 @@
 					"external": true
 				},
 				{
-					"path": "src/CodeBlock",
+					"path": "src/CodeBlock.ts",
 					"kind": "import-statement",
-					"external": true
+					"original": "src/CodeBlock"
 				},
 				{
 					"path": "src/codemirror/Cm6_ViewPlugin.ts",
@@ -11931,6 +11942,11 @@
 	"outputs": {
 		"main.js": {
 			"imports": [
+				{
+					"path": "obsidian",
+					"kind": "require-call",
+					"external": true
+				},
 				{
 					"path": "obsidian",
 					"kind": "require-call",
@@ -13954,7 +13970,10 @@
 					"bytesInOutput": 100
 				},
 				"src/main.ts": {
-					"bytesInOutput": 2677
+					"bytesInOutput": 3745
+				},
+				"src/CodeBlock.ts": {
+					"bytesInOutput": 986
 				},
 				"src/codemirror/Cm6_ViewPlugin.ts": {
 					"bytesInOutput": 2708
@@ -14221,7 +14240,7 @@
 					"bytesInOutput": 32
 				},
 				"node_modules/hast-util-select/lib/pseudo.js": {
-					"bytesInOutput": 3796
+					"bytesInOutput": 3800
 				},
 				"node_modules/hast-util-select/lib/test.js": {
 					"bytesInOutput": 388
@@ -14335,7 +14354,7 @@
 					"bytesInOutput": 4584
 				}
 			},
-			"bytes": 19041508
+			"bytes": 19043566
 		}
 	}
 }
