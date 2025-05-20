@@ -8,7 +8,7 @@ import {
 	type TokensResult,
 	type BundledLanguage,
 	type ThemedToken,
-} from 'shiki/index.mjs';
+} from 'shiki';
 import { ThemeMapper } from 'src/themes/ThemeMapper';
 import { pluginShiki } from '@expressive-code/plugin-shiki';
 import { pluginCollapsibleSections } from '@expressive-code/plugin-collapsible-sections';
