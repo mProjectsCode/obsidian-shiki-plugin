@@ -150,11 +150,11 @@ export default class ShikiPlugin extends Plugin {
 								textarea.setAttribute(key, val);
 							});
 							// async part
-							this.codeblock_getPre(language, source).then(pre => span.innerHTML = pre);
+							this.codeblock_getPre(language, source, el, ctx).then(pre => span.innerHTML = pre);
 							textarea.value = source;
 							textarea.oninput = (ev) => {
 								const newValue = (ev.target as HTMLTextAreaElement).value
-								this.codeblock_getPre(language, newValue).then(pre => span.innerHTML = pre);
+								this.codeblock_getPre(language, newValue, el, ctx).then(pre => span.innerHTML = pre);
 							}
 							textarea.onchange = (ev) => {
 								const newValue = (ev.target as HTMLTextAreaElement).value
@@ -163,7 +163,7 @@ export default class ShikiPlugin extends Plugin {
 							}
 						}
 						else if (this.settings.renderMode === 'pre') {
-							this.codeblock_getPre(language, source).then(pre => el.innerHTML = pre);
+							this.codeblock_getPre(language, source, el, ctx).then(pre => el.innerHTML = pre);
 						}
 						else {
 							const codeBlock = new CodeBlock(this, el, source, language, ctx);
@@ -178,10 +178,26 @@ export default class ShikiPlugin extends Plugin {
 		}
 	}
 
-	async codeblock_getPre(language:string, source:string): Promise<string> {
+	async codeblock_getPre(language:string, source:string, el:HTMLElement, ctx:MarkdownPostProcessorContext): Promise<string> {
+		// lanugageMeta (allow both ends space, allow null string)
+		const sectionInfo = ctx.getSectionInfo(el);
+		if (!sectionInfo) {
+			new Notice("Warning: whitout editor!", 3000)
+			throw('Warning: whitout editor!')
+		}
+		const lines = sectionInfo.text.split('\n')
+		if (lines.length < sectionInfo.lineStart + 1) {
+			new Notice("Warning: el ctx error!", 3000)
+			throw('Warning: el ctx error!')
+		}
+		// If an alias is used, `lines[sectionInfo.lineStart]` may not necessarily contain `language`
+		const languageMeta = lines[sectionInfo.lineStart].replace(/^[`~]+\S*\s?/, '')
+
+		// pre html string
 		const pre:string = await codeToHtml(source, {
 			lang: language,
 			theme: this.settings.theme,
+			meta: { __raw: languageMeta },
 			// https://shiki.style/packages/transformers
 			transformers: [
 				transformerNotationDiff({ matchAlgorithm: 'v3' }),
@@ -220,8 +236,8 @@ export default class ShikiPlugin extends Plugin {
 			new Notice("Warning: whitout editor!", 3000)
 			return;
 		}
-		sectionInfo.lineStart; // index in (```<language>)
-		sectionInfo.lineEnd;   // index in (```), Let's not modify the fence part
+		// sectionInfo.lineStart; // index in (```<language>)
+		// sectionInfo.lineEnd;   // index in (```), Let's not modify the fence part
 
 		// editor
 		const editor = this.app.workspace.activeEditor?.editor;
