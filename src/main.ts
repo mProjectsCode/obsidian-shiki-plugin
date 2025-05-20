@@ -7,11 +7,14 @@ import { filterHighlightAllPlugin } from 'src/PrismPlugin';
 import { CodeHighlighter } from 'src/Highlighter';
 
 import {
-  transformerNotationDiff,
-  transformerNotationHighlight,
-  transformerNotationFocus,
-  transformerNotationErrorLevel,
-  transformerMetaHighlight,
+	transformerNotationDiff,
+	transformerNotationHighlight,
+	transformerNotationFocus,
+	transformerNotationErrorLevel,
+	transformerNotationWordHighlight,
+
+	transformerMetaHighlight,
+	transformerMetaWordHighlight,
 } from '@shikijs/transformers';
 import { codeToHtml } from 'shiki';
 
@@ -110,11 +113,8 @@ export default class ShikiPlugin extends Plugin {
 								return;
 							}
 						}
-
-						let option: 'pre'|'old'|'textarea' = 'textarea' // TODO as a new setting option
 						
-						// @ts-ignore
-						if (option === 'textarea') {
+						if (this.settings.renderMode === 'textarea') {
 							// - div
 							//   - span
 							//     - pre
@@ -161,13 +161,8 @@ export default class ShikiPlugin extends Plugin {
 								// on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 								this.codeblock_saveContent(language, newValue, el, ctx)
 							}
-
-							// This method is ineffective. When re-rendering the el, the div inside will be destroyed and cannot be retained!
-							// let cacheEl = el.querySelector('.obsidian-shiki-plugin');
-							// if (!cacheEl) {
 						}
-						// @ts-ignore
-						else if (option === 'pre') {
+						else if (this.settings.renderMode === 'pre') {
 							this.codeblock_getPre(language, source).then(pre => el.innerHTML = pre);
 						}
 						else {
@@ -187,13 +182,16 @@ export default class ShikiPlugin extends Plugin {
 		const pre:string = await codeToHtml(source, {
 			lang: language,
 			theme: this.settings.theme,
+			// https://shiki.style/packages/transformers
 			transformers: [
-				transformerNotationDiff(), 
 				transformerNotationDiff({ matchAlgorithm: 'v3' }),
 				transformerNotationHighlight(),
 				transformerNotationFocus(),
 				transformerNotationErrorLevel(),
+				transformerNotationWordHighlight(),
+
 				transformerMetaHighlight(),
+				transformerMetaWordHighlight(),
 			],
 		})
 		return pre
@@ -232,6 +230,7 @@ export default class ShikiPlugin extends Plugin {
 			return;
 		}
 
+		// change
 		editor.transaction({ // EditorTransaction
 			// replaceSelection,
 			changes: [{

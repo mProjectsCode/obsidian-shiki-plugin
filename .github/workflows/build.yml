@@ -17,10 +17,14 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '22'
+    - name: Install Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: latest
     - name: build
       run: |
-        npm ci
-        npm run build
+        bun install
+        bun run build
     - name: upload build artifact
       if: always()
       uses: actions/upload-artifact@v4

@@ -48,6 +48,21 @@ export class ShikiSettingsTab extends PluginSettingTab {
 				});
 			});
 
+		new Setting(this.containerEl)
+			.setName('RenderMode')
+			.setDesc('Select the renderMode for the code blocks.')
+			.addDropdown(dropdown => {
+				dropdown.addOptions({
+					'textarea': 'textarea',
+					'pre': 'pre',
+					'codemirror': 'codemirror',
+				});
+				dropdown.setValue(this.plugin.settings.renderMode).onChange(async value => {
+					this.plugin.settings.renderMode = value as 'textarea'|'pre'|'codemirror';
+					await this.plugin.saveSettings();
+				});
+			});
+
 		const customThemeFolderSetting = new Setting(this.containerEl)
 			.setName('Custom themes folder location')
 			.setDesc('Folder relative to your Vault where custom JSON theme files are located.')

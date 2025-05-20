@@ -9,13 +9,6 @@ import {
 	type BundledLanguage,
 	type ThemedToken,
 } from 'shiki';
-import {
-  transformerNotationDiff,
-  transformerNotationHighlight,
-  transformerNotationFocus,
-  transformerNotationErrorLevel,
-  transformerMetaHighlight,
-} from '@shikijs/transformers';
 import { ThemeMapper } from 'src/themes/ThemeMapper';
 import { pluginShiki } from '@expressive-code/plugin-shiki';
 import { pluginCollapsibleSections } from '@expressive-code/plugin-collapsible-sections';
