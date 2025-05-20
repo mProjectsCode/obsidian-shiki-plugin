@@ -129,7 +129,6 @@ main :: proc() {
 }
 ```
 
-
 ```cpp
 #include <foo>
 #include <iostream>
