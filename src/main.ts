@@ -123,8 +123,12 @@ export default class ShikiPlugin extends Plugin {
 							div.setAttribute('relative', ''); div.setAttribute('float-left', ''); div.setAttribute('min-w-full', ''); // div.setAttribute('min-h-100', '');
 							const span = document.createElement('span'); div.appendChild(span);
 							const textarea = document.createElement('textarea'); div.appendChild(textarea); textarea.classList.add('line-height-$vp-code-line-height', 'font-$vp-font-family-mono', 'text-size-$vp-code-font-size');
-							// 这些属性很奇怪，我抄了shiki.style上的属性。但支撑这些的，是许多类似 `[absolute=""]` 这样选择器的css
-							// 也许是为了方便样式覆盖
+							// TODO
+							// These attributes are very strange. I copied the attributes on `shiki.style`.
+							// But what supports all these are many css selectors like '[absolute=""]'
+							// Perhaps it is for the convenience of style overlay
+							// 
+							// But in obsidian, I don't think it's necessary to do so.
 							const attributes = {
 								'whitespace-pre': '',
 								'overflow-auto': '',
@@ -216,18 +220,25 @@ export default class ShikiPlugin extends Plugin {
 	/**
 	 * Save textarea text content to codeBlock markdown source
 	 * 
-	 * Data security (Importance) 数据安全
+	 * Data security (Importance)
 	 * - Make sure `Ctrl+z` is normal: use transaction
 	 * - Make sure check error: try-catch
 	 * - Make sure to remind users of errors: use Notice
 	 * - Avoid overwriting the original data with incorrect data, this is unacceptable
 	 * 
-	 * 更新优化
-	 * - 我们需要确保在更新代码块内容时不会重新创建textarea元素，而应复用，避免光标位置改变
-	 * - 减少更新频率，减少事务次数 (500ms)
+	 * Refresh strategy1 (unable, todo): real-time, debounce
+	 * - We need to ensure that the textarea element is not recreated when updating
+	 *   the content of the code block. It should be reused to avoid changes in the cursor position.
+	 * - Reduce the update frequency and the number of transactions.
+	 *   Multiple calls within a certain period of time will only become one. (debounce)
 	 * 
-	 * 可复用模块
-	 * - 其他obsidian也需要这个模块，可以写通用些
+	 * Refresh strategy2 (enable): onchange emit
+	 * - It is better implemented under the obsidian architecture.
+	 *   Strategy1 requires additional processing: cache el
+	 * - **Disadvantage**: Can't use ctrl+z well in the code block.
+	 * 
+	 * Universal
+	 * - This should be a universal module. It has nothing to do with the logic of the plugin.
 	 */
 	async codeblock_saveContent(language:string, source:string, el:HTMLElement, ctx:MarkdownPostProcessorContext): Promise<void> {
 		// range
