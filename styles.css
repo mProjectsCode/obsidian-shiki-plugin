@@ -231,9 +231,9 @@ span.shiki-ul {
 
 code>span.line.diff {
 	transition: background-color .5s;
-	margin: 0 -24px;
-	padding: 0 24px;
-	width: calc(100% + 48px);
+	margin: 0 calc(-1 * var(--shiki-x-padding));
+	padding: 0 var(--shiki-x-padding);
+	width: calc(100% + 2 * var(--shiki-x-padding));
 	display: inline-block
 }
 code>span.line.diff:before {
@@ -257,9 +257,9 @@ code>span.line.diff.remove:before {
 code>span.line.highlighted {
 	background-color: var(--vp-code-line-highlight-color);
 	transition: background-color .5s;
-	margin: 0 -24px;
-	padding: 0 24px;
-	width: calc(100% + 48px);
+	margin: 0 calc(-1 * var(--shiki-x-padding));
+	padding: 0 var(--shiki-x-padding);
+	width: calc(100% + 2 * var(--shiki-x-padding));
 	display: inline-block
 }
 code>span.line.highlighted.error {
@@ -317,6 +317,9 @@ code>span.line {
  * It is necessary to ensure that the style of this part is not overwritten,
  * Otherwise, `textarea` and `code` won't align
  */
+ :root {
+	--shiki-x-padding: 16px;
+ }
 .obsidian-shiki-plugin code, .obsidian-shiki-plugin textarea {
 	line-height: 24px !important;
 	font-size: var(--code-size) !important;
@@ -328,6 +331,20 @@ code>span.line {
 }
 .obsidian-shiki-plugin pre, .obsidian-shiki-plugin textarea {
 	margin: 0 !important;
-	padding: 12px 16px !important;
+	padding: 12px var(--shiki-x-padding) !important;
 	border: 0 !important;
+}
+/* edit-block-button > textarea > pre */
+.obsidian-shiki-plugin pre { z-index: 0; }
+.obsidian-shiki-plugin textarea { z-index: 0; }
+
+/* read mode / rendered */
+.markdown-preview-view .obsidian-shiki-plugin textarea,
+.markdown-rendered:not(.cm-preview-code-block.cm-embed-block) .obsidian-shiki-plugin textarea {
+	display: none;
+}
+.markdown-preview-view .obsidian-shiki-plugin pre,
+.markdown-rendered:not(.cm-preview-code-block.cm-embed-block) .obsidian-shiki-plugin pre {
+	margin-top: 16px !important;
+	margin-bottom: 16px !important;
 }

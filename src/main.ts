@@ -1,4 +1,4 @@
-import { loadPrism, Plugin, TFile, type MarkdownPostProcessor } from 'obsidian';
+import { loadPrism, Plugin, TFile, type MarkdownPostProcessor, MarkdownPostProcessorContext, Notice } from 'obsidian';
 import { CodeBlock } from 'src/CodeBlock';
 import { createCm6Plugin } from 'src/codemirror/Cm6_ViewPlugin';
 import { DEFAULT_SETTINGS, type Settings } from 'src/settings/Settings';
@@ -120,7 +120,7 @@ export default class ShikiPlugin extends Plugin {
 							//     - pre
 							// - textarea
 							const div = document.createElement('div'); el.appendChild(div); div.classList.add('obsidian-shiki-plugin')
-							div.setAttribute('relative', ''); div.setAttribute('min-h-100', ''); div.setAttribute('float-left', ''); div.setAttribute('min-w-full', ''); 
+							div.setAttribute('relative', ''); div.setAttribute('float-left', ''); div.setAttribute('min-w-full', ''); // div.setAttribute('min-h-100', '');
 							const span = document.createElement('span'); div.appendChild(span);
 							const textarea = document.createElement('textarea'); div.appendChild(textarea); textarea.classList.add('line-height-$vp-code-line-height', 'font-$vp-font-family-mono', 'text-size-$vp-code-font-size');
 							// 这些属性很奇怪，我抄了shiki.style上的属性。但支撑这些的，是许多类似 `[absolute=""]` 这样选择器的css
@@ -150,16 +150,25 @@ export default class ShikiPlugin extends Plugin {
 								textarea.setAttribute(key, val);
 							});
 							// async part
-							this.getPre(language, source).then(pre => span.innerHTML = pre);
+							this.codeblock_getPre(language, source).then(pre => span.innerHTML = pre);
 							textarea.value = source;
 							textarea.oninput = (ev) => {
 								const newValue = (ev.target as HTMLTextAreaElement).value
-								this.getPre(language, newValue).then(pre => span.innerHTML = pre);
+								this.codeblock_getPre(language, newValue).then(pre => span.innerHTML = pre);
 							}
+							textarea.onchange = (ev) => {
+								const newValue = (ev.target as HTMLTextAreaElement).value
+								// on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
+								this.codeblock_saveContent(language, newValue, el, ctx)
+							}
+
+							// This method is ineffective. When re-rendering the el, the div inside will be destroyed and cannot be retained!
+							// let cacheEl = el.querySelector('.obsidian-shiki-plugin');
+							// if (!cacheEl) {
 						}
 						// @ts-ignore
 						else if (option === 'pre') {
-							this.getPre(language, source).then(pre => el.innerHTML = pre);
+							this.codeblock_getPre(language, source).then(pre => el.innerHTML = pre);
 						}
 						else {
 							const codeBlock = new CodeBlock(this, el, source, language, ctx);
@@ -174,7 +183,7 @@ export default class ShikiPlugin extends Plugin {
 		}
 	}
 
-	async getPre(language:string, source:string): Promise<string> {
+	async codeblock_getPre(language:string, source:string): Promise<string> {
 		const pre:string = await codeToHtml(source, {
 			lang: language,
 			theme: this.settings.theme,
@@ -188,6 +197,51 @@ export default class ShikiPlugin extends Plugin {
 			],
 		})
 		return pre
+	}
+
+	/**
+	 * Save textarea text content to codeBlock markdown source
+	 * 
+	 * Data security (Importance) 数据安全
+	 * - Make sure `Ctrl+z` is normal: use transaction
+	 * - Make sure check error: try-catch
+	 * - Make sure to remind users of errors: use Notice
+	 * - Avoid overwriting the original data with incorrect data, this is unacceptable
+	 * 
+	 * 更新优化
+	 * - 我们需要确保在更新代码块内容时不会重新创建textarea元素，而应复用，避免光标位置改变
+	 * - 减少更新频率，减少事务次数 (500ms)
+	 * 
+	 * 可复用模块
+	 * - 其他obsidian也需要这个模块，可以写通用些
+	 */
+	async codeblock_saveContent(language:string, source:string, el:HTMLElement, ctx:MarkdownPostProcessorContext): Promise<void> {
+		// range
+		const sectionInfo = ctx.getSectionInfo(el);
+		if (!sectionInfo) {
+			new Notice("Warning: whitout editor!", 3000)
+			return;
+		}
+		sectionInfo.lineStart; // index in (```<language>)
+		sectionInfo.lineEnd;   // index in (```), Let's not modify the fence part
+
+		// editor
+		const editor = this.app.workspace.activeEditor?.editor;
+		if (!editor) {
+			new Notice("Warning: whitout editor!", 3000)
+			return;
+		}
+
+		editor.transaction({ // EditorTransaction
+			// replaceSelection,
+			changes: [{
+				from: {line: sectionInfo.lineStart+1, ch: 0},
+				to: {line: sectionInfo.lineEnd, ch: 0},
+				text: source + '\n'
+			}],
+			// selections,
+			// selection
+		});
 	}
 
 	registerInlineCodeProcessor(): void {
