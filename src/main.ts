@@ -226,7 +226,7 @@ export default class ShikiPlugin extends Plugin {
 	 * - Make sure to remind users of errors: use Notice
 	 * - Avoid overwriting the original data with incorrect data, this is unacceptable
 	 * 
-	 * Refresh strategy1 (unable, todo): real-time, debounce
+	 * Refresh strategy1 (unable): real-time save, debounce
 	 * - We need to ensure that the textarea element is not recreated when updating
 	 *   the content of the code block. It should be reused to avoid changes in the cursor position.
 	 * - Reduce the update frequency and the number of transactions.
@@ -235,7 +235,8 @@ export default class ShikiPlugin extends Plugin {
 	 * Refresh strategy2 (enable): onchange emit
 	 * - It is better implemented under the obsidian architecture.
 	 *   Strategy1 requires additional processing: cache el
-	 * - **Disadvantage**: Can't use ctrl+z well in the code block.
+	 * - ~~Disadvantage: Can't use `ctrl+z` well in the code block.~~
+	 *   textarea can be `ctrl+z` normally
 	 * 
 	 * Universal
 	 * - This should be a universal module. It has nothing to do with the logic of the plugin.
