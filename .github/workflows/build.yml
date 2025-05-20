@@ -1,0 +1,32 @@
+name: Node.js CI/CD Pipeline
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build-obsidian:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout repo
+      uses: actions/checkout@v4
+    - name: env use node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+    - name: build
+      run: |
+        npm ci
+        npm run build
+    - name: upload build artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifact
+        path: |
+          manifest.json
+          main.js
+          styles.css
