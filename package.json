@@ -6,6 +6,7 @@
 	"scripts": {
 		"dev": "bun run automation/build/esbuild.dev.config.ts",
 		"build": "bun run tsc && bun run automation/build/esbuild.config.ts",
+		"build-min": "bun run tsc && bun run automation/build/esbuild.config.min.ts",
 		"tsc": "tsc -noEmit -skipLibCheck",
 		"test": "bun test",
 		"test:log": "LOG_TESTS=true bun test",

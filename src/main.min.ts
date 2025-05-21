@@ -1,10 +1,21 @@
 import { loadPrism, Plugin, TFile, type MarkdownPostProcessor, MarkdownPostProcessorContext, Notice } from 'obsidian';
-import { CodeBlock } from 'src/CodeBlock';
-import { createCm6Plugin } from 'src/codemirror/Cm6_ViewPlugin';
+// import { CodeBlock } from 'src/CodeBlock';
+// import { createCm6Plugin } from 'src/codemirror/Cm6_ViewPlugin';
 import { DEFAULT_SETTINGS, type Settings } from 'src/settings/Settings';
-import { ShikiSettingsTab } from 'src/settings/SettingsTab';
-import { filterHighlightAllPlugin } from 'src/PrismPlugin';
-import { CodeHighlighter } from 'src/Highlighter';
+// import { ShikiSettingsTab } from 'src/settings/SettingsTab';
+// import { filterHighlightAllPlugin } from 'src/PrismPlugin';
+// import { CodeHighlighter } from 'src/Highlighter';
+
+// [!code ++:10]
+// check obsidian env
+// @ts-ignore
+const Prism:any|null = window.Prism;
+console.log('check prism', Prism)
+document.addEventListener('DOMContentLoaded', () => {
+	// @ts-ignore
+	const Prism = window.Prism;
+	console.log('check prism2', Prism)
+});
 
 import {
 	transformerNotationDiff,
@@ -16,82 +27,90 @@ import {
 	transformerMetaHighlight,
 	transformerMetaWordHighlight,
 } from '@shikijs/transformers';
-import { codeToHtml } from 'shiki'; // 8.6MB
+// import { codeToHtml } from 'shiki'; // 8.6MB
+// [!code ++:6]
+// import { getHighlighter } from 'shiki';
+// const highlighter = await getHighlighter({
+// 	themes: ['github-dark'], // 只加载需要的主题
+// 	langs: ['javascript'],   // 只加载需要的语言
+// });
+// const codeToHtml = highlighter.codeToHtml
 
 export const SHIKI_INLINE_REGEX = /^\{([^\s]+)\} (.*)/i; // format: `{lang} code`
 
 export default class ShikiPlugin extends Plugin {
-	highlighter!: CodeHighlighter;
-	activeCodeBlocks!: Map<string, CodeBlock[]>;
+	// highlighter!: CodeHighlighter;
+	// activeCodeBlocks!: Map<string, CodeBlock[]>;
 	settings!: Settings;
 	loadedSettings!: Settings;
-	updateCm6Plugin!: () => Promise<void>;
+	// updateCm6Plugin!: () => Promise<void>;
 
 	codeBlockProcessors: MarkdownPostProcessor[] = [];
 
 	async onload(): Promise<void> {
 		await this.loadSettings();
 		this.loadedSettings = structuredClone(this.settings);
-		this.addSettingTab(new ShikiSettingsTab(this));
+		// this.addSettingTab(new ShikiSettingsTab(this));
 
-		this.highlighter = new CodeHighlighter(this);
-		await this.highlighter.load();
+		// this.highlighter = new CodeHighlighter(this);
+		// await this.highlighter.load();
 
-		this.activeCodeBlocks = new Map();
+		// this.activeCodeBlocks = new Map();
 
-		this.registerInlineCodeProcessor();
+		// this.registerInlineCodeProcessor();
 		this.registerCodeBlockProcessors();
 
-		this.registerEditorExtension([createCm6Plugin(this)]);
+		// this.registerEditorExtension([createCm6Plugin(this)]);
 
 		// this is a workaround for the fact that obsidian does not rerender the code block
 		// when the start line with the language changes, and we need that for the EC meta string
-		this.registerEvent(
-			this.app.vault.on('modify', async file => {
-				// sleep 0 so that the code block context is updated before we rerender
-				await sleep(100);
+		// this.registerEvent(
+		// 	this.app.vault.on('modify', async file => {
+		// 		// sleep 0 so that the code block context is updated before we rerender
+		// 		await sleep(100);
 
-				if (file instanceof TFile) {
-					if (this.activeCodeBlocks.has(file.path)) {
-						for (const codeBlock of this.activeCodeBlocks.get(file.path)!) {
-							void codeBlock.rerenderOnNoteChange();
-						}
-					}
-				}
-			}),
-		);
+		// 		if (file instanceof TFile) {
+		// 			if (this.activeCodeBlocks.has(file.path)) {
+		// 				for (const codeBlock of this.activeCodeBlocks.get(file.path)!) {
+		// 					void codeBlock.rerenderOnNoteChange();
+		// 				}
+		// 			}
+		// 		}
+		// 	}),
+		// );
 
-		await this.registerPrismPlugin();
+		// await this.registerPrismPlugin();
 	}
 
-	async reloadHighlighter(): Promise<void> {
-		await this.highlighter.unload();
+	// async reloadHighlighter(): Promise<void> {
+	// 	await this.highlighter.unload();
 
-		this.loadedSettings = structuredClone(this.settings);
+	// 	this.loadedSettings = structuredClone(this.settings);
 
-		await this.highlighter.load();
+	// 	await this.highlighter.load();
 
-		for (const [_, codeBlocks] of this.activeCodeBlocks) {
-			for (const codeBlock of codeBlocks) {
-				await codeBlock.forceRerender();
-			}
-		}
+	// 	for (const [_, codeBlocks] of this.activeCodeBlocks) {
+	// 		for (const codeBlock of codeBlocks) {
+	// 			await codeBlock.forceRerender();
+	// 		}
+	// 	}
 
-		await this.updateCm6Plugin();
-	}
+	// 	await this.updateCm6Plugin();
+	// }
 
-	async registerPrismPlugin(): Promise<void> {
-		/* eslint-disable */
+	// async registerPrismPlugin(): Promise<void> {
+	// 	/* eslint-disable */
 
-		await loadPrism();
+	// 	await loadPrism();
 
-		const prism = await loadPrism();
-		filterHighlightAllPlugin(prism);
-		prism.plugins.filterHighlightAll.reject.addSelector('div.expressive-code pre code');
-	}
+	// 	const prism = await loadPrism();
+	// 	// filterHighlightAllPlugin(prism);
+	// 	prism.plugins.filterHighlightAll.reject.addSelector('div.expressive-code pre code');
+	// }
 
 	registerCodeBlockProcessors(): void {
-		const languages = this.highlighter.obsidianSafeLanguageNames();
+		// const languages = this.highlighter.obsidianSafeLanguageNames();
+		const languages = ['js', 'ts', 'rust', 'c', 'cpp', 'java', 'shell', 'bash'] // [!code ++] TODO
 
 		for (const language of languages) {
 			try {
@@ -114,9 +133,7 @@ export default class ShikiPlugin extends Plugin {
 							}
 						}
 						
-						// able edit live
-						// disadvantage: First screen CLS (Page jitter)
-						if (this.settings.renderMode === 'textarea') {
+						{
 							// - div
 							//   - span
 							//     - pre
@@ -168,13 +185,6 @@ export default class ShikiPlugin extends Plugin {
 								this.codeblock_saveContent(language, newValue, el, ctx)
 							}
 						}
-						else if (this.settings.renderMode === 'pre') {
-							this.codeblock_renderPre(language, source, el, ctx, el);
-						}
-						else {
-							const codeBlock = new CodeBlock(this, el, source, language, ctx);
-							ctx.addChild(codeBlock);
-						}
 					},
 					1000,
 				);
@@ -184,7 +194,7 @@ export default class ShikiPlugin extends Plugin {
 		}
 	}
 
-	/**
+    /**
 	 * Render code to targetEl
 	 * 
 	 * @param language (does not contain meta information)
@@ -209,23 +219,34 @@ export default class ShikiPlugin extends Plugin {
 		const languageMeta = lines[sectionInfo.lineStart].replace(/^[`~]+\S*\s?/, '')
 
 		// pre html string
-		const pre:string = await codeToHtml(source, {
-			lang: language,
-			theme: this.settings.theme,
-			meta: { __raw: languageMeta },
-			// https://shiki.style/packages/transformers
-			transformers: [
-				transformerNotationDiff({ matchAlgorithm: 'v3' }),
-				transformerNotationHighlight(),
-				transformerNotationFocus(),
-				transformerNotationErrorLevel(),
-				transformerNotationWordHighlight(),
+		// const pre:string = await codeToHtml(source, {
+		// 	lang: language,
+		// 	theme: this.settings.theme,
+		// 	meta: { __raw: languageMeta },
+		// 	// https://shiki.style/packages/transformers
+		// 	transformers: [
+		// 		transformerNotationDiff({ matchAlgorithm: 'v3' }),
+		// 		transformerNotationHighlight(),
+		// 		transformerNotationFocus(),
+		// 		transformerNotationErrorLevel(),
+		// 		transformerNotationWordHighlight(),
+		// 
+		// 		transformerMetaHighlight(),
+		// 		transformerMetaWordHighlight(),
+		// 	],
+		// })
+		// targetEl.innerHTML = pre
 
-				transformerMetaHighlight(),
-				transformerMetaWordHighlight(),
-			],
-		})
-		targetEl.innerHTML = pre
+		// [!code ++:5]
+		console.log('prism min render', targetEl)
+		if (!Prism) {
+			new Notice('waring: withou Prism')
+			throw('waring: withou Prism')
+		}
+		targetEl.innerHTML = ''
+		const pre = document.createElement('pre'); targetEl.appendChild(pre);
+		const code = document.createElement('code'); pre.appendChild(code); code.classList.add('language-'+language); code.innerHTML = source;
+		Prism.highlightElement(code)
 	}
 
 	/**
@@ -282,53 +303,53 @@ export default class ShikiPlugin extends Plugin {
 		});
 	}
 
-	registerInlineCodeProcessor(): void {
-		this.registerMarkdownPostProcessor(async (el, ctx) => {
-			const inlineCodes = el.findAll(':not(pre) > code');
-			for (let codeElm of inlineCodes) {
-				let match = codeElm.textContent?.match(SHIKI_INLINE_REGEX); // format: `{lang} code`
-				if (match) {
-					const highlight = await this.highlighter.getHighlightTokens(match[2], match[1]);
-					const tokens = highlight?.tokens.flat(1);
-					if (!tokens?.length) {
-						continue;
-					}
+	// registerInlineCodeProcessor(): void {
+	// 	this.registerMarkdownPostProcessor(async (el, ctx) => {
+	// 		const inlineCodes = el.findAll(':not(pre) > code');
+	// 		for (let codeElm of inlineCodes) {
+	// 			let match = codeElm.textContent?.match(SHIKI_INLINE_REGEX); // format: `{lang} code`
+	// 			if (match) {
+	// 				const highlight = await this.highlighter.getHighlightTokens(match[2], match[1]);
+	// 				const tokens = highlight?.tokens.flat(1);
+	// 				if (!tokens?.length) {
+	// 					continue;
+	// 				}
 
-					codeElm.empty();
-					codeElm.addClass('shiki-inline');
+	// 				codeElm.empty();
+	// 				codeElm.addClass('shiki-inline');
 
-					for (let token of tokens) {
-						this.highlighter.tokenToSpan(token, codeElm);
-					}
-				}
-			}
-		});
-	}
+	// 				for (let token of tokens) {
+	// 					this.highlighter.tokenToSpan(token, codeElm);
+	// 				}
+	// 			}
+	// 		}
+	// 	});
+	// }
 
 	onunload(): void {
-		this.highlighter.unload();
+		// this.highlighter.unload();
 	}
 
-	addActiveCodeBlock(codeBlock: CodeBlock): void {
-		const filePath = codeBlock.ctx.sourcePath;
+	// addActiveCodeBlock(codeBlock: CodeBlock): void {
+	// 	const filePath = codeBlock.ctx.sourcePath;
 
-		if (!this.activeCodeBlocks.has(filePath)) {
-			this.activeCodeBlocks.set(filePath, [codeBlock]);
-		} else {
-			this.activeCodeBlocks.get(filePath)!.push(codeBlock);
-		}
-	}
+	// 	if (!this.activeCodeBlocks.has(filePath)) {
+	// 		this.activeCodeBlocks.set(filePath, [codeBlock]);
+	// 	} else {
+	// 		this.activeCodeBlocks.get(filePath)!.push(codeBlock);
+	// 	}
+	// }
 
-	removeActiveCodeBlock(codeBlock: CodeBlock): void {
-		const filePath = codeBlock.ctx.sourcePath;
+	// removeActiveCodeBlock(codeBlock: CodeBlock): void {
+	// 	const filePath = codeBlock.ctx.sourcePath;
 
-		if (this.activeCodeBlocks.has(filePath)) {
-			const index = this.activeCodeBlocks.get(filePath)!.indexOf(codeBlock);
-			if (index !== -1) {
-				this.activeCodeBlocks.get(filePath)!.splice(index, 1);
-			}
-		}
-	}
+	// 	if (this.activeCodeBlocks.has(filePath)) {
+	// 		const index = this.activeCodeBlocks.get(filePath)!.indexOf(codeBlock);
+	// 		if (index !== -1) {
+	// 			this.activeCodeBlocks.get(filePath)!.splice(index, 1);
+	// 		}
+	// 	}
+	// }
 
 	async loadSettings(): Promise<void> {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData()) as Settings;

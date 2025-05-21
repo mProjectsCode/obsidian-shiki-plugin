@@ -34,3 +34,31 @@ jobs:
           manifest.json
           main.js
           styles.css
+
+  build-obsidian-min:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout repo
+      uses: actions/checkout@v4
+    - name: env use node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+    - name: Install Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: latest
+    - name: build
+      run: |
+        bun install
+        bun run build-min
+        mv dist-min/main.js main.js
+    - name: upload build artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifact-min
+        path: |
+          manifest.json
+          main.js
+          styles.css
