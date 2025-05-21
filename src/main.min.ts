@@ -206,7 +206,13 @@ export default class ShikiPlugin extends Plugin {
 			languageMeta = lines[sectionInfo.lineStart].replace(/^[`~]+\S*\s?/, '')
 		}
 
-		// pre html string
+		// source correct.
+		// When the last line of the source is blank (with no Spaces either),
+		// prismjs and shiki will both ignore the line,
+		// this causes `textarea` and `pre` to fail to align.
+		if (source.endsWith('\n')) source += '\n'
+
+		// pre html string - shiki
 		// const pre:string = await codeToHtml(source, {
 		// 	lang: language,
 		// 	theme: this.settings.theme,
