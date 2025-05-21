@@ -195,18 +195,17 @@ export default class ShikiPlugin extends Plugin {
 	 */
 	async codeblock_renderPre(language:string, source:string, el:HTMLElement, ctx:MarkdownPostProcessorContext, targetEl:HTMLElement): Promise<void> {
 		// lanugageMeta (allow both ends space, allow null string)
-		const sectionInfo = ctx.getSectionInfo(el);
-		if (!sectionInfo) {
-			new Notice("Warning: whitout editor!", 3000)
-			throw('Warning: whitout editor!')
+		let languageMeta:string = ''
+		const sectionInfo = ctx.getSectionInfo(el); // rerender without
+		if (sectionInfo) { // allow without (when rerender)
+			const lines = sectionInfo.text.split('\n')
+			if (lines.length < sectionInfo.lineStart + 1) {
+				new Notice("Warning: el ctx error!", 3000)
+				throw('Warning: el ctx error!')
+			}
+			// If an alias is used, `lines[sectionInfo.lineStart]` may not necessarily contain `language`
+			languageMeta = lines[sectionInfo.lineStart].replace(/^[`~]+\S*\s?/, '')
 		}
-		const lines = sectionInfo.text.split('\n')
-		if (lines.length < sectionInfo.lineStart + 1) {
-			new Notice("Warning: el ctx error!", 3000)
-			throw('Warning: el ctx error!')
-		}
-		// If an alias is used, `lines[sectionInfo.lineStart]` may not necessarily contain `language`
-		const languageMeta = lines[sectionInfo.lineStart].replace(/^[`~]+\S*\s?/, '')
 
 		// pre html string
 		const pre:string = await codeToHtml(source, {
@@ -256,7 +255,7 @@ export default class ShikiPlugin extends Plugin {
 		// range
 		const sectionInfo = ctx.getSectionInfo(el);
 		if (!sectionInfo) {
-			new Notice("Warning: whitout editor!", 3000)
+			new Notice("Warning: without el section!", 3000)
 			return;
 		}
 		// sectionInfo.lineStart; // index in (```<language>)
@@ -265,7 +264,7 @@ export default class ShikiPlugin extends Plugin {
 		// editor
 		const editor = this.app.workspace.activeEditor?.editor;
 		if (!editor) {
-			new Notice("Warning: whitout editor!", 3000)
+			new Notice("Warning: without editor!", 3000)
 			return;
 		}
 
