@@ -6,17 +6,6 @@ import { DEFAULT_SETTINGS, type Settings } from 'src/settings/Settings';
 // import { filterHighlightAllPlugin } from 'src/PrismPlugin';
 // import { CodeHighlighter } from 'src/Highlighter';
 
-// [!code ++:10]
-// check obsidian env
-// @ts-ignore
-const Prism:any|null = window.Prism;
-console.log('check prism', Prism)
-document.addEventListener('DOMContentLoaded', () => {
-	// @ts-ignore
-	const Prism = window.Prism;
-	console.log('check prism2', Prism)
-});
-
 import {
 	transformerNotationDiff,
 	transformerNotationHighlight,
@@ -238,7 +227,7 @@ export default class ShikiPlugin extends Plugin {
 		// targetEl.innerHTML = pre
 
 		// [!code ++:5]
-		console.log('prism min render', targetEl)
+		const Prism = await loadPrism()
 		if (!Prism) {
 			new Notice('waring: withou Prism')
 			throw('waring: withou Prism')
