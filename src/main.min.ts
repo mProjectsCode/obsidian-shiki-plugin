@@ -106,13 +106,14 @@ export default class ShikiPlugin extends Plugin {
 				this.registerMarkdownCodeBlockProcessor(
 					language,
 					async (source, el, ctx) => {
+						// check env
 						// @ts-expect-error
 						const isReadingMode = ctx.containerEl.hasClass('markdown-preview-section') || ctx.containerEl.hasClass('markdown-preview-view');
 						// this seems to indicate whether we are in the pdf export mode
 						// sadly there is no section info in this mode
 						// thus we can't check if the codeblock is at the start of the note and thus frontmatter
 						// const isPdfExport = ctx.displayMode === true;
-
+						// 
 						// this is so that we leave the hidden frontmatter code block in reading mode alone
 						if (language === 'yaml' && isReadingMode && ctx.frontmatter) {
 							const sectionInfo = ctx.getSectionInfo(el);
@@ -121,15 +122,39 @@ export default class ShikiPlugin extends Plugin {
 								return;
 							}
 						}
+
+						// lanugage info
+						language;
+						let languageAll:string = ''
+						const sectionInfo = ctx.getSectionInfo(el); // rerender without
+						if (sectionInfo) { // allow without (when rerender)
+							const lines = sectionInfo.text.split('\n')
+							if (lines.length < sectionInfo.lineStart + 1) {
+								new Notice("Warning: el ctx error!", 3000)
+								throw('Warning: el ctx error!')
+							}
+							languageAll = lines[sectionInfo.lineStart].replace(/^(~~~+|```+)/, '')
+						}
+						// If an alias is used, `lines[sectionInfo.lineStart]` may not necessarily contain `language`
+						const languageMeta:string = languageAll.replace(/^\S*\s?/, '')
 						
+						// able edit live
+						// disadvantage: First screen CLS (Page jitter)
 						{
-							// - div
-							//   - span
-							//     - pre
-							// - textarea
+							// dom
+							// - div.obsidian-shiki-plugin
+							//   - span > pre > code
+							//   - textarea
+							//   - div.language-edit
+
+							// div
 							const div = document.createElement('div'); el.appendChild(div); div.classList.add('obsidian-shiki-plugin')
-							div.setAttribute('relative', ''); div.setAttribute('float-left', ''); div.setAttribute('min-w-full', ''); // div.setAttribute('min-h-100', '');
+
+							// span
 							const span = document.createElement('span'); div.appendChild(span);
+							this.codeblock_renderPre(language, languageMeta, source, el, ctx, span)
+
+							// textarea
 							const textarea = document.createElement('textarea'); div.appendChild(textarea); textarea.classList.add('line-height-$vp-code-line-height', 'font-$vp-font-family-mono', 'text-size-$vp-code-font-size');
 							// TODO
 							// These attributes are very strange. I copied the attributes on `shiki.style`.
@@ -161,17 +186,34 @@ export default class ShikiPlugin extends Plugin {
 							Object.entries(attributes).forEach(([key, val]) => {
 								textarea.setAttribute(key, val);
 							});
-							// async part
-							this.codeblock_renderPre(language, source, el, ctx, span)
 							textarea.value = source;
+							// textarea - async part
 							textarea.oninput = (ev) => {
 								const newValue = (ev.target as HTMLTextAreaElement).value
-								this.codeblock_renderPre(language, newValue, el, ctx, span)
+								this.codeblock_renderPre(language, languageMeta, newValue, el, ctx, span)
 							}
 							textarea.onchange = (ev) => {
 								const newValue = (ev.target as HTMLTextAreaElement).value
 								// on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
-								this.codeblock_saveContent(language, newValue, el, ctx)
+								this.codeblock_saveContent(null, newValue, el, ctx)
+							}
+
+							// language-edit
+							const editEl = document.createElement('div'); div.appendChild(editEl); editEl.classList.add('language-edit');
+							editEl.setAttribute('align', 'right'); editEl.setAttribute('contenteditable', '');
+							const editInput = document.createElement('input'); editEl.appendChild(editInput);
+							editInput.value = languageAll
+							// language-edit - async part
+							// editInput.oninput = (ev) => {
+							// 	const newValue = (ev.target as HTMLInputElement).value
+							// 	// TODO source is old data !!!!!!!!!!!!!
+							// 	// TODO newValue language is languageAll !!!!!!!!!!!!! 
+							// 	this.codeblock_renderPre(newValue, languageMeta, source, el, ctx, span)
+							// }
+							editInput.onchange = (ev) => {
+								const newValue = (ev.target as HTMLInputElement).value
+								// on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
+								this.codeblock_saveContent(newValue, null, el, ctx)
 							}
 						}
 					},
@@ -192,20 +234,7 @@ export default class ShikiPlugin extends Plugin {
 	 * @param ctx    same as registerMarkdownCodeBlockProcessor args
 	 * @param targetEl in which element should the result be rendered
 	 */
-	async codeblock_renderPre(language:string, source:string, el:HTMLElement, ctx:MarkdownPostProcessorContext, targetEl:HTMLElement): Promise<void> {
-		// lanugageMeta (allow both ends space, allow null string)
-		let languageMeta:string = ''
-		const sectionInfo = ctx.getSectionInfo(el); // rerender without
-		if (sectionInfo) { // allow without (when rerender)
-			const lines = sectionInfo.text.split('\n')
-			if (lines.length < sectionInfo.lineStart + 1) {
-				new Notice("Warning: el ctx error!", 3000)
-				throw('Warning: el ctx error!')
-			}
-			// If an alias is used, `lines[sectionInfo.lineStart]` may not necessarily contain `language`
-			languageMeta = lines[sectionInfo.lineStart].replace(/^[`~]+\S*\s?/, '')
-		}
-
+	async codeblock_renderPre(language:string, languageMeta:string, source:string, el:HTMLElement, ctx:MarkdownPostProcessorContext, targetEl:HTMLElement): Promise<void> {
 		// source correct.
 		// When the last line of the source is blank (with no Spaces either),
 		// prismjs and shiki will both ignore the line,
@@ -224,7 +253,7 @@ export default class ShikiPlugin extends Plugin {
 		// 		transformerNotationFocus(),
 		// 		transformerNotationErrorLevel(),
 		// 		transformerNotationWordHighlight(),
-		// 
+
 		// 		transformerMetaHighlight(),
 		// 		transformerMetaWordHighlight(),
 		// 	],
@@ -267,7 +296,7 @@ export default class ShikiPlugin extends Plugin {
 	 * Universal
 	 * - This should be a universal module. It has nothing to do with the logic of the plugin.
 	 */
-	async codeblock_saveContent(language:string, source:string, el:HTMLElement, ctx:MarkdownPostProcessorContext): Promise<void> {
+	async codeblock_saveContent(language:string|null, source:string|null, el:HTMLElement, ctx:MarkdownPostProcessorContext): Promise<void> {
 		// range
 		const sectionInfo = ctx.getSectionInfo(el);
 		if (!sectionInfo) {
@@ -284,17 +313,31 @@ export default class ShikiPlugin extends Plugin {
 			return;
 		}
 
-		// change
-		editor.transaction({ // EditorTransaction
-			// replaceSelection,
-			changes: [{
-				from: {line: sectionInfo.lineStart+1, ch: 0},
-				to: {line: sectionInfo.lineEnd, ch: 0},
-				text: source + '\n'
-			}],
-			// selections,
-			// selection
-		});
+		// change - language
+		if (language !== null) {
+			const fristLine = sectionInfo.text.split('\n')[sectionInfo.lineStart]
+			const match = fristLine.match(/^(~~~+|```+).*/)
+			if (match) {
+				editor.transaction({
+					changes: [{
+						from: {line: sectionInfo.lineStart, ch: 0},
+						to: {line: sectionInfo.lineStart+1, ch: 0},
+						text: match[1] + language + '\n'
+					}],
+				});
+			}
+		}
+
+		// change - source
+		if (source !== null) {
+			editor.transaction({
+				changes: [{
+					from: {line: sectionInfo.lineStart+1, ch: 0},
+					to: {line: sectionInfo.lineEnd, ch: 0},
+					text: source + '\n'
+				}],
+			});
+		}
 	}
 
 	// registerInlineCodeProcessor(): void {

@@ -311,17 +311,23 @@ code>span.line {
 [carent-gray=""] {}
 [font-mono=""] {}
 
+.obsidian-shiki-plugin {
+	position: relative;
+	min-width: 100%;
+}
+
 /*
  * keep same: pre & textare
  * 
  * It is necessary to ensure that the style of this part is not overwritten,
  * Otherwise, `textarea` and `code` won't align
  */
- :root {
+:root {
 	--shiki-x-padding: 16px;
+	--shiki-line-height: 24px;
  }
 .obsidian-shiki-plugin code, .obsidian-shiki-plugin textarea {
-	line-height: 24px !important;
+	line-height: var(--shiki-line-height) !important;
 	font-size: var(--code-size) !important;
 }
 .obsidian-shiki-plugin code {
@@ -337,6 +343,11 @@ code>span.line {
 /* edit-block-button > textarea > pre */
 .obsidian-shiki-plugin pre { z-index: 0; }
 .obsidian-shiki-plugin textarea { z-index: 0; }
+/* fix black line zero height */
+.obsidian-shiki-plugin code > span {
+	vertical-align: top !important;
+	min-height: var(--shiki-line-height) !important;
+}
 
 /* read mode / rendered */
 .markdown-preview-view .obsidian-shiki-plugin textarea,
@@ -347,4 +358,24 @@ code>span.line {
 .markdown-rendered:not(.cm-preview-code-block.cm-embed-block) .obsidian-shiki-plugin pre {
 	margin-top: 16px !important;
 	margin-bottom: 16px !important;
+}
+
+/* language-type-btn */
+.obsidian-shiki-plugin .language-edit {
+	position: absolute;
+	bottom: 1px;
+	right: 0;
+	margin: 0;
+	padding: 0;
+	line-height: var(--shiki-line-height);
+	min-height: var(--shiki-line-height);
+	font-size: 13px;
+}
+.obsidian-shiki-plugin .language-edit>input {
+	margin: 0;
+	padding: 0 14px;
+	border: none;
+	background: none;
+	box-shadow: none;
+	text-align: right;
 }
