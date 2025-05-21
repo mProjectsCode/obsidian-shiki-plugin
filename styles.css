@@ -370,6 +370,7 @@ code>span.line {
 	line-height: var(--shiki-line-height);
 	min-height: var(--shiki-line-height);
 	font-size: 13px;
+	opacity: 0.5;
 }
 .obsidian-shiki-plugin .language-edit>input {
 	margin: 0;
