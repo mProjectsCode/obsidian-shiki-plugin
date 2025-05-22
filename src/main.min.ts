@@ -1,4 +1,5 @@
-import { loadPrism, Plugin, TFile, type MarkdownPostProcessor, MarkdownPostProcessorContext, Notice } from 'obsidian';
+import { language } from 'happy-dom/lib/PropertySymbol';
+import { loadPrism, Plugin, type MarkdownPostProcessor, type MarkdownPostProcessorContext, Notice } from 'obsidian';
 // import { CodeBlock } from 'src/CodeBlock';
 // import { createCm6Plugin } from 'src/codemirror/Cm6_ViewPlugin';
 import { DEFAULT_SETTINGS, type Settings } from 'src/settings/Settings';
@@ -6,16 +7,16 @@ import { DEFAULT_SETTINGS, type Settings } from 'src/settings/Settings';
 // import { filterHighlightAllPlugin } from 'src/PrismPlugin';
 // import { CodeHighlighter } from 'src/Highlighter';
 
-import {
-	transformerNotationDiff,
-	transformerNotationHighlight,
-	transformerNotationFocus,
-	transformerNotationErrorLevel,
-	transformerNotationWordHighlight,
-
-	transformerMetaHighlight,
-	transformerMetaWordHighlight,
-} from '@shikijs/transformers';
+// import {
+// 	transformerNotationDiff,
+// 	transformerNotationHighlight,
+// 	transformerNotationFocus,
+// 	transformerNotationErrorLevel,
+// 	transformerNotationWordHighlight,
+// 
+// 	transformerMetaHighlight,
+// 	transformerMetaWordHighlight,
+// } from '@shikijs/transformers';
 // import { codeToHtml } from 'shiki'; // 8.6MB
 // [!code ++:6]
 // import { getHighlighter } from 'shiki';
@@ -26,6 +27,26 @@ import {
 // const codeToHtml = highlighter.codeToHtml
 
 export const SHIKI_INLINE_REGEX = /^\{([^\s]+)\} (.*)/i; // format: `{lang} code`
+const reg_code = /^((\s|>\s|-\s|\*\s|\+\s)*)(```+|~~~+)(\S*)(\s?.*)/
+// const reg_code_noprefix = /^((\s)*)(```+|~~~+)(\S*)(\s?.*)/
+
+/**
+ * Codeblock Info.
+ * Life cycle: One codeblock has one.
+ * Pay attention to consistency.
+ */
+interface CodeblockInfo {
+	// from ctx.getSectionInfo(el) // [!code warning] There may be indentation
+	prefix: string, // `> - * + ` // [!code warning] Because of the list nest, first-line indentation is not equal to universal indentation.
+	flag: string, // (```+|~~~+)
+	language_meta: string, // allow both end space, allow blank
+	language_type: string, // source code, can be an alias
+	source: string|null,
+
+	// from obsidian callback args // [!code warning] It might be old data in oninput/onchange method
+	language_old: string, // to lib, can't be an alias
+	source_old: string,
+}
 
 export default class ShikiPlugin extends Plugin {
 	// highlighter!: CodeHighlighter;
@@ -123,20 +144,7 @@ export default class ShikiPlugin extends Plugin {
 							}
 						}
 
-						// lanugage info
-						language;
-						let languageAll:string = ''
-						const sectionInfo = ctx.getSectionInfo(el); // rerender without
-						if (sectionInfo) { // allow without (when rerender)
-							const lines = sectionInfo.text.split('\n')
-							if (lines.length < sectionInfo.lineStart + 1) {
-								new Notice("Warning: el ctx error!", 3000)
-								throw('Warning: el ctx error!')
-							}
-							languageAll = lines[sectionInfo.lineStart].replace(/^(~~~+|```+)/, '')
-						}
-						// If an alias is used, `lines[sectionInfo.lineStart]` may not necessarily contain `language`
-						const languageMeta:string = languageAll.replace(/^\S*\s?/, '')
+						const codeblockInfo = this.codeblock_getCodeBlockInfo(language, source, el, ctx)
 						
 						// able edit live
 						// disadvantage: First screen CLS (Page jitter)
@@ -152,7 +160,8 @@ export default class ShikiPlugin extends Plugin {
 
 							// span
 							const span = document.createElement('span'); div.appendChild(span);
-							this.codeblock_renderPre(language, languageMeta, source, el, ctx, span)
+							codeblockInfo.source = source
+							this.codeblock_renderPre(codeblockInfo, el, ctx, span)
 
 							// textarea
 							const textarea = document.createElement('textarea'); div.appendChild(textarea); textarea.classList.add('line-height-$vp-code-line-height', 'font-$vp-font-family-mono', 'text-size-$vp-code-font-size');
@@ -163,25 +172,7 @@ export default class ShikiPlugin extends Plugin {
 							// 
 							// But in obsidian, I don't think it's necessary to do so.
 							const attributes = {
-								'whitespace-pre': '',
-								'overflow-auto': '',
-								'w-full': '',
-								'h-full': '',
-								'font-mono': '',
-								'bg-transparent': '',
-								'absolute': '',
-								'inset-0': '',
-								'py-20px': '',
-								'px-24px': '',
-								'text-transparent': '',
-								'carent-gray': '',
-								'tab-4': '',
-								'resize-none': '',
-								'z-10': '',
-								'autocomplete': 'off',
-								'autocorrect': 'off',
-								'autocapitalize': 'none',
-								'spellcheck': 'false',
+								'whitespace-pre': '', 'overflow-auto': '', 'w-full': '', 'h-full': '', 'font-mono': '', 'bg-transparent': '', 'absolute': '', 'inset-0': '', 'py-20px': '', 'px-24px': '', 'text-transparent': '', 'carent-gray': '', 'tab-4': '', 'resize-none': '', 'z-10': '', 'autocomplete': 'off', 'autocorrect': 'off', 'autocapitalize': 'none', 'spellcheck': 'false',
 							};
 							Object.entries(attributes).forEach(([key, val]) => {
 								textarea.setAttribute(key, val);
@@ -190,30 +181,36 @@ export default class ShikiPlugin extends Plugin {
 							// textarea - async part
 							textarea.oninput = (ev) => {
 								const newValue = (ev.target as HTMLTextAreaElement).value
-								this.codeblock_renderPre(language, languageMeta, newValue, el, ctx, span)
+								codeblockInfo.source = newValue
+								this.codeblock_renderPre(codeblockInfo, el, ctx, span)
 							}
-							textarea.onchange = (ev) => {
+							textarea.onchange = (ev) => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 								const newValue = (ev.target as HTMLTextAreaElement).value
-								// on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
-								this.codeblock_saveContent(null, newValue, el, ctx)
+								codeblockInfo.source = newValue
+								this.codeblock_saveContent(codeblockInfo, el, ctx, false, true)
 							}
 
 							// language-edit
 							const editEl = document.createElement('div'); div.appendChild(editEl); editEl.classList.add('language-edit');
 							editEl.setAttribute('align', 'right'); editEl.setAttribute('contenteditable', '');
 							const editInput = document.createElement('input'); editEl.appendChild(editInput);
-							editInput.value = languageAll
+							editInput.value = codeblockInfo.language_type + codeblockInfo.language_meta
 							// language-edit - async part
-							// editInput.oninput = (ev) => {
-							// 	const newValue = (ev.target as HTMLInputElement).value
-							// 	// TODO source is old data !!!!!!!!!!!!!
-							// 	// TODO newValue language is languageAll !!!!!!!!!!!!! 
-							// 	this.codeblock_renderPre(newValue, languageMeta, source, el, ctx, span)
-							// }
-							editInput.onchange = (ev) => {
+							editInput.oninput = (ev) => {
 								const newValue = (ev.target as HTMLInputElement).value
-								// on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
-								this.codeblock_saveContent(newValue, null, el, ctx)
+								const match = /^(\S*)(\s?.*)$/.exec(newValue)
+								if (!match) throw('This is not a regular expression matching that may fail')
+								codeblockInfo.language_type = match[1]
+								codeblockInfo.language_meta = match[2]
+								this.codeblock_renderPre(codeblockInfo, el, ctx, span)
+							}
+							editInput.onchange = (ev) => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
+								const newValue = (ev.target as HTMLInputElement).value
+								const match = /^(\S*)(\s?.*)$/.exec(newValue)
+								if (!match) throw('This is not a regular expression matching that may fail')
+								codeblockInfo.language_type = match[1]
+								codeblockInfo.language_meta = match[2]
+								this.codeblock_saveContent(codeblockInfo, el, ctx, true, false)
 							}
 						}
 					},
@@ -225,6 +222,65 @@ export default class ShikiPlugin extends Plugin {
 		}
 	}
 
+	codeblock_getCodeBlockInfo(language_old:string, source_old:string, el:HTMLElement, ctx:MarkdownPostProcessorContext): CodeblockInfo {
+		const sectionInfo = ctx.getSectionInfo(el);
+		if (!sectionInfo) {
+			// This is possible. when rerender
+			const codeblockInfo:CodeblockInfo = {
+				prefix: '',
+				flag: '', // null flag
+				language_meta: '',
+				language_type: language_old,
+				source: null, // null flag
+
+				language_old: language_old,
+				source_old: source_old,
+			}
+			return codeblockInfo
+		}
+		// sectionInfo.lineStart; // index in (```<language>)
+		// sectionInfo.lineEnd;   // index in (```), Let's not modify the fence part
+
+		const lines = sectionInfo.text.split('\n')
+		if (lines.length <= sectionInfo.lineStart + 1 || lines.length <= sectionInfo.lineEnd + 1) {
+			// This is impossible.
+			// Unless obsidian makes a mistake.
+			new Notice("Warning: el ctx error!", 3000)
+			throw('Warning: el ctx error!')
+		}
+
+		const firstLine = lines[sectionInfo.lineStart]
+		const match = reg_code.exec(firstLine)
+		if (!match) {
+			// This is possible.
+			// When the code block is nested and the first line is not a code block
+			// (The smallest section of getSectionInfo is `markdown-preview-section>div`)
+			const codeblockInfo:CodeblockInfo = {
+				prefix: '',
+				flag: '', // null flag
+				language_meta: '',
+				language_type: language_old,
+				source: null, // null flag
+
+				language_old: language_old,
+				source_old: source_old,
+			}
+			return codeblockInfo
+		}
+
+		const codeblockInfo:CodeblockInfo = {
+			prefix: match[1],
+			flag: match[3],
+			language_meta: match[5],
+			language_type: match[4],
+			source: lines.slice(sectionInfo.lineStart + 1, sectionInfo.lineEnd).join('\n'),
+
+			language_old: language_old,
+			source_old: source_old,
+		}
+		return codeblockInfo
+	}
+
     /**
 	 * Render code to targetEl
 	 * 
@@ -234,18 +290,19 @@ export default class ShikiPlugin extends Plugin {
 	 * @param ctx    same as registerMarkdownCodeBlockProcessor args
 	 * @param targetEl in which element should the result be rendered
 	 */
-	async codeblock_renderPre(language:string, languageMeta:string, source:string, el:HTMLElement, ctx:MarkdownPostProcessorContext, targetEl:HTMLElement): Promise<void> {
+	async codeblock_renderPre(codeblockInfo:CodeblockInfo, el:HTMLElement, ctx:MarkdownPostProcessorContext, targetEl:HTMLElement): Promise<void> {
 		// source correct.
 		// When the last line of the source is blank (with no Spaces either),
 		// prismjs and shiki will both ignore the line,
 		// this causes `textarea` and `pre` to fail to align.
+		let source: string = codeblockInfo.source ?? codeblockInfo.source_old
 		if (source.endsWith('\n')) source += '\n'
 
 		// pre html string - shiki
 		// const pre:string = await codeToHtml(source, {
-		// 	lang: language,
+		// 	lang: codeblockInfo.language_old,
 		// 	theme: this.settings.theme,
-		// 	meta: { __raw: languageMeta },
+		// 	meta: { __raw: codeblockInfo.language_meta },
 		// 	// https://shiki.style/packages/transformers
 		// 	transformers: [
 		// 		transformerNotationDiff({ matchAlgorithm: 'v3' }),
@@ -253,14 +310,14 @@ export default class ShikiPlugin extends Plugin {
 		// 		transformerNotationFocus(),
 		// 		transformerNotationErrorLevel(),
 		// 		transformerNotationWordHighlight(),
-
+		// 
 		// 		transformerMetaHighlight(),
 		// 		transformerMetaWordHighlight(),
 		// 	],
 		// })
 		// targetEl.innerHTML = pre
 
-		// [!code ++:5]
+		// pre html string- prism // [!code ++]
 		const Prism = await loadPrism()
 		if (!Prism) {
 			new Notice('waring: withou Prism')
@@ -268,7 +325,7 @@ export default class ShikiPlugin extends Plugin {
 		}
 		targetEl.innerHTML = ''
 		const pre = document.createElement('pre'); targetEl.appendChild(pre);
-		const code = document.createElement('code'); pre.appendChild(code); code.classList.add('language-'+language); code.innerHTML = source;
+		const code = document.createElement('code'); pre.appendChild(code); code.classList.add('language-'+codeblockInfo.language_type); code.innerHTML = source;
 		Prism.highlightElement(code)
 	}
 
@@ -292,11 +349,18 @@ export default class ShikiPlugin extends Plugin {
 	 *   Strategy1 requires additional processing: cache el
 	 * - ~~Disadvantage: Can't use `ctrl+z` well in the code block.~~
 	 *   textarea can be `ctrl+z` normally
+	 * - Afraid if the program crashes, the frequency of save is low
 	 * 
-	 * Universal
+	 * Other / Universal
 	 * - This should be a universal module. It has nothing to do with the logic of the plugin.
+	 * - Indent process
+	 * 
+	 * @param isUpdateLanguage reduce modifications and minimize mistakes, can be used to increase stability
+	 * @param isUpdateSource   reduce modifications and minimize mistakes, can be used to increase stability
 	 */
-	async codeblock_saveContent(language:string|null, source:string|null, el:HTMLElement, ctx:MarkdownPostProcessorContext): Promise<void> {
+	async codeblock_saveContent(codeblockInfo: CodeblockInfo, el:HTMLElement, ctx:MarkdownPostProcessorContext,
+		isUpdateLanguage: boolean = true, isUpdateSource: boolean = true
+	): Promise<void> {
 		// range
 		const sectionInfo = ctx.getSectionInfo(el);
 		if (!sectionInfo) {
@@ -314,27 +378,23 @@ export default class ShikiPlugin extends Plugin {
 		}
 
 		// change - language
-		if (language !== null) {
-			const fristLine = sectionInfo.text.split('\n')[sectionInfo.lineStart]
-			const match = fristLine.match(/^(~~~+|```+).*/)
-			if (match) {
-				editor.transaction({
-					changes: [{
-						from: {line: sectionInfo.lineStart, ch: 0},
-						to: {line: sectionInfo.lineStart+1, ch: 0},
-						text: match[1] + language + '\n'
-					}],
-				});
-			}
+		if (isUpdateLanguage) {
+			editor.transaction({
+				changes: [{
+					from: {line: sectionInfo.lineStart, ch: 0},
+					to: {line: sectionInfo.lineStart+1, ch: 0},
+					text: codeblockInfo.flag + codeblockInfo.language_type + codeblockInfo.language_meta + '\n'
+				}],
+			});
 		}
 
 		// change - source
-		if (source !== null) {
+		if (isUpdateSource) {
 			editor.transaction({
 				changes: [{
 					from: {line: sectionInfo.lineStart+1, ch: 0},
 					to: {line: sectionInfo.lineEnd, ch: 0},
-					text: source + '\n'
+					text: codeblockInfo.source ?? codeblockInfo.source_old + '\n'
 				}],
 			});
 		}

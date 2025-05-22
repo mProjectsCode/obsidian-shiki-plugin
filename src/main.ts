@@ -1,4 +1,4 @@
-import { loadPrism, Plugin, TFile, type MarkdownPostProcessor, MarkdownPostProcessorContext, Notice } from 'obsidian';
+import { loadPrism, Plugin, TFile, type MarkdownPostProcessor, type MarkdownPostProcessorContext, Notice } from 'obsidian';
 import { CodeBlock } from 'src/CodeBlock';
 import { createCm6Plugin } from 'src/codemirror/Cm6_ViewPlugin';
 import { DEFAULT_SETTINGS, type Settings } from 'src/settings/Settings';
@@ -21,11 +21,13 @@ import { language } from '@codemirror/language';
 
 export const SHIKI_INLINE_REGEX = /^\{([^\s]+)\} (.*)/i; // format: `{lang} code`
 const reg_code = /^((\s|>\s|-\s|\*\s|\+\s)*)(```+|~~~+)(\S*)(\s?.*)/
-const reg_code_noprefix = /^((\s)*)(```+|~~~+)(\S*)(\s?.*)/
+// const reg_code_noprefix = /^((\s)*)(```+|~~~+)(\S*)(\s?.*)/
 
-// Codeblock Info.
-// Life cycle: One codeblock has one.
-// Pay attention to consistency.
+/**
+ * Codeblock Info.
+ * Life cycle: One codeblock has one.
+ * Pay attention to consistency.
+ */
 interface CodeblockInfo {
 	// from ctx.getSectionInfo(el) // [!code warning] There may be indentation
 	prefix: string, // `> - * + ` // [!code warning] Because of the list nest, first-line indentation is not equal to universal indentation.
