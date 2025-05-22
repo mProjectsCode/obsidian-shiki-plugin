@@ -32,7 +32,7 @@ interface CodeblockInfo {
 	flag: string, // (```+|~~~+)
 	language_meta: string, // allow both end space, allow blank
 	language_type: string, // source code, can be an alias
-	source: string,
+	source: string|null,
 
 	// from obsidian callback args // [!code warning] It might be old data in oninput/onchange method
 	language_old: string, // to lib, can't be an alias
@@ -221,13 +221,14 @@ export default class ShikiPlugin extends Plugin {
 
 	codeblock_getCodeBlockInfo(language_old:string, source_old:string, el:HTMLElement, ctx:MarkdownPostProcessorContext): CodeblockInfo {
 		const sectionInfo = ctx.getSectionInfo(el);
-		if (!sectionInfo) { // allow without (when rerender)
+		if (!sectionInfo) {
+			// This is possible. when rerender
 			const codeblockInfo:CodeblockInfo = {
 				prefix: '',
 				flag: '', // null flag
 				language_meta: '',
 				language_type: language_old,
-				source: '', // null flag
+				source: null, // null flag
 
 				language_old: language_old,
 				source_old: source_old,
@@ -238,16 +239,31 @@ export default class ShikiPlugin extends Plugin {
 		// sectionInfo.lineEnd;   // index in (```), Let's not modify the fence part
 
 		const lines = sectionInfo.text.split('\n')
-		if (lines.length <= sectionInfo.lineStart + 1 || lines.length <= sectionInfo.lineEnd + 1) { // Must be correct. if incorrect, must be a problem with obsidian
+		if (lines.length <= sectionInfo.lineStart + 1 || lines.length <= sectionInfo.lineEnd + 1) {
+			// This is impossible.
+			// Unless obsidian makes a mistake.
 			new Notice("Warning: el ctx error!", 3000)
 			throw('Warning: el ctx error!')
 		}
+
 		const firstLine = lines[sectionInfo.lineStart]
 		const match = firstLine.match(reg_code)
 		if (!match) {
-			new Notice("Warning: match codeblock frist line error!", 3000)
-			throw('Warning: match codeblock frist line error!')
-		}11
+			// This is possible.
+			// When the code block is nested and the first line is not a code block
+			// (The smallest section of getSectionInfo is `markdown-preview-section>div`)
+			const codeblockInfo:CodeblockInfo = {
+				prefix: '',
+				flag: '', // null flag
+				language_meta: '',
+				language_type: language_old,
+				source: null, // null flag
+
+				language_old: language_old,
+				source_old: source_old,
+			}
+			return codeblockInfo
+		}
 
 		const codeblockInfo:CodeblockInfo = {
 			prefix: match[1],
@@ -276,8 +292,8 @@ export default class ShikiPlugin extends Plugin {
 		// When the last line of the source is blank (with no Spaces either),
 		// prismjs and shiki will both ignore the line,
 		// this causes `textarea` and `pre` to fail to align.
-		let source: string = codeblockInfo.source
-		if (codeblockInfo.source.endsWith('\n')) source += '\n'
+		let source: string = codeblockInfo.source ?? codeblockInfo.source_old
+		if (source.endsWith('\n')) source += '\n'
 
 		// pre html string - shiki
 		const pre:string = await codeToHtml(source, {
@@ -364,7 +380,7 @@ export default class ShikiPlugin extends Plugin {
 				changes: [{
 					from: {line: sectionInfo.lineStart+1, ch: 0},
 					to: {line: sectionInfo.lineEnd, ch: 0},
-					text: codeblockInfo.source + '\n'
+					text: codeblockInfo.source ?? codeblockInfo.source_old + '\n'
 				}],
 			});
 		}
