@@ -1,5 +1,5 @@
-import { language } from 'happy-dom/lib/PropertySymbol';
 import { loadPrism, Plugin, type MarkdownPostProcessor, type MarkdownPostProcessorContext, Notice } from 'obsidian';
+import type Prism from 'prismjs' // [!code ++]
 // import { CodeBlock } from 'src/CodeBlock';
 // import { createCm6Plugin } from 'src/codemirror/Cm6_ViewPlugin';
 import { DEFAULT_SETTINGS, type Settings } from 'src/settings/Settings';
@@ -18,13 +18,12 @@ import { DEFAULT_SETTINGS, type Settings } from 'src/settings/Settings';
 // 	transformerMetaWordHighlight,
 // } from '@shikijs/transformers';
 // import { codeToHtml } from 'shiki'; // 8.6MB
-// [!code ++:6]
-// import { getHighlighter } from 'shiki';
-// const highlighter = await getHighlighter({
-// 	themes: ['github-dark'], // 只加载需要的主题
-// 	langs: ['javascript'],   // 只加载需要的语言
-// });
-// const codeToHtml = highlighter.codeToHtml
+
+declare module 'obsidian' {
+	interface MarkdownPostProcessorContext {
+		containerEl: HTMLElement
+	}
+}
 
 export const SHIKI_INLINE_REGEX = /^\{([^\s]+)\} (.*)/i; // format: `{lang} code`
 const reg_code = /^((\s|>\s|-\s|\*\s|\+\s)*)(```+|~~~+)(\S*)(\s?.*)/
@@ -128,8 +127,7 @@ export default class ShikiPlugin extends Plugin {
 					language,
 					async (source, el, ctx) => {
 						// check env
-						// @ts-expect-error
-						const isReadingMode = ctx.containerEl.hasClass('markdown-preview-section') || ctx.containerEl.hasClass('markdown-preview-view');
+						const isReadingMode: boolean = ctx.containerEl.hasClass('markdown-preview-section') || ctx.containerEl.hasClass('markdown-preview-view');
 						// this seems to indicate whether we are in the pdf export mode
 						// sadly there is no section info in this mode
 						// thus we can't check if the codeblock is at the start of the note and thus frontmatter
@@ -161,7 +159,7 @@ export default class ShikiPlugin extends Plugin {
 							// span
 							const span = document.createElement('span'); div.appendChild(span);
 							codeblockInfo.source = source
-							this.codeblock_renderPre(codeblockInfo, el, ctx, span)
+							void this.codeblock_renderPre(codeblockInfo, el, ctx, span)
 
 							// textarea
 							const textarea = document.createElement('textarea'); div.appendChild(textarea); textarea.classList.add('line-height-$vp-code-line-height', 'font-$vp-font-family-mono', 'text-size-$vp-code-font-size');
@@ -179,15 +177,15 @@ export default class ShikiPlugin extends Plugin {
 							});
 							textarea.value = source;
 							// textarea - async part
-							textarea.oninput = (ev) => {
+							textarea.oninput = (ev): void => {
 								const newValue = (ev.target as HTMLTextAreaElement).value
 								codeblockInfo.source = newValue
-								this.codeblock_renderPre(codeblockInfo, el, ctx, span)
+								void this.codeblock_renderPre(codeblockInfo, el, ctx, span)
 							}
-							textarea.onchange = (ev) => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
+							textarea.onchange = (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 								const newValue = (ev.target as HTMLTextAreaElement).value
 								codeblockInfo.source = newValue
-								this.codeblock_saveContent(codeblockInfo, el, ctx, false, true)
+								void this.codeblock_saveContent(codeblockInfo, el, ctx, false, true)
 							}
 
 							// language-edit
@@ -196,21 +194,21 @@ export default class ShikiPlugin extends Plugin {
 							const editInput = document.createElement('input'); editEl.appendChild(editInput);
 							editInput.value = codeblockInfo.language_type + codeblockInfo.language_meta
 							// language-edit - async part
-							editInput.oninput = (ev) => {
+							editInput.oninput = (ev): void => {
 								const newValue = (ev.target as HTMLInputElement).value
 								const match = /^(\S*)(\s?.*)$/.exec(newValue)
-								if (!match) throw('This is not a regular expression matching that may fail')
+								if (!match) throw new Error('This is not a regular expression matching that may fail')
 								codeblockInfo.language_type = match[1]
 								codeblockInfo.language_meta = match[2]
-								this.codeblock_renderPre(codeblockInfo, el, ctx, span)
+								void this.codeblock_renderPre(codeblockInfo, el, ctx, span)
 							}
-							editInput.onchange = (ev) => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
+							editInput.onchange = (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 								const newValue = (ev.target as HTMLInputElement).value
 								const match = /^(\S*)(\s?.*)$/.exec(newValue)
-								if (!match) throw('This is not a regular expression matching that may fail')
+								if (!match) throw new Error('This is not a regular expression matching that may fail')
 								codeblockInfo.language_type = match[1]
 								codeblockInfo.language_meta = match[2]
-								this.codeblock_saveContent(codeblockInfo, el, ctx, true, false)
+								void this.codeblock_saveContent(codeblockInfo, el, ctx, true, false)
 							}
 						}
 					},
@@ -246,7 +244,7 @@ export default class ShikiPlugin extends Plugin {
 			// This is impossible.
 			// Unless obsidian makes a mistake.
 			new Notice("Warning: el ctx error!", 3000)
-			throw('Warning: el ctx error!')
+			throw new Error('Warning: el ctx error!')
 		}
 
 		const firstLine = lines[sectionInfo.lineStart]
@@ -318,15 +316,15 @@ export default class ShikiPlugin extends Plugin {
 		// targetEl.innerHTML = pre
 
 		// pre html string- prism // [!code ++]
-		const Prism = await loadPrism()
-		if (!Prism) {
-			new Notice('waring: withou Prism')
-			throw('waring: withou Prism')
+		const prism = await loadPrism() as typeof Prism;
+		if (!prism) {
+			new Notice('warning: withou Prism')
+			throw new Error('warning: withou Prism')
 		}
 		targetEl.innerHTML = ''
 		const pre = document.createElement('pre'); targetEl.appendChild(pre);
 		const code = document.createElement('code'); pre.appendChild(code); code.classList.add('language-'+codeblockInfo.language_type); code.innerHTML = source;
-		Prism.highlightElement(code)
+		prism.highlightElement(code)
 	}
 
 	/**

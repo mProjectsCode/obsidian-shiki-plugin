@@ -39,6 +39,7 @@
 		"@shikijs/transformers": "^3.4.2",
 		"@tsconfig/svelte": "^5.0.4",
 		"@types/bun": "^1.2.13",
+		"@types/prismjs": "^1.26.5",
 		"builtin-modules": "^5.0.0",
 		"esbuild": "^0.25.4",
 		"esbuild-plugin-copy-watch": "^2.3.1",

@@ -17,7 +17,12 @@ import {
 	transformerMetaWordHighlight,
 } from '@shikijs/transformers';
 import { codeToHtml } from 'shiki'; // 8.6MB
-import { language } from '@codemirror/language';
+
+declare module 'obsidian' {
+	interface MarkdownPostProcessorContext {
+		containerEl: HTMLElement
+	}
+}
 
 export const SHIKI_INLINE_REGEX = /^\{([^\s]+)\} (.*)/i; // format: `{lang} code`
 const reg_code = /^((\s|>\s|-\s|\*\s|\+\s)*)(```+|~~~+)(\S*)(\s?.*)/
@@ -120,8 +125,7 @@ export default class ShikiPlugin extends Plugin {
 					language,
 					async (source, el, ctx) => {
 						// check env
-						// @ts-expect-error
-						const isReadingMode = ctx.containerEl.hasClass('markdown-preview-section') || ctx.containerEl.hasClass('markdown-preview-view');
+						const isReadingMode: boolean = ctx.containerEl.hasClass('markdown-preview-section') || ctx.containerEl.hasClass('markdown-preview-view');
 						// this seems to indicate whether we are in the pdf export mode
 						// sadly there is no section info in this mode
 						// thus we can't check if the codeblock is at the start of the note and thus frontmatter
@@ -153,7 +157,7 @@ export default class ShikiPlugin extends Plugin {
 							// span
 							const span = document.createElement('span'); div.appendChild(span);
 							codeblockInfo.source = source
-							this.codeblock_renderPre(codeblockInfo, el, ctx, span)
+							this.codeblock_renderPre(codeblockInfo, el, ctx, span).then().catch()
 
 							// textarea
 							const textarea = document.createElement('textarea'); div.appendChild(textarea); textarea.classList.add('line-height-$vp-code-line-height', 'font-$vp-font-family-mono', 'text-size-$vp-code-font-size');
@@ -171,12 +175,12 @@ export default class ShikiPlugin extends Plugin {
 							});
 							textarea.value = source;
 							// textarea - async part
-							textarea.oninput = (ev) => {
+							textarea.oninput = (ev): void => {
 								const newValue = (ev.target as HTMLTextAreaElement).value
 								codeblockInfo.source = newValue
-								this.codeblock_renderPre(codeblockInfo, el, ctx, span)
+								void this.codeblock_renderPre(codeblockInfo, el, ctx, span)
 							}
-							textarea.onchange = (ev) => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
+							textarea.onchange = (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 								const newValue = (ev.target as HTMLTextAreaElement).value
 								codeblockInfo.source = newValue
 								this.codeblock_saveContent(codeblockInfo, el, ctx, false, true)
@@ -188,25 +192,25 @@ export default class ShikiPlugin extends Plugin {
 							const editInput = document.createElement('input'); editEl.appendChild(editInput);
 							editInput.value = codeblockInfo.language_type + codeblockInfo.language_meta
 							// language-edit - async part
-							editInput.oninput = (ev) => {
+							editInput.oninput = (ev): void => {
 								const newValue = (ev.target as HTMLInputElement).value
 								const match = newValue.match(/^(\S*)(\s?.*)$/)
-								if (!match) throw('This is not a regular expression matching that may fail')
+								if (!match) throw new Error('This is not a regular expression matching that may fail')
 								codeblockInfo.language_type = match[1]
 								codeblockInfo.language_meta = match[2]
-								this.codeblock_renderPre(codeblockInfo, el, ctx, span)
+								void this.codeblock_renderPre(codeblockInfo, el, ctx, span)
 							}
-							editInput.onchange = (ev) => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
+							editInput.onchange = (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 								const newValue = (ev.target as HTMLInputElement).value
 								const match = newValue.match(/^(\S*)(\s?.*)$/)
-								if (!match) throw('This is not a regular expression matching that may fail')
+								if (!match) throw new Error('This is not a regular expression matching that may fail')
 								codeblockInfo.language_type = match[1]
 								codeblockInfo.language_meta = match[2]
-								this.codeblock_saveContent(codeblockInfo, el, ctx, true, false)
+								void this.codeblock_saveContent(codeblockInfo, el, ctx, true, false)
 							}
 						}
 						else if (this.settings.renderMode === 'pre') {
-							this.codeblock_renderPre(codeblockInfo, el, ctx, el);
+							void this.codeblock_renderPre(codeblockInfo, el, ctx, el)
 						}
 						else {
 							const codeBlock = new CodeBlock(this, el, source, language, ctx);
@@ -245,7 +249,7 @@ export default class ShikiPlugin extends Plugin {
 			// This is impossible.
 			// Unless obsidian makes a mistake.
 			new Notice("Warning: el ctx error!", 3000)
-			throw('Warning: el ctx error!')
+			throw new Error('Warning: el ctx error!')
 		}
 
 		const firstLine = lines[sectionInfo.lineStart]
