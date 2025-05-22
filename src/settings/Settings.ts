@@ -4,6 +4,7 @@ export interface Settings {
 	customLanguageFolder: string;
 	theme: string;
 	renderMode: 'textarea'|'pre'|'codemirror';
+	renderEngine: 'shiki'|'prismjs';
 	preferThemeColors: boolean;
 	inlineHighlighting: boolean;
 }
@@ -14,6 +15,7 @@ export const DEFAULT_SETTINGS: Settings = {
 	customLanguageFolder: '',
 	theme: 'obsidian-theme',
 	renderMode: 'textarea',
+	renderEngine: 'shiki',
 	preferThemeColors: true,
 	inlineHighlighting: true,
 };

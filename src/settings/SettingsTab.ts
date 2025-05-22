@@ -39,7 +39,7 @@ export class ShikiSettingsTab extends PluginSettingTab {
 
 		new Setting(this.containerEl)
 			.setName('Theme')
-			.setDesc('Select the theme for the code blocks.')
+			.setDesc('Select the theme for the code blocks (shiki).')
 			.addDropdown(dropdown => {
 				dropdown.addOptions(themes);
 				dropdown.setValue(this.plugin.settings.theme).onChange(async value => {
@@ -49,8 +49,22 @@ export class ShikiSettingsTab extends PluginSettingTab {
 			});
 
 		new Setting(this.containerEl)
-			.setName('RenderMode')
-			.setDesc('Select the renderMode for the code blocks.')
+			.setName('Render Engine')
+			.setDesc('Select the render engine for the code blocks.')
+			.addDropdown(dropdown => {
+				dropdown.addOptions({
+					'shiki': 'shiki',
+					'prismjs': 'prismjs',
+				});
+				dropdown.setValue(this.plugin.settings.renderEngine).onChange(async value => {
+					this.plugin.settings.renderEngine = value as 'shiki'|'prismjs';
+					await this.plugin.saveSettings();
+				});
+			});
+
+		new Setting(this.containerEl)
+			.setName('Render Mode')
+			.setDesc('Select the render mode for the code blocks.')
 			.addDropdown(dropdown => {
 				dropdown.addOptions({
 					'textarea': 'textarea',

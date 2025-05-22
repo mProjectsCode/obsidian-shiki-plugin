@@ -1,4 +1,5 @@
 import { loadPrism, Plugin, TFile, type MarkdownPostProcessor, type MarkdownPostProcessorContext, Notice } from 'obsidian';
+import type Prism from 'prismjs'
 import { CodeBlock } from 'src/CodeBlock';
 import { createCm6Plugin } from 'src/codemirror/Cm6_ViewPlugin';
 import { DEFAULT_SETTINGS, type Settings } from 'src/settings/Settings';
@@ -302,23 +303,37 @@ export default class ShikiPlugin extends Plugin {
 		if (source.endsWith('\n')) source += '\n'
 
 		// pre html string - shiki
-		const pre:string = await codeToHtml(source, {
-			lang: codeblockInfo.language_old,
-			theme: this.settings.theme,
-			meta: { __raw: codeblockInfo.language_meta },
-			// https://shiki.style/packages/transformers
-			transformers: [
-				transformerNotationDiff({ matchAlgorithm: 'v3' }),
-				transformerNotationHighlight(),
-				transformerNotationFocus(),
-				transformerNotationErrorLevel(),
-				transformerNotationWordHighlight(),
+		if (this.settings.renderEngine == 'shiki') {
+			const pre:string = await codeToHtml(source, {
+				lang: codeblockInfo.language_old,
+				theme: this.settings.theme,
+				meta: { __raw: codeblockInfo.language_meta },
+				// https://shiki.style/packages/transformers
+				transformers: [
+					transformerNotationDiff({ matchAlgorithm: 'v3' }),
+					transformerNotationHighlight(),
+					transformerNotationFocus(),
+					transformerNotationErrorLevel(),
+					transformerNotationWordHighlight(),
 
-				transformerMetaHighlight(),
-				transformerMetaWordHighlight(),
-			],
-		})
-		targetEl.innerHTML = pre
+					transformerMetaHighlight(),
+					transformerMetaWordHighlight(),
+				],
+			})
+			targetEl.innerHTML = pre
+		}
+		// pre html string - prism
+		else {
+			const prism = await loadPrism() as typeof Prism;
+			if (!prism) {
+				new Notice('warning: withou Prism')
+				throw new Error('warning: withou Prism')
+			}
+			targetEl.innerHTML = ''
+			const pre = document.createElement('pre'); targetEl.appendChild(pre);
+			const code = document.createElement('code'); pre.appendChild(code); code.classList.add('language-'+codeblockInfo.language_type); code.innerHTML = source;
+			prism.highlightElement(code)
+		}
 	}
 
 	/**
