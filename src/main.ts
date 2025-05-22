@@ -20,12 +20,15 @@ import { codeToHtml } from 'shiki'; // 8.6MB
 import { language } from '@codemirror/language';
 
 export const SHIKI_INLINE_REGEX = /^\{([^\s]+)\} (.*)/i; // format: `{lang} code`
+const reg_code = /^((\s|>\s|-\s|\*\s|\+\s)*)(```+|~~~+)(\S*)(\s?.*)/
+const reg_code_noprefix = /^((\s)*)(```+|~~~+)(\S*)(\s?.*)/
 
 // Codeblock Info.
 // Life cycle: One codeblock has one.
 // Pay attention to consistency.
 interface CodeblockInfo {
 	// from ctx.getSectionInfo(el) // [!code warning] There may be indentation
+	prefix: string, // `> - * + ` // [!code warning] Because of the list nest, first-line indentation is not equal to universal indentation.
 	flag: string, // (```+|~~~+)
 	language_meta: string, // allow both end space, allow blank
 	language_type: string, // source code, can be an alias
@@ -220,6 +223,7 @@ export default class ShikiPlugin extends Plugin {
 		const sectionInfo = ctx.getSectionInfo(el);
 		if (!sectionInfo) { // allow without (when rerender)
 			const codeblockInfo:CodeblockInfo = {
+				prefix: '',
 				flag: '', // null flag
 				language_meta: '',
 				language_type: language_old,
@@ -239,16 +243,17 @@ export default class ShikiPlugin extends Plugin {
 			throw('Warning: el ctx error!')
 		}
 		const firstLine = lines[sectionInfo.lineStart]
-		const match = firstLine.match(/^(~~~+|```+)(\S*)(\s?.*)$/) // [!code error] TODO indent
+		const match = firstLine.match(reg_code)
 		if (!match) {
 			new Notice("Warning: match codeblock frist line error!", 3000)
 			throw('Warning: match codeblock frist line error!')
 		}11
 
 		const codeblockInfo:CodeblockInfo = {
-			flag: match[1],
-			language_meta: match[3],
-			language_type: match[2],
+			prefix: match[1],
+			flag: match[3],
+			language_meta: match[5],
+			language_type: match[4],
 			source: lines.slice(sectionInfo.lineStart + 1, sectionInfo.lineEnd).join('\n'),
 
 			language_old: language_old,
