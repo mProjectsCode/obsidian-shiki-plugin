@@ -16,6 +16,8 @@ Shiki, PrismJS, CodeMirror
   - When choosing this one, you can also select the min version of this plugin, which has a smaller plugin size and a faster loading speed
   - It can be color-matched with code using obsidian themes and can be used in conjunction with some other obsidian stylization plugins
 - CodeMirror: Obsidian is the default rendering engine used in real-time mode. The current plugin is not supported
+  - It is suitable for real-time rendering and has acceptable performance
+  - However, the code analysis is rather rough, with a small number of highlighting layers and a poor effect
 
 ### Rendering method
 

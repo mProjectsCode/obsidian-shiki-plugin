@@ -335,6 +335,7 @@ code>span.line {
 	margin: 0 !important;
 	padding: 12px var(--shiki-x-padding) !important;
 	border: 0 !important;
+	tab-size: var(--indent-size) !important;
 	cursor: text;
 }
 /* edit-block-button > textarea > pre */
@@ -376,4 +377,9 @@ code>span.line {
 	background: none;
 	box-shadow: none;
 	text-align: right;
+}
+
+/* pdf. Avoid displaying metadata in pdf exports. */
+.print .mod-frontmatter {
+	display: none !important;
 }

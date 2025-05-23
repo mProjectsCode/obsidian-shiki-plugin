@@ -24,7 +24,7 @@ export class ShikiSettingsTab extends PluginSettingTab {
 		};
 
 		this.containerEl.createEl('a', {
-			text: 'Settings Panel Docuemtn',
+			text: 'Settings Panel Document',
 			href: 'https://github.com/mProjectsCode/obsidian-shiki-plugin/blob/master/docs/README.md'
 		});
 
