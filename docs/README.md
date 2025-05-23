@@ -2,7 +2,7 @@
 
 version: v0.5.1
 
-## Setting panel document
+## SettingPanel Document
 
 ### Rendering engine
 
@@ -20,6 +20,7 @@ Shiki, PrismJS, CodeMirror
 ### Rendering method
 
 - textarea: Allows real-time editing and offers a Typora-like WYSIWYG experience
+  - WARNING: Since this method allows for the editing of text content, it is best to use it when the warehouse is regularly backed up to avoid accidents
 - pre: Real-time editing is not allowed. The rendering effect is more similar to the textarea method
 - codemirror: The only supported method for V0.5.0 and earlier versions, which does not allow real-time editing
 

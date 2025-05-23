@@ -20,6 +20,7 @@ Shiki, PrismJS，CodeMirror
 ### 渲染方式
 
 - textarea: 允许实时编辑，typora般的所见即所得的体验
+  - WARNING: 由于该方式允许编辑文本内容，最好能在仓库定期备份的情况下使用，避免意外
 - pre: 不允许实时编辑
 - codemirror: V0.5.0及之前唯一支持的方式，不允许实时编辑
 

@@ -23,6 +23,11 @@ export class ShikiSettingsTab extends PluginSettingTab {
 			...builtInThemes,
 		};
 
+		this.containerEl.createEl('a', {
+			text: 'Settings Panel Docuemtn',
+			href: 'https://github.com/mProjectsCode/obsidian-shiki-plugin/blob/master/docs/README.md'
+		});
+
 		new Setting(this.containerEl)
 			.setName('Reload Highlighter')
 			.setDesc('Reload the syntax highlighter. REQUIRED AFTER SETTINGS CHANGES.')
