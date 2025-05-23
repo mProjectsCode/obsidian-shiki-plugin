@@ -165,15 +165,9 @@ export default class ShikiPlugin extends Plugin {
 							this.codeblock_renderPre(codeblockInfo, el, ctx, span).then().catch()
 
 							// #region textarea
-							const textarea = document.createElement('textarea'); div.appendChild(textarea); textarea.classList.add('line-height-$vp-code-line-height', 'font-$vp-font-family-mono', 'text-size-$vp-code-font-size');
-							// TODO
-							// These attributes are very strange. I copied the attributes on `shiki.style`.
-							// But what supports all these are many css selectors like '[absolute=""]'
-							// Perhaps it is for the convenience of style overlay
-							// 
-							// But in obsidian, I don't think it's necessary to do so.
+							const textarea = document.createElement('textarea'); div.appendChild(textarea);
 							const attributes = {
-								'whitespace-pre': '', 'overflow-auto': '', 'w-full': '', 'h-full': '', 'font-mono': '', 'bg-transparent': '', 'absolute': '', 'inset-0': '', 'py-20px': '', 'px-24px': '', 'text-transparent': '', 'carent-gray': '', 'tab-4': '', 'resize-none': '', 'z-10': '', 'autocomplete': 'off', 'autocorrect': 'off', 'autocapitalize': 'none', 'spellcheck': 'false',
+								'resize-none': '', 'autocomplete': 'off', 'autocorrect': 'off', 'autocapitalize': 'none', 'spellcheck': 'false',
 							};
 							Object.entries(attributes).forEach(([key, val]) => {
 								textarea.setAttribute(key, val);
@@ -192,9 +186,7 @@ export default class ShikiPlugin extends Plugin {
 							}
 							// textarea - tab
 							textarea.addEventListener('keydown', (ev: KeyboardEvent) => {
-								console.log('textarea ev')
 								if (ev.key == 'Tab') {
-									console.log('textarea ev tab')
 									ev.preventDefault()
 									const value = textarea.value
 									const selectionStart: number = textarea.selectionStart

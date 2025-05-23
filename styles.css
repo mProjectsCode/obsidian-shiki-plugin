@@ -290,30 +290,26 @@ code>span.line {
 	line-height: 24px;
 }
 
-/* shiki attr style */
-[absolute=""] { position: absolute; }
-[relative=""] { position: relative; }
-[min-w-full=""] { min-width: 100%; }
-[min-h-100=""] { min-height: 25rem; }
-[w-full=""] { width: 100%; }
-[h-full=""] { height: 100%; }
-[float-left=""] { float: left; }
-[overflow-auto=""] { overflow: auto; }
-[bg-transparent=""] { background-color: transparent; }
-/* [text-transparent=""] { color: transparent; } */
-[text-transparent=""] { color: #ffffff22; }
-[inset-0=""] { top: 0; right: 0; bottom: 0; left: 0; }
-[py-20px=""] { padding-top: 20px; padding-bottom: 20px; }
-[px-24px=""] { padding-top: 24px; padding-bottom: 24px; }
-[resize-none=""] { resize: none; }
-[z-10=""] { z-index: 10; }
-[tab-4=""] {}
-[carent-gray=""] {}
-[font-mono=""] {}
-
 .obsidian-shiki-plugin {
 	position: relative;
 	min-width: 100%;
+}
+
+/* shiki attr style */
+.obsidian-shiki-plugin textarea {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	resize: none;
+	white-space: pre;
+	overflow: auto;
+	background-color: transparent;
+	/* color: transparent; */
+	color: #ffffff22;
 }
 
 /*
