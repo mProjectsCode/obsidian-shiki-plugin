@@ -17,7 +17,7 @@ import {
 	transformerMetaHighlight,
 	transformerMetaWordHighlight,
 } from '@shikijs/transformers';
-import { codeToHtml } from 'shiki'; // 8.6MB
+import { bundledThemesInfo, codeToHtml } from 'shiki'; // 8.6MB
 
 declare module 'obsidian' {
 	interface MarkdownPostProcessorContext {
@@ -388,9 +388,19 @@ export default class ShikiPlugin extends Plugin {
 
 		// pre html string - shiki
 		if (this.settings.renderEngine == 'shiki') {
+			// check theme, TODO: use more theme
+			let theme = ''
+			for (const item of bundledThemesInfo) {
+				if (item.id == this.settings.theme) { theme = this.settings.theme; break }
+			}
+			if (theme === '') {
+				theme = 'andromeeda'
+				console.warn(`no support theme '${this.settings.theme}' temp in this render mode`)
+			}
+
 			const pre:string = await codeToHtml(source, {
 				lang: codeblockInfo.language_old,
-				theme: this.settings.theme,
+				theme: theme,
 				meta: { __raw: codeblockInfo.language_meta },
 				// https://shiki.style/packages/transformers
 				transformers: [
