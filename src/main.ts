@@ -404,7 +404,7 @@ export default class ShikiPlugin extends Plugin {
 					transformerMetaWordHighlight(),
 				],
 			})
-			targetEl.textContent = pre // don't use innerHTML. will deal with <html label> text
+			targetEl.innerHTML = pre // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
 		}
 		// pre html string - prism
 		else {
@@ -416,7 +416,7 @@ export default class ShikiPlugin extends Plugin {
 			targetEl.innerHTML = ''
 			const pre = document.createElement('pre'); targetEl.appendChild(pre);
 			const code = document.createElement('code'); pre.appendChild(code); code.classList.add('language-'+codeblockInfo.language_type);
-			code.textContent = source; // don't use innerHTML. will deal with <html label> text
+			code.textContent = source; // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
 			prism.highlightElement(code)
 		}
 	}

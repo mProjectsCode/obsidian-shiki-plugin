@@ -219,9 +219,6 @@ export class CodeHighlighter {
 		return this.shiki.codeToTokens(code, {
 			lang: lang as BundledLanguage,
 			theme: this.plugin.settings.theme,
-			//  transformers: [ // TODO Error，codeToToken have no transformer method (code2Html have)
-			//  	transformerNotationDiff(),
-			//  ]
 		});
 	}
 
