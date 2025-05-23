@@ -182,7 +182,7 @@ export default class ShikiPlugin extends Plugin {
 							textarea.onchange = (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 								const newValue = (ev.target as HTMLTextAreaElement).value
 								codeblockInfo.source = newValue
-								this.codeblock_saveContent(codeblockInfo, el, ctx, false, true)
+								void this.codeblock_saveContent(codeblockInfo, el, ctx, false, true)
 							}
 							// textarea - tab
 							textarea.addEventListener('keydown', (ev: KeyboardEvent) => {
@@ -228,7 +228,7 @@ export default class ShikiPlugin extends Plugin {
 							// language-edit - async part
 							editInput.oninput = (ev): void => {
 								const newValue = (ev.target as HTMLInputElement).value
-								const match = newValue.match(/^(\S*)(\s?.*)$/)
+								const match = /^(\S*)(\s?.*)$/.exec(newValue)
 								if (!match) throw new Error('This is not a regular expression matching that may fail')
 								codeblockInfo.language_type = match[1]
 								codeblockInfo.language_meta = match[2]
@@ -236,7 +236,7 @@ export default class ShikiPlugin extends Plugin {
 							}
 							editInput.onchange = (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 								const newValue = (ev.target as HTMLInputElement).value
-								const match = newValue.match(/^(\S*)(\s?.*)$/)
+								const match = /^(\S*)(\s?.*)$/.exec(newValue)
 								if (!match) throw new Error('This is not a regular expression matching that may fail')
 								codeblockInfo.language_type = match[1]
 								codeblockInfo.language_meta = match[2]
@@ -288,7 +288,7 @@ export default class ShikiPlugin extends Plugin {
 		}
 
 		const firstLine = lines[sectionInfo.lineStart]
-		const match = firstLine.match(reg_code)
+		const match = reg_code.exec(firstLine)
 		if (!match) {
 			// This is possible.
 			// When the code block is nested and the first line is not a code block
