@@ -329,8 +329,8 @@ code>span.line {
 	font-family: var(--font-monospace) !important;
 }
 .obsidian-shiki-plugin code::selection, .obsidian-shiki-plugin textarea::selection {
-	background-color: var(--main-node) !important;
-	color: var(--main-background) !important;
+	background-color: var(--text-selection) !important;
+	color: currentColor !important
 }
 .obsidian-shiki-plugin code {
 	margin: 0 !important;
