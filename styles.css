@@ -287,7 +287,7 @@ code>span.line.highlighted.warning {
 
 /* chore fix: keep color magin zero */
 code>span.line {
-	line-height: 24px;
+	line-height: var(--shiki-line-height);
 }
 
 .obsidian-shiki-plugin {
@@ -325,6 +325,11 @@ code>span.line {
 .obsidian-shiki-plugin code, .obsidian-shiki-plugin textarea {
 	line-height: var(--shiki-line-height) !important;
 	font-size: var(--code-size) !important;
+	/* font-family: ???; There are no css variables, js needs to be used */
+}
+.obsidian-shiki-plugin code::selection, .obsidian-shiki-plugin textarea::selection {
+	background-color: var(--main-node) !important;
+	color: var(--main-background) !important;
 }
 .obsidian-shiki-plugin code {
 	margin: 0 !important;
