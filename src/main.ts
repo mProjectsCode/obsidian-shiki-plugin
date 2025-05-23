@@ -404,7 +404,7 @@ export default class ShikiPlugin extends Plugin {
 					transformerMetaWordHighlight(),
 				],
 			})
-			targetEl.innerHTML = pre
+			targetEl.textContent = pre // don't use innerHTML. will deal with <html label> text
 		}
 		// pre html string - prism
 		else {
@@ -415,7 +415,8 @@ export default class ShikiPlugin extends Plugin {
 			}
 			targetEl.innerHTML = ''
 			const pre = document.createElement('pre'); targetEl.appendChild(pre);
-			const code = document.createElement('code'); pre.appendChild(code); code.classList.add('language-'+codeblockInfo.language_type); code.innerHTML = source;
+			const code = document.createElement('code'); pre.appendChild(code); code.classList.add('language-'+codeblockInfo.language_type);
+			code.textContent = source; // don't use innerHTML. will deal with <html label> text
 			prism.highlightElement(code)
 		}
 	}
