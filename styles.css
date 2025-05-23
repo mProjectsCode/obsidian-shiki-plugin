@@ -339,6 +339,7 @@ code>span.line {
 	margin: 0 !important;
 	padding: 12px var(--shiki-x-padding) !important;
 	border: 0 !important;
+	cursor: text;
 }
 /* edit-block-button > textarea > pre */
 .obsidian-shiki-plugin pre { z-index: 0; }

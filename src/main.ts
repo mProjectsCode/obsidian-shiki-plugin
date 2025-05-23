@@ -23,6 +23,10 @@ declare module 'obsidian' {
 	interface MarkdownPostProcessorContext {
 		containerEl: HTMLElement
 	}
+	interface Vault {
+		getConfig(arg: 'useTab'): boolean
+		getConfig(arg: 'tabSize'): number
+	}
 }
 
 export const SHIKI_INLINE_REGEX = /^\{([^\s]+)\} (.*)/i; // format: `{lang} code`
@@ -160,7 +164,7 @@ export default class ShikiPlugin extends Plugin {
 							codeblockInfo.source = source
 							this.codeblock_renderPre(codeblockInfo, el, ctx, span).then().catch()
 
-							// textarea
+							// #region textarea
 							const textarea = document.createElement('textarea'); div.appendChild(textarea); textarea.classList.add('line-height-$vp-code-line-height', 'font-$vp-font-family-mono', 'text-size-$vp-code-font-size');
 							// TODO
 							// These attributes are very strange. I copied the attributes on `shiki.style`.
@@ -186,7 +190,43 @@ export default class ShikiPlugin extends Plugin {
 								codeblockInfo.source = newValue
 								this.codeblock_saveContent(codeblockInfo, el, ctx, false, true)
 							}
+							// textarea - tab
+							textarea.addEventListener('keydown', (ev: KeyboardEvent) => {
+								console.log('textarea ev')
+								if (ev.key == 'Tab') {
+									console.log('textarea ev tab')
+									ev.preventDefault()
+									const value = textarea.value
+									const selectionStart: number = textarea.selectionStart
+									const selectionEnd: number = textarea.selectionEnd
+									const lineStart: number = value.lastIndexOf('\n', selectionStart - 1) + 1
+									const lineEnd: number = value.indexOf('\n', selectionStart)
+									const lineCurrent: string = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd)
 
+									// get indent, auto indent
+									const configUseTab = this.app.vault.getConfig('useTab')
+									const configTabSize = this.app.vault.getConfig('tabSize')
+									const indent_space = ' '.repeat(configTabSize)
+									let indent = configUseTab ? '\t' : indent_space
+									if (lineCurrent.startsWith('\t')) indent = '\t'
+									else if (lineCurrent.startsWith(' ')) indent = indent_space
+									
+									// change
+									// new value: cursorBefore + tab + cusrorAfter
+									textarea.value = textarea.value.substring(0, selectionStart) + indent + textarea.value.substring(selectionEnd)
+									// new cursor pos
+									textarea.selectionStart = textarea.selectionEnd = selectionStart + indent.length;
+									textarea.dispatchEvent(new InputEvent('input', {
+										inputType: 'insertText',
+										data: indent,
+										bubbles: true,
+										cancelable: true
+									}))
+								}
+							})
+							// #endregion
+
+							// #region language-edit
 							// language-edit
 							const editEl = document.createElement('div'); div.appendChild(editEl); editEl.classList.add('language-edit');
 							editEl.setAttribute('align', 'right'); editEl.setAttribute('contenteditable', '');
@@ -209,6 +249,7 @@ export default class ShikiPlugin extends Plugin {
 								codeblockInfo.language_meta = match[2]
 								void this.codeblock_saveContent(codeblockInfo, el, ctx, true, false)
 							}
+							// #endregion
 						}
 						else if (this.settings.renderMode === 'pre') {
 							void this.codeblock_renderPre(codeblockInfo, el, ctx, el)
