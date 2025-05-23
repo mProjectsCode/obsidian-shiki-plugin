@@ -203,6 +203,7 @@ export default class ShikiPlugin extends Plugin {
 									const lineStart: number = value.lastIndexOf('\n', selectionStart - 1) + 1
 									const lineEnd: number = value.indexOf('\n', selectionStart)
 									const lineCurrent: string = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd)
+									// TODO enhamce: determine whether to insert the tab directly or the entire line of tabs based on the cursor
 
 									// get indent, auto indent
 									const configUseTab = this.app.vault.getConfig('useTab')
@@ -211,7 +212,7 @@ export default class ShikiPlugin extends Plugin {
 									let indent = configUseTab ? '\t' : indent_space
 									if (lineCurrent.startsWith('\t')) indent = '\t'
 									else if (lineCurrent.startsWith(' ')) indent = indent_space
-									
+
 									// change
 									// new value: cursorBefore + tab + cusrorAfter
 									textarea.value = textarea.value.substring(0, selectionStart) + indent + textarea.value.substring(selectionEnd)
