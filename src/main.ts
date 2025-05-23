@@ -184,7 +184,7 @@ export default class ShikiPlugin extends Plugin {
 								codeblockInfo.source = newValue
 								void this.codeblock_saveContent(codeblockInfo, el, ctx, false, true)
 							}
-							// textarea - tab
+							// textarea - `tab` key、`arrow` key
 							textarea.addEventListener('keydown', (ev: KeyboardEvent) => {
 								if (ev.key == 'Tab') {
 									ev.preventDefault()
@@ -215,6 +215,56 @@ export default class ShikiPlugin extends Plugin {
 										bubbles: true,
 										cancelable: true
 									}))
+								}
+								else if (ev.key == 'ArrowDown' || ev.key == 'ArrowRight') {
+									const value = textarea.value
+									const selectionEnd: number = textarea.selectionEnd
+									if (selectionEnd != value.length) return
+
+									const editor = this.app.workspace.activeEditor?.editor;
+									if (!editor) return
+
+									const sectionInfo = ctx.getSectionInfo(el);
+									if (!sectionInfo) return
+
+									ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange`
+									let toLine = sectionInfo.lineEnd + 1
+									if (toLine > editor.lineCount() - 1) { // when codeblock on the last line
+										// strategy1: only move to end
+										// toLine--
+
+										// strategy2: insert a blank line
+										const lastLineIndex = editor.lineCount() - 1
+										const lastLineContent = editor.getLine(lastLineIndex)
+										editor.replaceRange("\n", { line: lastLineIndex, ch: lastLineContent.length })
+										
+									}
+									editor.setCursor(toLine, 0)
+									editor.focus()
+								}
+								else if (ev.key == 'ArrowUp' || ev.key == 'ArrowLeft') {
+									const value = textarea.value
+									const selectionStart: number = textarea.selectionStart
+									if (selectionStart != 0) return
+
+									const editor = this.app.workspace.activeEditor?.editor;
+									if (!editor) return
+
+									const sectionInfo = ctx.getSectionInfo(el);
+									if (!sectionInfo) return
+
+									ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange`
+									let toLine = sectionInfo.lineStart - 1
+									if (toLine < 0) { // when codeblock on the frist line
+										// strategy1: only move to start
+										// toLine = 0
+
+										// strategy2: insert a blank line
+										toLine = 0
+										editor.replaceRange("\n", { line: 0, ch: 0 })
+									}
+									editor.setCursor(toLine, 0)
+									editor.focus()
 								}
 							})
 							// #endregion
@@ -280,7 +330,7 @@ export default class ShikiPlugin extends Plugin {
 		// sectionInfo.lineEnd;   // index in (```), Let's not modify the fence part
 
 		const lines = sectionInfo.text.split('\n')
-		if (lines.length <= sectionInfo.lineStart + 1 || lines.length <= sectionInfo.lineEnd + 1) {
+		if (lines.length < sectionInfo.lineStart + 1 || lines.length < sectionInfo.lineEnd + 1) {
 			// This is impossible.
 			// Unless obsidian makes a mistake.
 			new Notice("Warning: el ctx error!", 3000)
