@@ -435,7 +435,7 @@ export default class ShikiPlugin extends Plugin {
 				changes: [{
 					from: {line: sectionInfo.lineStart+1, ch: 0},
 					to: {line: sectionInfo.lineEnd, ch: 0},
-					text: codeblockInfo.source ?? codeblockInfo.source_old + '\n'
+					text: (codeblockInfo.source ?? codeblockInfo.source_old) + '\n'
 				}],
 			});
 		}
