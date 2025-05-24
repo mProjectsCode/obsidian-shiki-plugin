@@ -19,6 +19,7 @@ import {
 } from '@shikijs/transformers';
 import { bundledThemesInfo, codeToHtml } from 'shiki'; // 8.6MB
 import type Prism from 'prismjs';
+import { language } from '@codemirror/language';
 
 const reg_code = /^((\s|>\s|-\s|\*\s|\+\s)*)(```+|~~~+)(\S*)(\s?.*)/
 // const reg_code_noprefix = /^((\s)*)(```+|~~~+)(\S*)(\s?.*)/
@@ -187,26 +188,8 @@ export class EditableCodeblock {
 				const selectionEnd: number = textarea.selectionEnd
 				if (selectionEnd != textarea.value.length) return
 
-				const editor = this.plugin.app.workspace.activeEditor?.editor;
-				if (!editor) return
-
-				const sectionInfo = this.ctx.getSectionInfo(this.el);
-				if (!sectionInfo) return
-
-				ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange`
-				const toLine = sectionInfo.lineEnd + 1
-				if (toLine > editor.lineCount() - 1) { // when codeblock on the last line
-					// strategy1: only move to end
-					// toLine--
-
-					// strategy2: insert a blank line
-					const lastLineIndex = editor.lineCount() - 1
-					const lastLineContent = editor.getLine(lastLineIndex)
-					editor.replaceRange("\n", { line: lastLineIndex, ch: lastLineContent.length })
-					
-				}
-				editor.setCursor(toLine, 0)
-				editor.focus()
+				editInput.setSelectionRange(0, 0)
+				editInput.focus()
 			}
 			else if (ev.key == 'ArrowUp' || ev.key == 'ArrowLeft') {
 				const selectionStart: number = textarea.selectionStart
@@ -257,6 +240,35 @@ export class EditableCodeblock {
 			this.codeblockInfo.language_meta = match[2]
 			void this.saveContent(true, false)
 		}
+		editInput.addEventListener('keydown', (ev: KeyboardEvent) => {
+			if (ev.key == 'ArrowUp') {
+				ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange
+				const position = textarea.value.length
+				textarea.setSelectionRange(position, position)
+				textarea.focus()
+			}
+			else if (ev.key == 'ArrowDown') {
+				const editor = this.plugin.app.workspace.activeEditor?.editor;
+				if (!editor) return
+
+				const sectionInfo = this.ctx.getSectionInfo(this.el);
+				if (!sectionInfo) return
+
+				ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange`
+				const toLine = sectionInfo.lineEnd + 1
+				if (toLine > editor.lineCount() - 1) { // when codeblock on the last line
+					// strategy1: only move to end
+					// toLine--
+
+					// strategy2: insert a blank line
+					const lastLineIndex = editor.lineCount() - 1
+					const lastLineContent = editor.getLine(lastLineIndex)
+					editor.replaceRange("\n", { line: lastLineIndex, ch: lastLineContent.length })
+				}
+				editor.setCursor(toLine, 0)
+				editor.focus()
+			}
+		})
 		// #endregion
 	}
 
