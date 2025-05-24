@@ -83,6 +83,20 @@ export class ShikiSettingsTab extends PluginSettingTab {
 				});
 			});
 
+		new Setting(this.containerEl)
+			.setName('Auto Save Mode')
+			.setDesc('Select the auto save mode for the code blocks.')
+			.addDropdown(dropdown => {
+				dropdown.addOptions({
+					'onchange': 'when change',
+					'oninput': 'when input',
+				});
+				dropdown.setValue(this.plugin.settings.saveMode).onChange(async value => {
+					this.plugin.settings.saveMode = value as 'onchange'|'oninput';
+					await this.plugin.saveSettings();
+				});
+			});
+
 		const customThemeFolderSetting = new Setting(this.containerEl)
 			.setName('Custom themes folder location')
 			.setDesc('Folder relative to your Vault where custom JSON theme files are located.')

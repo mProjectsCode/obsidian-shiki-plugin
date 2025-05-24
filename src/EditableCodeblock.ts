@@ -148,13 +148,7 @@ export class EditableCodeblock {
 		textarea.value = this.codeblockInfo.source;
 
 		// #region textarea - async part - oninput/onchange
-		// strategy1: onchange save,
-		// - Advantage:
-		//   Great performance.
-		//   There is no need to manage the cursor position manually
-		// - Disadvantage:
-		//   Delay save, change will loss if the program crashes suddenly
-		if (true) {
+		if (this.plugin.settings.saveMode == 'onchange') {
 			textarea.oninput = (ev): void => {
 				this.editor = this.plugin.app.workspace.activeEditor?.editor;
 
@@ -165,15 +159,10 @@ export class EditableCodeblock {
 			textarea.onchange = (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 				const newValue = (ev.target as HTMLTextAreaElement).value
 				this.codeblockInfo.source = newValue
-				void this.saveContent_debounced(false, true)
+				void this.saveContent_safe(false, true)
 			}
 		}
-		// strategy2: cache and rebuild
-		// - Advantage:
-		//   Save immediately, data is more secure.
-		// - Disadvantage:
-		//   Worse performance?
-		//   The cursor position needs to be handled manually. Debounce manually.
+		// refresh/save strategy2: cache and rebuild
 		else {
 			void Promise.resolve().then(() => {
 				if (global_refresh_cache) {
@@ -196,7 +185,7 @@ export class EditableCodeblock {
 					start: textarea.selectionStart,
 					end: textarea.selectionEnd,
 				}
-				void this.saveContent_debounced(false, true)
+				void this.saveContent_safe(false, true)
 			}
 		}
 		// #endregion
@@ -288,7 +277,7 @@ export class EditableCodeblock {
 			if (!match) throw new Error('This is not a regular expression matching that may fail')
 			this.codeblockInfo.language_type = match[1]
 			this.codeblockInfo.language_meta = match[2]
-			void this.saveContent_debounced(true, false)
+			void this.saveContent_safe(true, false)
 		}
 		editInput.addEventListener('keydown', (ev: KeyboardEvent) => {
 			if (ev.key == 'ArrowUp') {
@@ -346,7 +335,10 @@ export class EditableCodeblock {
 		code.textContent = this.codeblockInfo.source // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
 		prism.highlightElement(code)
 		
-		// code - async part
+		// #region code - async part - oninput/onchange
+		if (this.plugin.settings.saveMode == 'oninput') {
+			console.warn('renderEditablePre no support oninput temp, force use onchange')
+		}
 		code.oninput = (ev): void => {
 			this.editor = this.plugin.app.workspace.activeEditor?.editor;
 
@@ -363,8 +355,9 @@ export class EditableCodeblock {
 		code.addEventListener('blur', (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 			const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
 			this.codeblockInfo.source = newValue // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
-			void this.saveContent_debounced(false, true)
+			void this.saveContent_safe(false, true)
 		})
+		// #endregion
 	}
 
 	renderEditablePre_saveCursorPosition(container: Node): null|{start: number, end: number} {
@@ -488,9 +481,9 @@ export class EditableCodeblock {
 
 	async saveContent_safe(isUpdateLanguage: boolean = true, isUpdateSource: boolean = true): Promise<void> {
 		try {
-			this.saveContent(isUpdateLanguage, isUpdateLanguage)
-		} catch (e) {
-			this.saveContent_debounced(isUpdateLanguage, isUpdateLanguage)
+			void this.saveContent(isUpdateLanguage, isUpdateSource)
+		} catch {
+			void this.saveContent_debounced(isUpdateLanguage, isUpdateSource)
 		}
 	}
 
