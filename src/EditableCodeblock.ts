@@ -4,7 +4,7 @@
  * This will gradually be modified into a universal module that does not rely on obsidian
  */ 
 
-import { type App, loadPrism, type MarkdownPostProcessorContext, Notice } from 'obsidian';
+import { type App, loadPrism, type MarkdownPostProcessorContext, Notice, debounce } from 'obsidian';
 import { type Settings } from 'src/settings/Settings';
 
 import {
@@ -19,7 +19,6 @@ import {
 } from '@shikijs/transformers';
 import { bundledThemesInfo, codeToHtml } from 'shiki'; // 8.6MB
 import type Prism from 'prismjs';
-import { language } from '@codemirror/language';
 
 const reg_code = /^((\s|>\s|-\s|\*\s|\+\s)*)(```+|~~~+)(\S*)(\s?.*)/
 // const reg_code_noprefix = /^((\s)*)(```+|~~~+)(\S*)(\s?.*)/
@@ -41,6 +40,9 @@ export interface CodeblockInfo {
 	language_old: string, // to lib, can't be an alias
 	source_old: string,
 }
+
+// RAII, use: setValue -> refresh -> getValue -> reSetNull
+let global_refresh_cache: null|{start:number, end:number} = null
 
 // Class definitions in rust style, The object is separated from the implementation
 export class EditableCodeblock {
@@ -142,17 +144,57 @@ export class EditableCodeblock {
 		});
 		textarea.value = this.codeblockInfo.source;
 
-		// #region textarea - async part
-		textarea.oninput = (ev): void => {
-			const newValue = (ev.target as HTMLTextAreaElement).value
-			this.codeblockInfo.source = newValue
-			void this.renderPre(span)
+		// #region textarea - async part - oninput/onchange
+		// strategy1: onchange save,
+		// - Advantage:
+		//   Great performance.
+		//   There is no need to manage the cursor position manually
+		// - Disadvantage:
+		//   Delay save, change will loss if the program crashes suddenly
+		if (true) {
+			textarea.oninput = (ev): void => {
+				const newValue = (ev.target as HTMLTextAreaElement).value
+				this.codeblockInfo.source = newValue
+				void this.renderPre(span)
+			}
+			textarea.onchange = (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
+				const newValue = (ev.target as HTMLTextAreaElement).value
+				this.codeblockInfo.source = newValue
+				void this.saveContent_debounced(false, true)
+			}
 		}
-		textarea.onchange = (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
-			const newValue = (ev.target as HTMLTextAreaElement).value
-			this.codeblockInfo.source = newValue
-			void this.saveContent(false, true)
+		// strategy2: cache and rebuild
+		// - Advantage:
+		//   Save immediately, data is more secure.
+		// - Disadvantage:
+		//   Worse performance?
+		//   The cursor position needs to be handled manually. Debounce manually.
+		else {
+			void Promise.resolve().then(() => {
+				if (global_refresh_cache) {
+					// this.el.appendChild(global_refresh_cache.el)
+					// const textarea: HTMLTextAreaElement|null = global_refresh_cache.el.querySelector('textarea')
+					textarea.setSelectionRange(global_refresh_cache.start, global_refresh_cache.end)
+					textarea.focus()
+					global_refresh_cache = null
+					// return
+				}
+			})
+			textarea.oninput = (ev): void => {
+				const newValue = (ev.target as HTMLTextAreaElement).value
+				this.codeblockInfo.source = newValue
+				void this.renderPre(span)
+
+				global_refresh_cache = {
+					start: textarea.selectionStart,
+					end: textarea.selectionEnd,
+				}
+				void this.saveContent_debounced(false, true)
+			}
 		}
+		// #endregion
+
+		// #region textarea - async part - keydwon
 		textarea.addEventListener('keydown', (ev: KeyboardEvent) => { // `tab` key、`arrow` key
 			if (ev.key == 'Tab') {
 				ev.preventDefault()
@@ -238,7 +280,7 @@ export class EditableCodeblock {
 			if (!match) throw new Error('This is not a regular expression matching that may fail')
 			this.codeblockInfo.language_type = match[1]
 			this.codeblockInfo.language_meta = match[2]
-			void this.saveContent(true, false)
+			void this.saveContent_debounced(true, false)
 		}
 		editInput.addEventListener('keydown', (ev: KeyboardEvent) => {
 			if (ev.key == 'ArrowUp') {
@@ -312,7 +354,7 @@ export class EditableCodeblock {
 		code.addEventListener('blur', (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 			const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
 			this.codeblockInfo.source = newValue // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
-			void this.saveContent(false, true)
+			void this.saveContent_debounced(false, true)
 		})
 	}
 
@@ -366,6 +408,16 @@ export class EditableCodeblock {
 		selection?.removeAllRanges()
 		selection?.addRange(range)
 	}
+
+	// There will be a strong sense of lag, and the experience is not good
+	/**
+	 * @deprecated There will be a strong sense of lag, and the experience is not good.
+	 * you should use `renderPre` version
+	 */
+	renderPre_debounced = debounce(async (targetEl:HTMLElement): Promise<void> => {
+		void this.renderPre(targetEl)
+		console.log('debug renderPre debounced')
+	}, 200)
 
 	/**
 	 * Render code to targetEl
@@ -425,8 +477,15 @@ export class EditableCodeblock {
 		}
 	}
 
+	saveContent_debounced = debounce(async (isUpdateLanguage: boolean = true, isUpdateSource: boolean = true) => {
+		void this.saveContent(isUpdateLanguage, isUpdateSource)
+	}, 200)
+
 	/**
 	 * Save textarea text content to codeBlock markdown source
+	 * 
+	 * @deprecated can't save when cursor in codeblock and use short-key switch to source mode.
+	 * You should use `saveContent_debounced` version
 	 * 
 	 * Data security (Importance)
 	 * - Make sure `Ctrl+z` is normal: use transaction
