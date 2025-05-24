@@ -4,7 +4,7 @@
  * This will gradually be modified into a universal module that does not rely on obsidian
  */ 
 
-import { type App, loadPrism, type MarkdownPostProcessorContext, Notice, debounce } from 'obsidian';
+import { type App, debounce, type Editor, loadPrism, type MarkdownPostProcessorContext, Notice } from 'obsidian';
 import { type Settings } from 'src/settings/Settings';
 
 import {
@@ -49,12 +49,15 @@ export class EditableCodeblock {
 	plugin: { app: App; settings: Settings };
 	el: HTMLElement;
 	ctx: MarkdownPostProcessorContext;
+	editor: Editor|undefined; // Cache to avoid focus changes. And the focus point may not be correct when creating the code block. It can be updated again when oninput
 	codeblockInfo: CodeblockInfo;
 
 	constructor(plugin: { app: App; settings: Settings }, language_old:string, source_old:string, el:HTMLElement, ctx:MarkdownPostProcessorContext) {
 		this.plugin = plugin
 		this.el = el
 		this.ctx = ctx
+		this.editor = this.plugin.app.workspace.activeEditor?.editor;
+
 		this.codeblockInfo = EditableCodeblock.createCodeBlockInfo(language_old, source_old, el, ctx)
 		this.codeblockInfo.source = this.codeblockInfo.source_old
 	}
@@ -153,6 +156,8 @@ export class EditableCodeblock {
 		//   Delay save, change will loss if the program crashes suddenly
 		if (true) {
 			textarea.oninput = (ev): void => {
+				this.editor = this.plugin.app.workspace.activeEditor?.editor;
+
 				const newValue = (ev.target as HTMLTextAreaElement).value
 				this.codeblockInfo.source = newValue
 				void this.renderPre(span)
@@ -181,6 +186,8 @@ export class EditableCodeblock {
 				}
 			})
 			textarea.oninput = (ev): void => {
+				this.editor = this.plugin.app.workspace.activeEditor?.editor;
+
 				const newValue = (ev.target as HTMLTextAreaElement).value
 				this.codeblockInfo.source = newValue
 				void this.renderPre(span)
@@ -234,11 +241,10 @@ export class EditableCodeblock {
 				editInput.focus()
 			}
 			else if (ev.key == 'ArrowUp' || ev.key == 'ArrowLeft') {
+				if (!this.editor) return
+
 				const selectionStart: number = textarea.selectionStart
 				if (selectionStart != 0) return
-
-				const editor = this.plugin.app.workspace.activeEditor?.editor;
-				if (!editor) return
 
 				const sectionInfo = this.ctx.getSectionInfo(this.el);
 				if (!sectionInfo) return
@@ -251,10 +257,10 @@ export class EditableCodeblock {
 
 					// strategy2: insert a blank line
 					toLine = 0
-					editor.replaceRange("\n", { line: 0, ch: 0 })
+					this.editor.replaceRange("\n", { line: 0, ch: 0 })
 				}
-				editor.setCursor(toLine, 0)
-				editor.focus()
+				this.editor.setCursor(toLine, 0)
+				this.editor.focus()
 			}
 		})
 		// #endregion
@@ -267,6 +273,8 @@ export class EditableCodeblock {
 		editInput.value = this.codeblockInfo.language_type + this.codeblockInfo.language_meta
 		// language-edit - async part
 		editInput.oninput = (ev): void => {
+			this.editor = this.plugin.app.workspace.activeEditor?.editor;
+
 			const newValue = (ev.target as HTMLInputElement).value
 			const match = /^(\S*)(\s?.*)$/.exec(newValue)
 			if (!match) throw new Error('This is not a regular expression matching that may fail')
@@ -290,25 +298,24 @@ export class EditableCodeblock {
 				textarea.focus()
 			}
 			else if (ev.key == 'ArrowDown') {
-				const editor = this.plugin.app.workspace.activeEditor?.editor;
-				if (!editor) return
+				if (!this.editor) return
 
 				const sectionInfo = this.ctx.getSectionInfo(this.el);
 				if (!sectionInfo) return
 
 				ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange`
 				const toLine = sectionInfo.lineEnd + 1
-				if (toLine > editor.lineCount() - 1) { // when codeblock on the last line
+				if (toLine > this.editor.lineCount() - 1) { // when codeblock on the last line
 					// strategy1: only move to end
 					// toLine--
 
 					// strategy2: insert a blank line
-					const lastLineIndex = editor.lineCount() - 1
-					const lastLineContent = editor.getLine(lastLineIndex)
-					editor.replaceRange("\n", { line: lastLineIndex, ch: lastLineContent.length })
+					const lastLineIndex = this.editor.lineCount() - 1
+					const lastLineContent = this.editor.getLine(lastLineIndex)
+					this.editor.replaceRange("\n", { line: lastLineIndex, ch: lastLineContent.length })
 				}
-				editor.setCursor(toLine, 0)
-				editor.focus()
+				this.editor.setCursor(toLine, 0)
+				this.editor.focus()
 			}
 		})
 		// #endregion
@@ -341,6 +348,8 @@ export class EditableCodeblock {
 		
 		// code - async part
 		code.oninput = (ev): void => {
+			this.editor = this.plugin.app.workspace.activeEditor?.editor;
+
 			const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
 			this.codeblockInfo.source = newValue
 			void Promise.resolve().then(() => { // like vue nextTick, ensure that the cursor is behind
@@ -477,6 +486,17 @@ export class EditableCodeblock {
 		}
 	}
 
+	async saveContent_safe(isUpdateLanguage: boolean = true, isUpdateSource: boolean = true): Promise<void> {
+		try {
+			this.saveContent(isUpdateLanguage, isUpdateLanguage)
+		} catch (e) {
+			this.saveContent_debounced(isUpdateLanguage, isUpdateLanguage)
+		}
+	}
+
+	/**
+	 * @deprecated You should use `saveContent_safe` version
+	 */
 	saveContent_debounced = debounce(async (isUpdateLanguage: boolean = true, isUpdateSource: boolean = true) => {
 		void this.saveContent(isUpdateLanguage, isUpdateSource)
 	}, 200)
@@ -485,7 +505,7 @@ export class EditableCodeblock {
 	 * Save textarea text content to codeBlock markdown source
 	 * 
 	 * @deprecated can't save when cursor in codeblock and use short-key switch to source mode.
-	 * You should use `saveContent_debounced` version
+	 * You should use `saveContent_safe` version
 	 * 
 	 * Data security (Importance)
 	 * - Make sure `Ctrl+z` is normal: use transaction
@@ -524,15 +544,14 @@ export class EditableCodeblock {
 		// sectionInfo.lineEnd;   // index in (```), Let's not modify the fence part
 
 		// editor
-		const editor = this.plugin.app.workspace.activeEditor?.editor;
-		if (!editor) {
+		if (!this.editor) {
 			new Notice("Warning: without editor!", 3000)
 			return;
 		}
 
 		// change - language
 		if (isUpdateLanguage) {
-			editor.transaction({
+			this.editor.transaction({
 				changes: [{
 					from: {line: sectionInfo.lineStart, ch: 0},
 					to: {line: sectionInfo.lineStart+1, ch: 0},
@@ -543,7 +562,7 @@ export class EditableCodeblock {
 
 		// change - source
 		if (isUpdateSource) {
-			editor.transaction({
+			this.editor.transaction({
 				changes: [{
 					from: {line: sectionInfo.lineStart+1, ch: 0},
 					to: {line: sectionInfo.lineEnd, ch: 0},
