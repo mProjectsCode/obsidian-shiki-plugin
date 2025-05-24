@@ -26,13 +26,14 @@ const build = await esbuild.build({
 		'@lezer/highlight',
 		'@lezer/lr',
 		...builtins,
+		'shiki', // [!code hl]
 	],
 	format: 'cjs',
 	target: 'es2018',
 	logLevel: 'info',
 	sourcemap: false,
 	treeShaking: true,
-	outfile: 'dist-min/main.js',
+	outfile: 'dist-min/main.js', // [!code hl]
 	minify: true,
 	metafile: true,
 	define: {
