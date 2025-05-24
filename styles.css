@@ -305,7 +305,6 @@ code>span.line {
 	width: 100%;
 	height: 100%;
 	resize: none;
-	white-space: pre;
 	overflow: auto;
 	background-color: transparent;
 	/* color: transparent; */
@@ -327,6 +326,7 @@ code>span.line {
 	tab-size: var(--indent-size) !important;
 	font-size: var(--code-size) !important;
 	font-family: var(--font-monospace) !important;
+	white-space: pre !important;
 }
 .obsidian-shiki-plugin code::selection, .obsidian-shiki-plugin textarea::selection {
 	background-color: var(--text-selection) !important;
@@ -341,6 +341,7 @@ code>span.line {
 	margin: 0 !important;
 	padding: 12px var(--shiki-x-padding) !important;
 	border: 0 !important;
+	white-space: pre !important;
 	cursor: text;
 }
 /* edit-block-button > textarea > pre */

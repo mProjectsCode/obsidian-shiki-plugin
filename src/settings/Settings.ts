@@ -3,7 +3,7 @@ export interface Settings {
 	customThemeFolder: string;
 	customLanguageFolder: string;
 	theme: string;
-	renderMode: 'textarea'|'pre'|'codemirror';
+	renderMode: 'textarea'|'pre'|'editablePre'|'codemirror';
 	renderEngine: 'shiki'|'prismjs';
 	preferThemeColors: boolean;
 	inlineHighlighting: boolean;

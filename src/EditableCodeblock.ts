@@ -52,11 +52,12 @@ export class EditableCodeblock {
 		this.plugin = plugin
 		this.el = el
 		this.ctx = ctx
-		this.codeblockInfo = EditableCodeblock.getCodeBlockInfo(language_old, source_old, el, ctx)
+		this.codeblockInfo = EditableCodeblock.createCodeBlockInfo(language_old, source_old, el, ctx)
+		this.codeblockInfo.source = this.codeblockInfo.source_old
 	}
 
 	// Data related to codeblock
-	static getCodeBlockInfo(language_old:string, source_old:string, el:HTMLElement, ctx:MarkdownPostProcessorContext): CodeblockInfo {
+	static createCodeBlockInfo(language_old:string, source_old:string, el:HTMLElement, ctx:MarkdownPostProcessorContext): CodeblockInfo {
 		const sectionInfo = ctx.getSectionInfo(el);
 		if (!sectionInfo) {
 			// This is possible. when rerender
@@ -121,7 +122,7 @@ export class EditableCodeblock {
 		//   - span > pre > code
 		//   - textarea
 		//   - div.language-edit
-
+		
 		// div
 		const div = document.createElement('div'); this.el.appendChild(div); div.classList.add('obsidian-shiki-plugin')
 
@@ -130,7 +131,7 @@ export class EditableCodeblock {
 		this.codeblockInfo.source = this.codeblockInfo.source_old
 		void this.renderPre(span).then().catch()
 
-		// #region textarea
+		// textarea
 		const textarea = document.createElement('textarea'); div.appendChild(textarea);
 		const attributes = {
 			'resize-none': '', 'autocomplete': 'off', 'autocorrect': 'off', 'autocapitalize': 'none', 'spellcheck': 'false',
@@ -139,7 +140,8 @@ export class EditableCodeblock {
 			textarea.setAttribute(key, val);
 		});
 		textarea.value = this.codeblockInfo.source;
-		// textarea - async part
+
+		// #region textarea - async part
 		textarea.oninput = (ev): void => {
 			const newValue = (ev.target as HTMLTextAreaElement).value
 			this.codeblockInfo.source = newValue
@@ -150,8 +152,7 @@ export class EditableCodeblock {
 			this.codeblockInfo.source = newValue
 			void this.saveContent(false, true)
 		}
-		// textarea - `tab` key、`arrow` key
-		textarea.addEventListener('keydown', (ev: KeyboardEvent) => {
+		textarea.addEventListener('keydown', (ev: KeyboardEvent) => { // `tab` key、`arrow` key
 			if (ev.key == 'Tab') {
 				ev.preventDefault()
 				const value = textarea.value
@@ -259,6 +260,101 @@ export class EditableCodeblock {
 		// #endregion
 	}
 
+	async renderEditablePre(): Promise<void> {
+		// dom
+		// - div.obsidian-shiki-plugin.editable-pre
+		//   - pre
+		//     - code.language-<codeType>
+
+		const prism = await loadPrism() as typeof Prism;
+		if (!prism) {
+			new Notice('warning: withou Prism')
+			throw new Error('warning: withou Prism')
+		}
+
+		// div
+		const div = document.createElement('div'); this.el.appendChild(div); div.classList.add('obsidian-shiki-plugin', 'editable-pre')
+
+		// pre
+		const pre = document.createElement('pre'); div.appendChild(pre);
+		
+		// code
+		const code = document.createElement('code'); pre.appendChild(code); code.classList.add('language-' + this.codeblockInfo.language_type)
+		code.setAttribute('contenteditable', 'true'); code.setAttribute('spellcheck', 'false');
+		this.codeblockInfo.source = this.codeblockInfo.source_old
+		code.textContent = this.codeblockInfo.source // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
+		prism.highlightElement(code)
+		
+		// code - async part
+		code.oninput = (ev): void => {
+			const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
+			this.codeblockInfo.source = newValue
+			void Promise.resolve().then(() => { // like vue nextTick, ensure that the cursor is behind
+				const savedPos = this.renderEditablePre_saveCursorPosition(pre)
+				code.textContent = newValue
+				prism.highlightElement(code) // `prism.highlightElement()` will reset cursor position
+				if (savedPos) { this.renderEditablePre_restoreCursorPosition(pre, savedPos.start, savedPos.end) }
+			})
+		}
+		//   pre/code without onchange, use blur event
+		code.addEventListener('blur', (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
+			const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
+			this.codeblockInfo.source = newValue // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
+			void this.saveContent(false, true)
+		})
+	}
+
+	renderEditablePre_saveCursorPosition(container: Node): null|{start: number, end: number} {
+		const selection = window.getSelection()
+		if (!selection || selection.rangeCount === 0) return null
+
+		const range: Range = selection.getRangeAt(0)
+
+		// get start
+		const preRange: Range = document.createRange()
+		preRange.selectNodeContents(container)
+		preRange.setEnd(range.startContainer, range.startOffset)
+		const start = preRange.toString().length
+
+		return {
+			start,
+			end: start + range.toString().length
+		}
+	}
+	
+	renderEditablePre_restoreCursorPosition(container: Node, start: number, end: number): void {
+		// get range
+		const range: Range = document.createRange()
+		let charIndex = 0
+		let isFoundStart = false
+		let isFoundEnd = false
+		function traverse(node: Node): void {
+			if (node.nodeType === Node.TEXT_NODE) { // pre/code is Node.ELEMENT_NODE, not inconformity
+				const nextIndex = charIndex + (node.nodeValue?.length ?? 0)
+				if (!isFoundStart && start >= charIndex && start <= nextIndex) { // start
+					range.setStart(node, start - charIndex)
+					isFoundStart = true
+				}
+				if (isFoundStart && !isFoundEnd && end >= charIndex && end <= nextIndex) { // end
+					range.setEnd(node, end - charIndex)
+					isFoundEnd = true
+				}
+				charIndex = nextIndex
+			} 
+			else {
+				for (const child of node.childNodes) {
+					traverse(child)
+					if (isFoundEnd) break
+				}
+			}
+		}
+		traverse(container)
+
+		const selection = window.getSelection()
+		selection?.removeAllRanges()
+		selection?.addRange(range)
+	}
+
 	/**
 	 * Render code to targetEl
 	 * 
@@ -272,7 +368,7 @@ export class EditableCodeblock {
 		let source: string = this.codeblockInfo.source ?? this.codeblockInfo.source_old
 		if (source.endsWith('\n')) source += '\n'
 
-		// pre html string - shiki
+		// pre html string - shiki, insert `<pre>...<pre/>`
 		if (this.plugin.settings.renderEngine == 'shiki') {
 			// check theme, TODO: use more theme
 			let theme = ''
@@ -302,7 +398,7 @@ export class EditableCodeblock {
 			})
 			targetEl.innerHTML = pre // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
 		}
-		// pre html string - prism
+		// pre html string - prism, insert `<pre>...<pre/>`
 		else {
 			const prism = await loadPrism() as typeof Prism;
 			if (!prism) {

@@ -58,8 +58,8 @@ export class ShikiSettingsTab extends PluginSettingTab {
 			.setDesc('Select the render engine for the code blocks.')
 			.addDropdown(dropdown => {
 				dropdown.addOptions({
-					'shiki': 'shiki',
-					'prismjs': 'prismjs',
+					'shiki': 'Shiki',
+					'prismjs': 'PrismJs',
 				});
 				dropdown.setValue(this.plugin.settings.renderEngine).onChange(async value => {
 					this.plugin.settings.renderEngine = value as 'shiki'|'prismjs';
@@ -74,10 +74,11 @@ export class ShikiSettingsTab extends PluginSettingTab {
 				dropdown.addOptions({
 					'textarea': 'textarea',
 					'pre': 'pre',
+					'editablePre': 'editable pre (beta)',
 					'codemirror': 'codemirror',
 				});
 				dropdown.setValue(this.plugin.settings.renderMode).onChange(async value => {
-					this.plugin.settings.renderMode = value as 'textarea'|'pre'|'codemirror';
+					this.plugin.settings.renderMode = value as 'textarea'|'pre'|'editablePre'|'codemirror';
 					await this.plugin.saveSettings();
 				});
 			});
