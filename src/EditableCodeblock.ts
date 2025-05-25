@@ -480,11 +480,14 @@ export class EditableCodeblock {
 	}
 
 	async saveContent_safe(isUpdateLanguage: boolean = true, isUpdateSource: boolean = true): Promise<void> {
-		try {
-			void this.saveContent(isUpdateLanguage, isUpdateSource)
-		} catch {
-			void this.saveContent_debounced(isUpdateLanguage, isUpdateSource)
-		}
+		// [!code warn:3] The exception caused by the transaction cannot be caught.
+		// If it fails here, there will be an error print
+		// so, use double save. Ensure both speed and safety at the same time.
+		// try {
+		void this.saveContent(isUpdateLanguage, isUpdateSource)
+		// } catch {
+		void this.saveContent_debounced(isUpdateLanguage, isUpdateSource)
+		// }
 	}
 
 	/**
