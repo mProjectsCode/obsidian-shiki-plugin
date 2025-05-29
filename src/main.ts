@@ -9,7 +9,8 @@ import { EditableCodeblock } from 'src/EditableCodeblock'
 
 declare module 'obsidian' {
 	interface MarkdownPostProcessorContext {
-		containerEl: HTMLElement
+		containerEl: HTMLElement,
+		el: HTMLElement
 	}
 	interface Vault {
 		getConfig(arg: 'useTab'): boolean

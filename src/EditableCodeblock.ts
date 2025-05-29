@@ -52,11 +52,18 @@ export class EditableCodeblock {
 	editor: Editor|undefined; // Cache to avoid focus changes. And the focus point may not be correct when creating the code block. It can be updated again when oninput
 	codeblockInfo: CodeblockInfo;
 
+	// redundancy
+	isReadingMode: boolean;
+	isMarkdownRendered: boolean;
+
 	constructor(plugin: { app: App; settings: Settings }, language_old:string, source_old:string, el:HTMLElement, ctx:MarkdownPostProcessorContext) {
 		this.plugin = plugin
 		this.el = el
 		this.ctx = ctx
 		this.editor = this.plugin.app.workspace.activeEditor?.editor;
+
+		this.isReadingMode = ctx.containerEl.hasClass('markdown-preview-section') || ctx.containerEl.hasClass('markdown-preview-view');
+		this.isMarkdownRendered = !ctx.el.hasClass('.cm-preview-code-block') && ctx.el.hasClass('markdown-rednered')
 
 		this.codeblockInfo = EditableCodeblock.createCodeBlockInfo(language_old, source_old, el, ctx)
 		this.codeblockInfo.source = this.codeblockInfo.source_old
@@ -146,6 +153,20 @@ export class EditableCodeblock {
 			textarea.setAttribute(key, val);
 		});
 		textarea.value = this.codeblockInfo.source;
+
+		// language-edit
+		const editEl = document.createElement('div'); div.appendChild(editEl); editEl.classList.add('language-edit');
+		editEl.setAttribute('align', 'right');
+		const editInput = document.createElement('input'); editEl.appendChild(editInput);
+		editInput.value = this.codeblockInfo.language_type + this.codeblockInfo.language_meta
+
+		// readmode and markdown reRender not shouldn't change
+		if (this.isReadingMode || this.isMarkdownRendered) {
+			textarea.setAttribute('readonly', '')
+			textarea.setAttribute('display', '')
+			editInput.setAttribute('readonly', '')
+			return
+		}
 
 		// #region textarea - async part - oninput/onchange
 		if (this.plugin.settings.saveMode == 'onchange') {
@@ -254,13 +275,7 @@ export class EditableCodeblock {
 		})
 		// #endregion
 
-		// #region language-edit
-		// language-edit
-		const editEl = document.createElement('div'); div.appendChild(editEl); editEl.classList.add('language-edit');
-		editEl.setAttribute('align', 'right'); editEl.setAttribute('contenteditable', '');
-		const editInput = document.createElement('input'); editEl.appendChild(editInput);
-		editInput.value = this.codeblockInfo.language_type + this.codeblockInfo.language_meta
-		// language-edit - async part
+		// #region language-edit - async part
 		editInput.oninput = (ev): void => {
 			this.editor = this.plugin.app.workspace.activeEditor?.editor;
 
@@ -334,6 +349,12 @@ export class EditableCodeblock {
 		this.codeblockInfo.source = this.codeblockInfo.source_old
 		code.textContent = this.codeblockInfo.source // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
 		prism.highlightElement(code)
+
+		// readmode and markdown reRender not shouldn't change
+		if (this.isReadingMode || this.isMarkdownRendered) {
+			code.setAttribute('readonly', '')
+			return
+		}
 		
 		// #region code - async part - oninput/onchange
 		if (this.plugin.settings.saveMode == 'oninput') {
