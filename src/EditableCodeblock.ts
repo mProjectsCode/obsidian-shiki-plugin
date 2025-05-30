@@ -168,9 +168,23 @@ export class EditableCodeblock {
 			return
 		}
 
+		// #region textarea - async part - composition start/end
+		let isComposing = false; // is in the input method combination stage, can fix chinese input method invalid
+		textarea.addEventListener('compositionstart', () => {
+			isComposing = true
+		});
+
+		textarea.addEventListener('compositionend', () => {
+			isComposing = false
+			// updateCursorPosition(); // (option)
+		});
+		// #endregion
+
 		// #region textarea - async part - oninput/onchange
 		if (this.plugin.settings.saveMode == 'onchange') {
 			textarea.oninput = (ev): void => {
+				if (isComposing) return
+
 				this.editor = this.plugin.app.workspace.activeEditor?.editor;
 
 				const newValue = (ev.target as HTMLTextAreaElement).value
@@ -196,6 +210,8 @@ export class EditableCodeblock {
 				}
 			})
 			textarea.oninput = (ev): void => {
+				if (isComposing) return
+
 				this.editor = this.plugin.app.workspace.activeEditor?.editor;
 
 				const newValue = (ev.target as HTMLTextAreaElement).value
@@ -277,6 +293,8 @@ export class EditableCodeblock {
 
 		// #region language-edit - async part
 		editInput.oninput = (ev): void => {
+			if (isComposing) return
+
 			this.editor = this.plugin.app.workspace.activeEditor?.editor;
 
 			const newValue = (ev.target as HTMLInputElement).value
@@ -355,12 +373,26 @@ export class EditableCodeblock {
 			code.setAttribute('readonly', '')
 			return
 		}
+
+		// #region code - async part - composition start/end
+		let isComposing = false; // is in the input method combination stage, can fix chinese input method invalid
+		code.addEventListener('compositionstart', () => {
+			isComposing = true
+		});
+
+		code.addEventListener('compositionend', () => {
+			isComposing = false
+			// updateCursorPosition(); // (option)
+		});
+		// #endregion
 		
 		// #region code - async part - oninput/onchange
 		if (this.plugin.settings.saveMode == 'oninput') {
 			console.warn('renderEditablePre no support oninput temp, force use onchange')
 		}
 		code.oninput = (ev): void => {
+			if (isComposing) return
+
 			this.editor = this.plugin.app.workspace.activeEditor?.editor;
 
 			const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)

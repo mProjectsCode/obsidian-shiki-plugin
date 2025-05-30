@@ -48,6 +48,7 @@ Shiki, PrismJS, CodeMirror
   - Disadvantage:
     Worse performance? The code block needs to be recreated every time it is modified
     The cursor position needs to be handled manually. Debounce manually.
+    It is necessary to pay attention to the input method issue. The `oninput` will also be triggered during the input candidate stage
 
 ## Shiki Extend Sytax
 
