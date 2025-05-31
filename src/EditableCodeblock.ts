@@ -230,70 +230,6 @@ export class EditableCodeblock {
 		}
 		// #endregion
 
-		// #region textarea - async part - keydwon
-		textarea.addEventListener('keydown', (ev: KeyboardEvent) => { // `tab` key、`arrow` key
-			if (ev.key == 'Tab') {
-				ev.preventDefault()
-				const value = textarea.value
-				const selectionStart: number = textarea.selectionStart
-				const selectionEnd: number = textarea.selectionEnd
-				const lineStart: number = value.lastIndexOf('\n', selectionStart - 1) + 1
-				const lineEnd: number = value.indexOf('\n', selectionStart)
-				const lineCurrent: string = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd)
-				// TODO enhamce: determine whether to insert the tab directly or the entire line of tabs based on the cursor
-
-				// get indent, auto indent
-				const configUseTab = this.plugin.app.vault.getConfig('useTab')
-				const configTabSize = this.plugin.app.vault.getConfig('tabSize')
-				const indent_space = ' '.repeat(configTabSize)
-				let indent = configUseTab ? '\t' : indent_space
-				if (lineCurrent.startsWith('\t')) indent = '\t'
-				else if (lineCurrent.startsWith(' ')) indent = indent_space
-				
-				// change
-				// new value: cursorBefore + tab + cusrorAfter
-				textarea.value = textarea.value.substring(0, selectionStart) + indent + textarea.value.substring(selectionEnd)
-				// new cursor pos
-				textarea.selectionStart = textarea.selectionEnd = selectionStart + indent.length;
-				textarea.dispatchEvent(new InputEvent('input', {
-					inputType: 'insertText',
-					data: indent,
-					bubbles: true,
-					cancelable: true
-				}))
-			}
-			else if (ev.key == 'ArrowDown' || ev.key == 'ArrowRight') {
-				const selectionEnd: number = textarea.selectionEnd
-				if (selectionEnd != textarea.value.length) return
-
-				editInput.setSelectionRange(0, 0)
-				editInput.focus()
-			}
-			else if (ev.key == 'ArrowUp' || ev.key == 'ArrowLeft') {
-				if (!this.editor) return
-
-				const selectionStart: number = textarea.selectionStart
-				if (selectionStart != 0) return
-
-				const sectionInfo = this.ctx.getSectionInfo(this.el);
-				if (!sectionInfo) return
-
-				ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange`
-				let toLine = sectionInfo.lineStart - 1
-				if (toLine < 0) { // when codeblock on the frist line
-					// strategy1: only move to start
-					// toLine = 0
-
-					// strategy2: insert a blank line
-					toLine = 0
-					this.editor.replaceRange("\n", { line: 0, ch: 0 })
-				}
-				this.editor.setCursor(toLine, 0)
-				this.editor.focus()
-			}
-		})
-		// #endregion
-
 		// #region language-edit - async part
 		if (this.plugin.settings.saveMode != 'oninput') {
 			// no support
@@ -322,35 +258,23 @@ export class EditableCodeblock {
 		}
 		// #endregion
 
-		// #region language-edit - async part - keydwon
-		editInput.addEventListener('keydown', (ev: KeyboardEvent) => {
-			if (ev.key == 'ArrowUp') {
-				ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange
-				const position = textarea.value.length
-				textarea.setSelectionRange(position, position)
-				textarea.focus()
-			}
-			else if (ev.key == 'ArrowDown') {
-				if (!this.editor) return
+		// #region textarea - async part - keydown
+		this.enableTabEmitIndent(textarea, undefined, undefined, (ev)=>{
+			const selectionEnd: number = textarea.selectionEnd
+			if (selectionEnd != textarea.value.length) return
 
-				const sectionInfo = this.ctx.getSectionInfo(this.el);
-				if (!sectionInfo) return
-
-				ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange`
-				const toLine = sectionInfo.lineEnd + 1
-				if (toLine > this.editor.lineCount() - 1) { // when codeblock on the last line
-					// strategy1: only move to end
-					// toLine--
-
-					// strategy2: insert a blank line
-					const lastLineIndex = this.editor.lineCount() - 1
-					const lastLineContent = this.editor.getLine(lastLineIndex)
-					this.editor.replaceRange("\n", { line: lastLineIndex, ch: lastLineContent.length })
-				}
-				this.editor.setCursor(toLine, 0)
-				this.editor.focus()
-			}
+			editInput.setSelectionRange(0, 0)
+			editInput.focus()
 		})
+		// #endregion
+
+		// #region language-edit - async part - keydown
+		this.enableTabEmitIndent(editInput, undefined, (ev)=>{
+			ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange
+			const position = textarea.value.length
+			textarea.setSelectionRange(position, position)
+			textarea.focus()
+		}, undefined)
 		// #endregion
 	}
 
@@ -459,6 +383,10 @@ export class EditableCodeblock {
 				void this.saveContent_safe(false, true)
 			}
 		}
+		// #endregion
+	
+		// #region code - async part - keydown
+		this.enableTabEmitIndent(code)
 		// #endregion
 	}
 
@@ -598,6 +526,150 @@ export class EditableCodeblock {
 			code.textContent = source; // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
 			prism.highlightElement(code)
 		}
+	}
+
+	// el: HTMLTextAreaElement|HTMLInputElement|HTMLPreElement
+	enableTabEmitIndent(el: HTMLElement, cb_tab?: (ev: KeyboardEvent)=>void, cb_up?: (ev: KeyboardEvent)=>void, cb_down?: (ev: KeyboardEvent)=>void) {
+		if (!(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el.isContentEditable)) return
+
+		// #region textarea - async part - keydown
+		el.addEventListener('keydown', (ev: KeyboardEvent) => { // `tab` key、`arrow` key	
+			if (ev.key == 'Tab') {
+				if (cb_tab) return cb_tab(ev)
+				ev.preventDefault()
+
+				// get indent
+				const configUseTab = this.plugin.app.vault.getConfig('useTab')
+				const configTabSize = this.plugin.app.vault.getConfig('tabSize')
+				const indent_space = ' '.repeat(configTabSize)
+				let indent = configUseTab ? '\t' : indent_space
+				
+				if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+					const value = el.value
+					const selectionStart: number = el.selectionStart || 0
+					const selectionEnd: number = el.selectionEnd || 0
+
+					// auto indent (otpion)
+					{
+						const lineStart: number = value.lastIndexOf('\n', selectionStart - 1) + 1
+						const lineEnd: number = value.indexOf('\n', selectionStart)
+						const lineCurrent: string = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd)
+						// TODO enhamce: determine whether to insert the tab directly or the entire line of tabs based on the cursor
+						if (lineCurrent.startsWith('\t')) indent = '\t'
+						else if (lineCurrent.startsWith(' ')) indent = indent_space
+					}
+					
+					// change
+					// new value: cursorBefore + tab + cusrorAfter
+					el.value = el.value.substring(0, selectionStart) + indent + el.value.substring(selectionEnd)
+					// new cursor pos
+					el.selectionStart = el.selectionEnd = selectionStart + indent.length;
+					el.dispatchEvent(new InputEvent('input', {
+						inputType: 'insertText',
+						data: indent,
+						bubbles: true,
+						cancelable: true
+					}))
+					return
+				}
+				else { // pre/code
+					const selection = window.getSelection();
+					if (!selection || selection.rangeCount === 0) return;
+					
+					// auto indent (otpion)
+					let range
+					{
+						range = selection.getRangeAt(0)
+						const container = range.startContainer
+						const lineText = container.textContent || ''
+						const lineStart = lineText.lastIndexOf('\n', range.startOffset - 1) + 1
+						const lineCurrent = lineText.slice(lineStart, range.startOffset)
+						if (lineCurrent.startsWith('\t')) indent = '\t'
+						else if (lineCurrent.startsWith(' ')) indent = indent_space
+					}
+					
+					// change
+					// new value
+					const textNode = document.createTextNode(indent)
+					range.deleteContents()
+					range.insertNode(textNode)
+					// new cursor pos
+					const newRange = document.createRange();
+					newRange.setStartAfter(textNode);
+					newRange.collapse(true);
+					selection.removeAllRanges();
+					selection.addRange(newRange);
+					el.dispatchEvent(new InputEvent('input', {
+						inputType: 'insertText',
+						data: indent,
+						bubbles: true,
+						cancelable: true
+					}));
+					return
+				}
+				return
+			}
+			else if (ev.key == 'ArrowDown' || ev.key == 'ArrowRight') {
+				if (cb_down) return cb_down(ev)
+				if (!this.editor) return
+
+				if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+					const selectionEnd: number|null = el.selectionEnd
+					if (!selectionEnd || selectionEnd != el.value.length) return
+				} else {
+					// TODO
+					return
+				}
+				
+				const sectionInfo = this.ctx.getSectionInfo(this.el);
+				if (!sectionInfo) return
+
+				ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange`
+				const toLine = sectionInfo.lineEnd + 1
+				if (toLine > this.editor.lineCount() - 1) { // when codeblock on the last line
+					// strategy1: only move to end
+					// toLine--
+
+					// strategy2: insert a blank line
+					const lastLineIndex = this.editor.lineCount() - 1
+					const lastLineContent = this.editor.getLine(lastLineIndex)
+					this.editor.replaceRange("\n", { line: lastLineIndex, ch: lastLineContent.length })
+				}
+				this.editor.setCursor(toLine, 0)
+				this.editor.focus()
+				return
+			}
+			else if (ev.key == 'ArrowUp' || ev.key == 'ArrowLeft') {
+				if (cb_up) return cb_up(ev)
+				if (!this.editor) return
+
+				if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+					const selectionStart: number|null = el.selectionStart
+					if (!selectionStart || selectionStart != 0) return
+				} else {
+					// TODO
+					return
+				}
+
+				const sectionInfo = this.ctx.getSectionInfo(this.el);
+				if (!sectionInfo) return
+
+				ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange`
+				let toLine = sectionInfo.lineStart - 1
+				if (toLine < 0) { // when codeblock on the frist line
+					// strategy1: only move to start
+					// toLine = 0
+
+					// strategy2: insert a blank line
+					toLine = 0
+					this.editor.replaceRange("\n", { line: 0, ch: 0 })
+				}
+				this.editor.setCursor(toLine, 0)
+				this.editor.focus()
+				return
+			}
+		})
+		// #endregion
 	}
 
 	async saveContent_safe(isUpdateLanguage: boolean = true, isUpdateSource: boolean = true): Promise<void> {
