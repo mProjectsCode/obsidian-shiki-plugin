@@ -535,7 +535,7 @@ export class EditableCodeblock {
 			}
 			if (theme === '') {
 				theme = 'andromeeda'
-				console.warn(`no support theme '${this.plugin.settings.theme}' temp in this render mode`)
+				// console.warn(`no support theme '${this.plugin.settings.theme}' temp in this render mode`) // [!code error] TODO fix
 			}
 
 			const preStr:string = await codeToHtml(source, {

@@ -27,6 +27,13 @@ export class ShikiSettingsTab extends PluginSettingTab {
 			text: 'Settings Panel Document',
 			href: 'https://github.com/mProjectsCode/obsidian-shiki-plugin/blob/master/docs/README.md'
 		});
+		this.containerEl.createEl('span', {
+			text: ' | '
+		})
+		this.containerEl.createEl('a', {
+			text: 'Visual select theme',
+			href: 'https://textmate-grammars-themes.netlify.app'
+		});
 
 		new Setting(this.containerEl)
 			.setName('Reload Highlighter')
