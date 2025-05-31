@@ -142,7 +142,7 @@ export class EditableCodeblock {
 		// span
 		const span = document.createElement('span'); div.appendChild(span);
 		this.codeblockInfo.source = this.codeblockInfo.source_old
-		void this.renderPre(span).then().catch()
+		void this.renderPre(span)
 
 		// textarea
 		const textarea = document.createElement('textarea'); div.appendChild(textarea);
@@ -181,6 +181,7 @@ export class EditableCodeblock {
 		// #endregion
 
 		// #region textarea - async part - oninput/onchange
+		// refresh/save strategy1: input no save
 		if (this.plugin.settings.saveMode == 'onchange') {
 			textarea.oninput = (ev): void => {
 				if (isComposing) return
@@ -200,14 +201,13 @@ export class EditableCodeblock {
 		// refresh/save strategy2: cache and rebuild
 		else {
 			void Promise.resolve().then(() => {
-				if (global_refresh_cache) {
-					// this.el.appendChild(global_refresh_cache.el)
-					// const textarea: HTMLTextAreaElement|null = global_refresh_cache.el.querySelector('textarea')
-					textarea.setSelectionRange(global_refresh_cache.start, global_refresh_cache.end)
-					textarea.focus()
-					global_refresh_cache = null
-					// return
-				}
+				if (!global_refresh_cache) return
+				// this.el.appendChild(global_refresh_cache.el)
+				// const textarea: HTMLTextAreaElement|null = global_refresh_cache.el.querySelector('textarea')
+				textarea.setSelectionRange(global_refresh_cache.start, global_refresh_cache.end)
+				textarea.focus()
+				global_refresh_cache = null
+				// return
 			})
 			textarea.oninput = (ev): void => {
 				if (isComposing) return
@@ -349,24 +349,16 @@ export class EditableCodeblock {
 		//   - pre
 		//     - code.language-<codeType>
 
-		const prism = await loadPrism() as typeof Prism;
-		if (!prism) {
-			new Notice('warning: withou Prism')
-			throw new Error('warning: withou Prism')
-		}
-
 		// div
 		const div = document.createElement('div'); this.el.appendChild(div); div.classList.add('obsidian-shiki-plugin', 'editable-pre')
-
-		// pre
-		const pre = document.createElement('pre'); div.appendChild(pre);
-		
-		// code
-		const code = document.createElement('code'); pre.appendChild(code); code.classList.add('language-' + this.codeblockInfo.language_type)
-		code.setAttribute('contenteditable', 'true'); code.setAttribute('spellcheck', 'false');
 		this.codeblockInfo.source = this.codeblockInfo.source_old
-		code.textContent = this.codeblockInfo.source // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
-		prism.highlightElement(code)
+
+		// pre, code
+		await this.renderPre(div)
+		let pre: HTMLPreElement|null = div.querySelector(':scope>pre')
+		let code: HTMLPreElement|null = div.querySelector(':scope>pre>code')
+		if (!pre || !code) { console.error('render failed. can\'t find pre/code 1'); return }
+		code.setAttribute('contenteditable', 'true'); code.setAttribute('spellcheck', 'false')
 
 		// readmode and markdown reRender not shouldn't change
 		if (this.isReadingMode || this.isMarkdownRendered) {
@@ -387,29 +379,72 @@ export class EditableCodeblock {
 		// #endregion
 		
 		// #region code - async part - oninput/onchange
-		if (this.plugin.settings.saveMode == 'oninput') {
-			console.warn('renderEditablePre no support oninput temp, force use onchange')
-		}
-		code.oninput = (ev): void => {
-			if (isComposing) return
+		// refresh/save strategy1: input no save
+		if (this.plugin.settings.saveMode == 'onchange') {
+			void Promise.resolve().then(() => {
+				if (!global_refresh_cache) return
+				if (!pre || !code) { console.error('render failed. can\'t find pre/code 11'); global_refresh_cache = null; return }
+				this.renderEditablePre_restoreCursorPosition(pre, global_refresh_cache.start, global_refresh_cache.end)
+				global_refresh_cache = null
+			})
+			code.oninput = (ev): void => {
+				if (isComposing) return
+				if (!pre || !code) { console.error('render failed. can\'t find pre/code 12'); return }
 
-			this.editor = this.plugin.app.workspace.activeEditor?.editor;
+				this.editor = this.plugin.app.workspace.activeEditor?.editor;
 
-			const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
-			this.codeblockInfo.source = newValue
-			void Promise.resolve().then(() => { // like vue nextTick, ensure that the cursor is behind
-				const savedPos = this.renderEditablePre_saveCursorPosition(pre)
-				code.textContent = newValue
-				prism.highlightElement(code) // `prism.highlightElement()` will reset cursor position
-				if (savedPos) { this.renderEditablePre_restoreCursorPosition(pre, savedPos.start, savedPos.end) }
+				const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
+				this.codeblockInfo.source = newValue
+				
+				void Promise.resolve().then(async () => { // like vue nextTick, ensure that the cursor is behind
+					pre = div.querySelector(':scope>pre')
+					code = div.querySelector(':scope>pre>code')
+					if (!pre || !code) { console.error('render failed. can\'t find pre/code 13'); global_refresh_cache = null; return }
+
+					// save pos
+					global_refresh_cache = this.renderEditablePre_saveCursorPosition(pre)
+
+					// pre, code
+					await this.renderPre(div, code)
+
+					// restore pos
+					code.setAttribute('contenteditable', 'true'); code.setAttribute('spellcheck', 'false')
+
+					if (!global_refresh_cache) return
+					this.renderEditablePre_restoreCursorPosition(pre, global_refresh_cache.start, global_refresh_cache.end)
+					global_refresh_cache = null
+				})
+			}
+			//   pre/code without onchange, use blur event
+			code.addEventListener('blur', (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
+				const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
+				this.codeblockInfo.source = newValue // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
+				void this.saveContent_safe(false, true)
 			})
 		}
-		//   pre/code without onchange, use blur event
-		code.addEventListener('blur', (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
-			const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
-			this.codeblockInfo.source = newValue // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
-			void this.saveContent_safe(false, true)
-		})
+		// refresh/save strategy2: cache and rebuild
+		else {
+			void Promise.resolve().then(() => {
+				if (!global_refresh_cache) return
+				if (!pre || !code) { console.error('render failed. can\'t find pre/code 21'); global_refresh_cache = null; return }
+				this.renderEditablePre_restoreCursorPosition(pre, global_refresh_cache.start, global_refresh_cache.end)
+				global_refresh_cache = null
+			})
+			code.oninput = (ev): void => {
+				if (isComposing) return
+				if (!pre || !code) { console.error('render failed. can\'t find pre/code 22'); return }
+
+				this.editor = this.plugin.app.workspace.activeEditor?.editor;
+
+				const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
+				this.codeblockInfo.source = newValue
+				void this.renderPre(div)
+
+
+				global_refresh_cache = this.renderEditablePre_saveCursorPosition(pre)
+				void this.saveContent_safe(false, true)
+			}
+		}
 		// #endregion
 	}
 
@@ -478,8 +513,12 @@ export class EditableCodeblock {
 	 * Render code to targetEl
 	 * 
 	 * @param targetEl in which element should the result be rendered
+	 * - targetEl (usually a div)
+	 *   - pre
+	 *     - code
+	 * @param code (option) code element, can reduce the refresh rate, avoid code blur event
 	 */
-	async renderPre(targetEl:HTMLElement): Promise<void> {
+	async renderPre(targetEl:HTMLElement, code?:HTMLElement): Promise<void> {
 		// source correct.
 		// When the last line of the source is blank (with no Spaces either),
 		// prismjs and shiki will both ignore the line,
@@ -499,7 +538,7 @@ export class EditableCodeblock {
 				console.warn(`no support theme '${this.plugin.settings.theme}' temp in this render mode`)
 			}
 
-			const pre:string = await codeToHtml(source, {
+			const preStr:string = await codeToHtml(source, {
 				lang: this.codeblockInfo.language_old,
 				theme: theme,
 				meta: { __raw: this.codeblockInfo.language_meta },
@@ -515,7 +554,17 @@ export class EditableCodeblock {
 					transformerMetaWordHighlight(),
 				],
 			})
-			targetEl.innerHTML = pre // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
+
+			if (!code) {
+				targetEl.innerHTML = preStr // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
+			}
+			else {
+				const parser = new DOMParser();
+  				const doc = parser.parseFromString(preStr, 'text/html');
+				const codeElement = doc.querySelector(':scope>code')
+				if (!codeElement) { console.error('shiki return preStr without code tag', doc); return }
+				code.innerHTML = codeElement.innerHTML
+			}
 		}
 		// pre html string - prism, insert `<pre>...<pre/>`
 		else {
@@ -524,9 +573,13 @@ export class EditableCodeblock {
 				new Notice('warning: withou Prism')
 				throw new Error('warning: withou Prism')
 			}
-			targetEl.innerHTML = ''
-			const pre = document.createElement('pre'); targetEl.appendChild(pre);
-			const code = document.createElement('code'); pre.appendChild(code); code.classList.add('language-'+this.codeblockInfo.language_type);
+
+			if (!code) {
+				targetEl.innerHTML = ''
+				const pre = document.createElement('pre'); targetEl.appendChild(pre);
+				code = document.createElement('code'); pre.appendChild(code); code.classList.add('language-'+this.codeblockInfo.language_type);
+			}
+
 			code.textContent = source; // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
 			prism.highlightElement(code)
 		}
