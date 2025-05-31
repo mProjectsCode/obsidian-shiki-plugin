@@ -5,6 +5,18 @@ import { DEFAULT_SETTINGS, type Settings } from 'src/settings/Settings';
 import { ShikiSettingsTab } from 'src/settings/SettingsTab';
 import { filterHighlightAllPlugin } from 'src/PrismPlugin';
 import { CodeHighlighter } from 'src/Highlighter';
+import { EditableCodeblock } from 'src/EditableCodeblock'
+
+declare module 'obsidian' {
+	interface MarkdownPostProcessorContext {
+		containerEl: HTMLElement,
+		el: HTMLElement
+	}
+	interface Vault {
+		getConfig(arg: 'useTab'): boolean
+		getConfig(arg: 'tabSize'): number
+	}
+}
 
 export const SHIKI_INLINE_REGEX = /^\{([^\s]+)\} (.*)/i; // format: `{lang} code`
 
@@ -78,6 +90,9 @@ export default class ShikiPlugin extends Plugin {
 		prism.plugins.filterHighlightAll.reject.addSelector('div.expressive-code pre code');
 	}
 
+	/**
+	 * param this.settings.renderMode 'textarea'/'pre'/'editablePre'/'codemirror'
+	 */
 	registerCodeBlockProcessors(): void {
 		const languages = this.highlighter.obsidianSafeLanguageNames();
 
@@ -86,13 +101,13 @@ export default class ShikiPlugin extends Plugin {
 				this.registerMarkdownCodeBlockProcessor(
 					language,
 					async (source, el, ctx) => {
-						// @ts-expect-error
-						const isReadingMode = ctx.containerEl.hasClass('markdown-preview-section') || ctx.containerEl.hasClass('markdown-preview-view');
+						// check env
+						const isReadingMode: boolean = ctx.containerEl.hasClass('markdown-preview-section') || ctx.containerEl.hasClass('markdown-preview-view');
 						// this seems to indicate whether we are in the pdf export mode
 						// sadly there is no section info in this mode
 						// thus we can't check if the codeblock is at the start of the note and thus frontmatter
 						// const isPdfExport = ctx.displayMode === true;
-
+						// 
 						// this is so that we leave the hidden frontmatter code block in reading mode alone
 						if (language === 'yaml' && isReadingMode && ctx.frontmatter) {
 							const sectionInfo = ctx.getSectionInfo(el);
@@ -101,10 +116,25 @@ export default class ShikiPlugin extends Plugin {
 								return;
 							}
 						}
-
-						const codeBlock = new CodeBlock(this, el, source, language, ctx);
-
-						ctx.addChild(codeBlock);
+						
+						// able edit live
+						// disadvantage: First screen CLS (Page jitter)
+						if (this.settings.renderMode === 'textarea') {
+							const editableCodeblock = new EditableCodeblock(this, language, source, el, ctx)
+							editableCodeblock.renderEditableCodeblock()
+						}
+						else if (this.settings.renderMode === 'pre') {
+							const editableCodeblock = new EditableCodeblock(this, language, source, el, ctx)
+							void editableCodeblock.renderPre(el)
+						}
+						else if (this.settings.renderMode === 'editablePre') {
+							const editableCodeblock = new EditableCodeblock(this, language, source, el, ctx)
+							void editableCodeblock.renderEditablePre()
+						}
+						else {
+							const codeBlock = new CodeBlock(this, el, source, language, ctx);
+							ctx.addChild(codeBlock);
+						}
 					},
 					1000,
 				);
