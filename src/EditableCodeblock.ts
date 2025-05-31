@@ -129,6 +129,9 @@ export class EditableCodeblock {
 		return codeblockInfo
 	}
 
+	/**
+	 * param this.plugin.settings.saveMode onchange/oninput
+	 */
 	renderEditableCodeblock(): void {
 		// dom
 		// - div.obsidian-shiki-plugin
@@ -292,26 +295,34 @@ export class EditableCodeblock {
 		// #endregion
 
 		// #region language-edit - async part
-		editInput.oninput = (ev): void => {
-			if (isComposing) return
-
-			this.editor = this.plugin.app.workspace.activeEditor?.editor;
-
-			const newValue = (ev.target as HTMLInputElement).value
-			const match = /^(\S*)(\s?.*)$/.exec(newValue)
-			if (!match) throw new Error('This is not a regular expression matching that may fail')
-			this.codeblockInfo.language_type = match[1]
-			this.codeblockInfo.language_meta = match[2]
-			void this.renderPre(span)
+		if (this.plugin.settings.saveMode != 'oninput') {
+			// no support
 		}
-		editInput.onchange = (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
-			const newValue = (ev.target as HTMLInputElement).value
-			const match = /^(\S*)(\s?.*)$/.exec(newValue)
-			if (!match) throw new Error('This is not a regular expression matching that may fail')
-			this.codeblockInfo.language_type = match[1]
-			this.codeblockInfo.language_meta = match[2]
-			void this.saveContent_safe(true, false)
+		{
+			editInput.oninput = (ev): void => {
+				if (isComposing) return
+
+				this.editor = this.plugin.app.workspace.activeEditor?.editor;
+
+				const newValue = (ev.target as HTMLInputElement).value
+				const match = /^(\S*)(\s?.*)$/.exec(newValue)
+				if (!match) throw new Error('This is not a regular expression matching that may fail')
+				this.codeblockInfo.language_type = match[1]
+				this.codeblockInfo.language_meta = match[2]
+				void this.renderPre(span)
+			}
+			editInput.onchange = (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
+				const newValue = (ev.target as HTMLInputElement).value
+				const match = /^(\S*)(\s?.*)$/.exec(newValue)
+				if (!match) throw new Error('This is not a regular expression matching that may fail')
+				this.codeblockInfo.language_type = match[1]
+				this.codeblockInfo.language_meta = match[2]
+				void this.saveContent_safe(true, false)
+			}
 		}
+		// #endregion
+
+		// #region language-edit - async part - keydwon
 		editInput.addEventListener('keydown', (ev: KeyboardEvent) => {
 			if (ev.key == 'ArrowUp') {
 				ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange
@@ -343,6 +354,9 @@ export class EditableCodeblock {
 		// #endregion
 	}
 
+	/**
+	 * param this.plugin.settings.saveMode onchange/oninput
+	 */
 	async renderEditablePre(): Promise<void> {
 		// dom
 		// - div.obsidian-shiki-plugin.editable-pre
@@ -512,6 +526,7 @@ export class EditableCodeblock {
 	/**
 	 * Render code to targetEl
 	 * 
+	 * param this.plugin.settings.renderEngine shiki/prism
 	 * @param targetEl in which element should the result be rendered
 	 * - targetEl (usually a div)
 	 *   - pre

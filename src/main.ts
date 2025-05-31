@@ -90,6 +90,9 @@ export default class ShikiPlugin extends Plugin {
 		prism.plugins.filterHighlightAll.reject.addSelector('div.expressive-code pre code');
 	}
 
+	/**
+	 * param this.settings.renderMode 'textarea'/'pre'/'editablePre'/'codemirror'
+	 */
 	registerCodeBlockProcessors(): void {
 		const languages = this.highlighter.obsidianSafeLanguageNames();
 
