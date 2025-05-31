@@ -263,6 +263,7 @@ export class EditableCodeblock {
 			const selectionEnd: number = textarea.selectionEnd
 			if (selectionEnd != textarea.value.length) return
 
+			ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange
 			editInput.setSelectionRange(0, 0)
 			editInput.focus()
 		})
@@ -270,6 +271,9 @@ export class EditableCodeblock {
 
 		// #region language-edit - async part - keydown
 		this.enableTabEmitIndent(editInput, undefined, (ev)=>{
+			const selectionStart: number|null = editInput.selectionStart
+			if (selectionStart === null || selectionStart != 0) return
+
 			ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange
 			const position = textarea.value.length
 			textarea.setSelectionRange(position, position)
@@ -529,13 +533,13 @@ export class EditableCodeblock {
 	}
 
 	// el: HTMLTextAreaElement|HTMLInputElement|HTMLPreElement
-	enableTabEmitIndent(el: HTMLElement, cb_tab?: (ev: KeyboardEvent)=>void, cb_up?: (ev: KeyboardEvent)=>void, cb_down?: (ev: KeyboardEvent)=>void) {
+	enableTabEmitIndent(el: HTMLElement, cb_tab?: (ev: KeyboardEvent)=>void, cb_up?: (ev: KeyboardEvent)=>void, cb_down?: (ev: KeyboardEvent)=>void): void {
 		if (!(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el.isContentEditable)) return
 
 		// #region textarea - async part - keydown
 		el.addEventListener('keydown', (ev: KeyboardEvent) => { // `tab` key、`arrow` key	
 			if (ev.key == 'Tab') {
-				if (cb_tab) return cb_tab(ev)
+				if (cb_tab) { cb_tab(ev); return }
 				ev.preventDefault()
 
 				// get indent
@@ -546,8 +550,8 @@ export class EditableCodeblock {
 				
 				if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
 					const value = el.value
-					const selectionStart: number = el.selectionStart || 0
-					const selectionEnd: number = el.selectionEnd || 0
+					const selectionStart: number = el.selectionStart ?? 0
+					const selectionEnd: number = el.selectionEnd ?? 0
 
 					// auto indent (otpion)
 					{
@@ -581,7 +585,7 @@ export class EditableCodeblock {
 					{
 						range = selection.getRangeAt(0)
 						const container = range.startContainer
-						const lineText = container.textContent || ''
+						const lineText = container.textContent ?? ''
 						const lineStart = lineText.lastIndexOf('\n', range.startOffset - 1) + 1
 						const lineCurrent = lineText.slice(lineStart, range.startOffset)
 						if (lineCurrent.startsWith('\t')) indent = '\t'
@@ -610,12 +614,12 @@ export class EditableCodeblock {
 				return
 			}
 			else if (ev.key == 'ArrowDown' || ev.key == 'ArrowRight') {
-				if (cb_down) return cb_down(ev)
+				if (cb_down) { cb_down(ev); return }
 				if (!this.editor) return
 
 				if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
 					const selectionEnd: number|null = el.selectionEnd
-					if (!selectionEnd || selectionEnd != el.value.length) return
+					if (selectionEnd === null || selectionEnd != el.value.length) return
 				} else {
 					// TODO
 					return
@@ -640,12 +644,12 @@ export class EditableCodeblock {
 				return
 			}
 			else if (ev.key == 'ArrowUp' || ev.key == 'ArrowLeft') {
-				if (cb_up) return cb_up(ev)
+				if (cb_up) { cb_up(ev); return }
 				if (!this.editor) return
 
 				if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
 					const selectionStart: number|null = el.selectionStart
-					if (!selectionStart || selectionStart != 0) return
+					if (selectionStart === null || selectionStart != 0) return
 				} else {
 					// TODO
 					return
