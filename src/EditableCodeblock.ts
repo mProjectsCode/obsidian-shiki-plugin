@@ -561,7 +561,7 @@ export class EditableCodeblock {
 			else {
 				const parser = new DOMParser();
   				const doc = parser.parseFromString(preStr, 'text/html');
-				const codeElement = doc.querySelector(':scope>code')
+				const codeElement = doc.querySelector('pre>code')
 				if (!codeElement) { console.error('shiki return preStr without code tag', doc); return }
 				code.innerHTML = codeElement.innerHTML
 			}
