@@ -79,7 +79,7 @@ export class ShikiSettingsTab extends PluginSettingTab {
 			.setDesc('Select the render mode for the code blocks.')
 			.addDropdown(dropdown => {
 				dropdown.addOptions({
-					'textarea': 'textarea',
+					'textarea': 'textarea pre',
 					'pre': 'pre',
 					'editablePre': 'editable pre (beta)',
 					'codemirror': 'codemirror',

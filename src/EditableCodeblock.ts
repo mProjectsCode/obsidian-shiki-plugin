@@ -132,7 +132,7 @@ export class EditableCodeblock {
 	/**
 	 * param this.plugin.settings.saveMode onchange/oninput
 	 */
-	renderEditableCodeblock(): void {
+	renderTextareaPre(): void {
 		// dom
 		// - div.obsidian-shiki-plugin
 		//   - span > pre > code
@@ -679,12 +679,17 @@ export class EditableCodeblock {
 	async saveContent_safe(isUpdateLanguage: boolean = true, isUpdateSource: boolean = true): Promise<void> {
 		// [!code warn:3] The exception caused by the transaction cannot be caught.
 		// If it fails here, there will be an error print
-		// so, use double save. Ensure both speed and safety at the same time.
+		// ~~so, use double save. Ensure both speed and safety at the same time.~~
+		// (When adding or deleting at the end, there will be bugs in double save)
 		// try {
-		void this.saveContent(isUpdateLanguage, isUpdateSource)
 		// } catch {
-		void this.saveContent_debounced(isUpdateLanguage, isUpdateSource)
 		// }
+		if (this.plugin.settings.saveMode == 'oninput') {
+			void this.saveContent(isUpdateLanguage, isUpdateSource)
+		}
+		else if (this.plugin.settings.saveMode == 'onchange') {
+			void this.saveContent_debounced(isUpdateLanguage, isUpdateSource)
+		}
 	}
 
 	/**

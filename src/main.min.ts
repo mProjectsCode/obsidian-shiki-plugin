@@ -119,7 +119,7 @@ export default class ShikiPlugin extends Plugin {
 						// disadvantage: First screen CLS (Page jitter)
 						{
 							const editableCodeblock = new EditableCodeblock(this, language, source, el, ctx)
-							editableCodeblock.renderEditableCodeblock()
+							editableCodeblock.renderTextareaPre()
 						}
 					},
 					1000,
