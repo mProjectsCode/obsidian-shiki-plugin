@@ -24,10 +24,12 @@ Shiki, PrismJS, CodeMirror
 
 - textarea: Allows real-time editing and offers a Typora-like WYSIWYG experience
   - In principle, textarea and pre are perfectly overlapped together, but they are prone to incomplete overlap due to the influence of themes and styles
+  - Support editing annotation-type highlighting
 - pre: Real-time editing is not allowed. The rendering effect is more similar to the textarea method
 - editable pre: Allows real-time editing and offers a Typora-like WYSIWYG experience
   - In principle, it is `code[contenteditable='true']`
   - The cursor position needs to be handled manually in the program
+  - *No support editing annotation-type highlighting*
 - codemirror: The only supported method for V0.5.0 and earlier versions, which does not allow real-time editing
 
 > [!warning]

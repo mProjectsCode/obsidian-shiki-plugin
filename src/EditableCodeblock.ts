@@ -261,7 +261,9 @@ export class EditableCodeblock {
 		// #region textarea - async part - keydown
 		this.enableTabEmitIndent(textarea, undefined, undefined, (ev)=>{
 			const selectionEnd: number = textarea.selectionEnd
-			if (selectionEnd != textarea.value.length) return
+			const textBefore = textarea.value.substring(0, selectionEnd)
+			const linesBefore = textBefore.split('\n')
+			if (linesBefore.length !== textarea.value.split('\n').length) return
 
 			ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange
 			editInput.setSelectionRange(0, 0)
@@ -271,9 +273,6 @@ export class EditableCodeblock {
 
 		// #region language-edit - async part - keydown
 		this.enableTabEmitIndent(editInput, undefined, (ev)=>{
-			const selectionStart: number|null = editInput.selectionStart
-			if (selectionStart === null || selectionStart != 0) return
-
 			ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange
 			const position = textarea.value.length
 			textarea.setSelectionRange(position, position)
@@ -613,10 +612,80 @@ export class EditableCodeblock {
 				}
 				return
 			}
-			else if (ev.key == 'ArrowDown' || ev.key == 'ArrowRight') {
+			else if (ev.key == 'ArrowDown') {
 				if (cb_down) { cb_down(ev); return }
 				if (!this.editor) return
 
+				// check is the last line
+				if (el instanceof HTMLInputElement) {
+					// true
+				} else if (el instanceof HTMLTextAreaElement) {
+					const selectionEnd: number = el.selectionEnd
+					const textBefore = el.value.substring(0, selectionEnd)
+					const linesBefore = textBefore.split('\n')
+					if (linesBefore.length !== el.value.split('\n').length) return
+				} else {
+					// TODO
+					return
+				}
+				
+				const sectionInfo = this.ctx.getSectionInfo(this.el);
+				if (!sectionInfo) return
+
+				ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange`
+				const toLine = sectionInfo.lineEnd + 1
+				if (toLine > this.editor.lineCount() - 1) { // when codeblock on the last line
+					// strategy1: only move to end
+					// toLine--
+
+					// strategy2: insert a blank line
+					const lastLineIndex = this.editor.lineCount() - 1
+					const lastLineContent = this.editor.getLine(lastLineIndex)
+					this.editor.replaceRange("\n", { line: lastLineIndex, ch: lastLineContent.length })
+				}
+				this.editor.setCursor(toLine, 0)
+				this.editor.focus()
+				return
+			}
+			else if (ev.key == 'ArrowUp') {
+				if (cb_up) { cb_up(ev); return }
+				if (!this.editor) return
+
+				// check is the first line
+				if (el instanceof HTMLInputElement) {
+					// true
+				} else if (el instanceof HTMLTextAreaElement) {
+					const selectionStart: number = el.selectionStart
+					const textBefore = el.value.substring(0, selectionStart)
+					const linesBefore = textBefore.split('\n')
+					if (linesBefore.length !== 1) return
+				} else {
+					// TODO
+					return
+				}
+
+				const sectionInfo = this.ctx.getSectionInfo(this.el);
+				if (!sectionInfo) return
+
+				ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange`
+				let toLine = sectionInfo.lineStart - 1
+				if (toLine < 0) { // when codeblock on the frist line
+					// strategy1: only move to start
+					// toLine = 0
+
+					// strategy2: insert a blank line
+					toLine = 0
+					this.editor.replaceRange("\n", { line: 0, ch: 0 })
+				}
+				this.editor.setCursor(toLine, 0)
+				this.editor.focus()
+				return
+			}
+			/*else if (ev.key == 'ArrowRight') {
+				if (cb_down) { cb_down(ev); return }
+				if (!this.editor) return
+
+				// check is the last char
 				if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
 					const selectionEnd: number|null = el.selectionEnd
 					if (selectionEnd === null || selectionEnd != el.value.length) return
@@ -643,10 +712,11 @@ export class EditableCodeblock {
 				this.editor.focus()
 				return
 			}
-			else if (ev.key == 'ArrowUp' || ev.key == 'ArrowLeft') {
+			else if (ev.key == 'ArrowLeft') {
 				if (cb_up) { cb_up(ev); return }
 				if (!this.editor) return
 
+				// check is the first char
 				if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
 					const selectionStart: number|null = el.selectionStart
 					if (selectionStart === null || selectionStart != 0) return
@@ -671,7 +741,7 @@ export class EditableCodeblock {
 				this.editor.setCursor(toLine, 0)
 				this.editor.focus()
 				return
-			}
+			}*/
 		})
 		// #endregion
 	}

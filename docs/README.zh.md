@@ -24,10 +24,12 @@ Shiki, PrismJS，CodeMirror
 
 - textarea: 允许实时编辑，typora般的所见即所得的体验
   - 原理上是将textarea和pre完美重叠在一起，但容易受主题和样式影响导致不完全重叠
+  - 支持编辑注释型高亮
 - pre: 不允许实时编辑
 - editable pre: 允许实时编辑，typora般的所见即所得的体验
   - 原理上是 `code[contenteditable='true']`
   - 程序上需要手动处理光标位置
+  - *不支持实时编辑注释型高亮*
 - codemirror: V0.5.0及之前唯一支持的方式，不允许实时编辑
 
 > [!warning]
