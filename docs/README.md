@@ -22,15 +22,26 @@ Shiki, PrismJS, CodeMirror
 
 ### Rendering method
 
-- textarea: Allows real-time editing and offers a Typora-like WYSIWYG experience
-  - In principle, textarea and pre are perfectly overlapped together, but they are prone to incomplete overlap due to the influence of themes and styles
-  - Support editing annotation-type highlighting
-- pre: Real-time editing is not allowed. The rendering effect is more similar to the textarea method
-- editable pre: Allows real-time editing and offers a Typora-like WYSIWYG experience
-  - In principle, it is `code[contenteditable='true']`
-  - The cursor position needs to be handled manually in the program
-  - *No support editing annotation-type highlighting*
-- codemirror: The only supported method for V0.5.0 and earlier versions, which does not allow real-time editing
+- textarea (default)
+  - Advantage:
+    Allows real-time editing and offers a Typora-like WYSIWYG experience
+    Support editing annotation-type highlighting
+    The new version of Obsidian's md table within block editing uses this approach. (However, the ob table editing does not trigger a re-rendering.)
+  - Disadvantage:
+    In principle, textarea and pre are perfectly overlapped together, but they are prone to incomplete overlap due to the influence of themes and styles
+- pre
+  - Disadvantage:
+    Real-time editing is not allowed. The rendering effect is more similar to the textarea method
+- editable pre
+  - Advantage:
+    Allows real-time editing and offers a Typora-like WYSIWYG experience
+    In principle, it is `code[contenteditable='true']`
+  - Disadvantage:
+    The cursor position needs to be handled manually in the program
+    *No support editing annotation-type highlighting*
+- codemirror
+  - Disadvantage:
+    The only supported method for V0.5.0 and earlier versions, which does not allow real-time editing
 
 > [!warning]
 > 
@@ -44,9 +55,10 @@ Shiki, PrismJS, CodeMirror
     There is no need to manage the cursor position manually
   - Disadvantage:
     Delay save, change will loss if: the program crashes suddenly. when cursor in codeblock, switch to readmode or close window/tab
-- oninput, 
+- oninput
   - Advantage:
     Save immediately, data is more secure.
+    The new version of Obsidian's md table within block editing uses this approach.
   - Disadvantage:
     Worse performance? The code block needs to be recreated every time it is modified
     The cursor position needs to be handled manually. Debounce manually.
