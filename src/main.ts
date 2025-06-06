@@ -95,6 +95,7 @@ export default class ShikiPlugin extends Plugin {
 	 */
 	registerCodeBlockProcessors(): void {
 		const languages = this.highlighter.obsidianSafeLanguageNames();
+		languages.push('sk-tip', 'sk-note', 'sk-info', 'sk-warning', 'sk-error')
 
 		for (const language of languages) {
 			try {
@@ -118,22 +119,30 @@ export default class ShikiPlugin extends Plugin {
 						}
 						
 						// able edit live
-						// disadvantage: First screen CLS (Page jitter)
-						if (this.settings.renderMode === 'textarea') {
+						if (language.startsWith('sk-')) { // editable callout
+							const editableCodeblock = new EditableCodeblock(this, language, source, el, ctx)
+							editableCodeblock.renderCallout()
+							return
+						}
+						else if (this.settings.renderMode === 'textarea') { // disadvantage: First screen CLS (Page jitter)
 							const editableCodeblock = new EditableCodeblock(this, language, source, el, ctx)
 							editableCodeblock.renderTextareaPre()
+							return
 						}
 						else if (this.settings.renderMode === 'pre') {
 							const editableCodeblock = new EditableCodeblock(this, language, source, el, ctx)
 							void editableCodeblock.renderPre(el)
+							return
 						}
 						else if (this.settings.renderMode === 'editablePre') {
 							const editableCodeblock = new EditableCodeblock(this, language, source, el, ctx)
 							void editableCodeblock.renderEditablePre()
+							return
 						}
 						else {
 							const codeBlock = new CodeBlock(this, el, source, language, ctx);
-							ctx.addChild(codeBlock);
+							ctx.addChild(codeBlock)
+							return
 						}
 					},
 					1000,

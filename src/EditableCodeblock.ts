@@ -4,8 +4,27 @@
  * This will gradually be modified into a universal module that does not rely on obsidian
  */ 
 
-import { type App, debounce, type Editor, loadPrism, type MarkdownPostProcessorContext, Notice } from 'obsidian';
+import {
+	type App,
+	debounce,
+	type Editor,
+	loadPrism,
+	type MarkdownPostProcessorContext,
+	Notice,
+	MarkdownRenderer,
+	MarkdownRenderChild,
+	MarkdownView,
+} from 'obsidian';
 import { type Settings } from 'src/settings/Settings';
+
+// import {
+// 	WorkspaceLeaf, MarkdownView, MarkdownEditView,
+// 	ViewState, livePreviewState, editorEditorField
+// } from 'obsidian';
+import { EditorState } from '@codemirror/state';
+import { EditorView } from '@codemirror/view';
+import { markdown } from "@codemirror/lang-markdown";
+import { basicSetup } from "@codemirror/basic-setup";
 
 import {
 	transformerNotationDiff,
@@ -129,6 +148,109 @@ export class EditableCodeblock {
 		return codeblockInfo
 	}
 
+	renderCallout(): void {
+		// - divAd
+		//   - divCallout
+		//     - divTitle
+		//       - divIcon
+		//       - divInner
+		//     - divContent
+		//       - ( ) b1 .markdown-rednered
+		//       - ( ) b2 .cm-editor > .cm-scroller > div.contenteditable
+		//   - divEditBtn
+
+		// divAd
+		const divAd = document.createElement('div'); this.el.appendChild(divAd); divAd.classList.add(
+			'cm-preview-code-block', 'cm-embed-block', 'markdown-rendered', 'admonition-parent', 'admonition-tip-parent',
+		)
+
+		// divCallout
+		const divCallout = document.createElement('div'); divAd.appendChild(divCallout); divCallout.classList.add(
+			'callout', 'admonition', 'admonition-tip', 'admonition-plugin'
+		);
+		divCallout.setAttribute('data-callout', this.codeblockInfo.language_type.slice(3)); divCallout.setAttribute('data-callout-fold', ''); divCallout.setAttribute('data-callout-metadata', '')
+
+		// divTitle
+		const divTitle = document.createElement('div'); divCallout.appendChild(divTitle); divTitle.classList.add('callout-title', 'admonition-title');
+		const divIcon = document.createElement('div'); divTitle.appendChild(divIcon); divIcon.classList.add('callout-icon', 'admonition-title-icon');
+		divIcon.innerHTML = `<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="fire" class="svg-inline--fa fa-fire fa-w-12" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M216 23.86c0-23.8-30.65-32.77-44.15-13.04C48 191.85 224 200 224 288c0 35.63-29.11 64.46-64.85 63.99-35.17-.45-63.15-29.77-63.15-64.94v-85.51c0-21.7-26.47-32.23-41.43-16.5C27.8 213.16 0 261.33 0 320c0 105.87 86.13 192 192 192s192-86.13 192-192c0-170.29-168-193-168-296.14z"></path></svg>`
+		const divInner = document.createElement('div'); divTitle.appendChild(divInner); divInner.classList.add('callout-title-inner', 'admonition-title-content');
+		divInner.textContent = this.codeblockInfo.language_type.slice(3)
+
+		// divContent
+		const divContent = document.createElement('div'); divCallout.appendChild(divContent); divContent.classList.add('callout-content', 'admonition-content');
+		{
+			divContent.innerHTML = ''
+			const divRender = document.createElement('div'); divContent.appendChild(divRender); divRender.classList.add('markdown-rednered');
+			const mdrc: MarkdownRenderChild = new MarkdownRenderChild(divRender);
+			void MarkdownRenderer.render(this.plugin.app, this.codeblockInfo.source ?? this.codeblockInfo.source_old, divRender, this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.file?.path??"", mdrc)
+		}
+
+		// divEditBtn
+		const divEditBtn = document.createElement('div'); divAd.appendChild(divEditBtn); divEditBtn.classList.add('edit-block-button')
+		divEditBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-code-2"><path d="m18 16 4-4-4-4"></path><path d="m6 8-4 4 4 4"></path><path d="m14.5 4-5 16"></path></svg>`
+
+		// #region divContent async part
+		if (!this.isReadingMode && !this.isMarkdownRendered) {
+			divContent.addEventListener('dblclick', () => {
+				divContent.innerHTML = ''
+
+				// Strategy 1 - import { EditorView } from '@codemirror/view';, but it is difficult get all ob extensions.
+				const cmState = EditorState.create({
+					doc: this.codeblockInfo.source ?? this.codeblockInfo.source_old,
+					extensions: [
+						basicSetup,
+						// keymap.of(defaultKeymap),
+						markdown(),
+						EditorView.updateListener.of(update => {
+							if (update.docChanged) {
+								this.codeblockInfo.source = update.state.doc.toString();
+							}
+						})
+					]
+					// extensions: livePreviewState
+				})
+				// const cmView =
+				new EditorView({
+					state: cmState,
+					parent: divContent // targetEl
+				})
+				// async
+				const elCmEditor: HTMLElement|null = divContent.querySelector('div[contenteditable=true]')
+				if (!elCmEditor) {
+					console.warn('can\'t find elCmEditor')
+					return
+				}
+				elCmEditor.focus()
+				elCmEditor.addEventListener('blur', (): void => {
+					divContent.innerHTML = ''
+					const divRender = document.createElement('div'); divContent.appendChild(divRender); divRender.classList.add('markdown-rednered');
+					const mdrc: MarkdownRenderChild = new MarkdownRenderChild(divRender);
+					void MarkdownRenderer.render(this.plugin.app, this.codeblockInfo.source ?? this.codeblockInfo.source_old, divRender, this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.file?.path??"", mdrc)
+
+					void this.saveContent_safe(false, true) // if nochange, will not rerender. So the above code is needed.
+				})
+
+				// Strategy 1.2 - HyperMD, but need hyperMD and codemirror same orgin
+				// const divTextarea = document.createElement('textarea'); divContent.appendChild(divTextarea);
+				// divTextarea.textContent = this.codeblockInfo.source ?? this.codeblockInfo.source_old
+				// const editor = HyperMD.fromTextArea(divTextarea, {
+				// 	mode: 'text/x-hypermd',
+				// 	lineNumbers: false,
+				// })
+
+				// Strategy 2 - MarkdownEditView, but it is difficult to create within the specified div.
+				// const leaf = this.plugin.app.workspace.getLeaf(true);
+				// const mdView = new MarkdownView(leaf)
+				// const mdEditView = new MarkdownEditView(mdView)
+
+				// Strategy 3 - innerText, but without render
+				// divContent.innerText = this.codeblockInfo.source ?? this.codeblockInfo.source_old
+			})
+		}
+		// #endregion
+	}
+
 	/**
 	 * param this.plugin.settings.saveMode onchange/oninput
 	 */
@@ -144,7 +266,6 @@ export class EditableCodeblock {
 
 		// span
 		const span = document.createElement('span'); div.appendChild(span);
-		this.codeblockInfo.source = this.codeblockInfo.source_old
 		void this.renderPre(span)
 
 		// textarea
@@ -155,7 +276,7 @@ export class EditableCodeblock {
 		Object.entries(attributes).forEach(([key, val]) => {
 			textarea.setAttribute(key, val);
 		});
-		textarea.value = this.codeblockInfo.source;
+		textarea.value = this.codeblockInfo.source ?? this.codeblockInfo.source_old;
 
 		// language-edit
 		const editEl = document.createElement('div'); div.appendChild(editEl); editEl.classList.add('language-edit');
@@ -292,7 +413,6 @@ export class EditableCodeblock {
 
 		// div
 		const div = document.createElement('div'); this.el.appendChild(div); div.classList.add('obsidian-shiki-plugin', 'editable-pre')
-		this.codeblockInfo.source = this.codeblockInfo.source_old
 
 		// pre, code
 		await this.renderPre(div)
