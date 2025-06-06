@@ -18,13 +18,15 @@ import {
 import { type Settings } from 'src/settings/Settings';
 
 // import {
-// 	WorkspaceLeaf, MarkdownView, MarkdownEditView,
+// 	// ScrollableMarkdownEditor,
+// 	WorkspaceLeaf, MarkdownEditView,
 // 	ViewState, livePreviewState, editorEditorField
 // } from 'obsidian';
-import { EditorState } from '@codemirror/state';
+import { EditorState, Extension, StateField } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { markdown } from "@codemirror/lang-markdown";
 import { basicSetup } from "@codemirror/basic-setup";
+import { getMyEditor, makeFakeController } from "./EditableEditor"
 
 import {
 	transformerNotationDiff,
@@ -68,7 +70,7 @@ export class EditableCodeblock {
 	plugin: { app: App; settings: Settings };
 	el: HTMLElement;
 	ctx: MarkdownPostProcessorContext;
-	editor: Editor|undefined; // Cache to avoid focus changes. And the focus point may not be correct when creating the code block. It can be updated again when oninput
+	editor: Editor|null; // Cache to avoid focus changes. And the focus point may not be correct when creating the code block. It can be updated again when oninput
 	codeblockInfo: CodeblockInfo;
 
 	// redundancy
@@ -79,7 +81,7 @@ export class EditableCodeblock {
 		this.plugin = plugin
 		this.el = el
 		this.ctx = ctx
-		this.editor = this.plugin.app.workspace.activeEditor?.editor;
+		this.editor = this.plugin.app.workspace.activeEditor?.editor ?? null;
 
 		this.isReadingMode = ctx.containerEl.hasClass('markdown-preview-section') || ctx.containerEl.hasClass('markdown-preview-view');
 		this.isMarkdownRendered = !ctx.el.hasClass('.cm-preview-code-block') && ctx.el.hasClass('markdown-rednered')
@@ -192,30 +194,89 @@ export class EditableCodeblock {
 
 		// #region divContent async part
 		if (!this.isReadingMode && !this.isMarkdownRendered) {
+
+			this.editor = this.plugin.app.workspace.activeEditor?.editor ?? null; // 这里，通常初始化和现在的activeEditor都拿不到editor，不知道为什么
+			const view = this.plugin.app.workspace.getActiveViewOfType(MarkdownView)
+			if (view) this.editor = view.editor
+
 			divContent.addEventListener('dblclick', () => {
 				divContent.innerHTML = ''
-
+				
 				// Strategy 1 - import { EditorView } from '@codemirror/view';, but it is difficult get all ob extensions.
-				const cmState = EditorState.create({
-					doc: this.codeblockInfo.source ?? this.codeblockInfo.source_old,
-					extensions: [
-						basicSetup,
-						// keymap.of(defaultKeymap),
-						markdown(),
-						EditorView.updateListener.of(update => {
-							if (update.docChanged) {
-								this.codeblockInfo.source = update.state.doc.toString();
-							}
-						})
-					]
-					// extensions: livePreviewState
-				})
-				// const cmView =
-				new EditorView({
-					state: cmState,
-					parent: divContent // targetEl
-				})
-				// async
+				/*
+				 * thanks https://github.com/Fevol/obsidian-criticmarkup/blob/6f2e8ed3fcf3a548875f7bd2fe09b9df2870e4fd/src/ui/embeddable-editor.ts
+				 * thanks https://github.com/mgmeyers/obsidian-kanban/blob/main/src/components/Editor/MarkdownEditor.tsx#L134
+				 *   view: KanbanView
+				 *   plugin: KanbanPlugin https://github.com/mgmeyers/obsidian-kanban/blob/main/src/KanbanView.tsx
+				 *   MarkdownEditor = Object.getPrototypeOf(Object.getPrototypeOf(md.editMode)).constructor; https://github.com/mgmeyers/obsidian-kanban/blob/main/src/main.ts#L41
+				 *   
+				 */
+				const MyEditor = getMyEditor(this.plugin.app)
+				// console.log('extensionsC', MyEditor, this.editor, this.plugin.app.workspace.activeEditor, this.plugin.app.workspace.activeEditor?.editor)
+				if (false && MyEditor && this.editor) { // this.editor && 
+					// @ts-expect-error Editor without cm
+					const obCmView: EditorView = this.editor.cm
+					const obCmState: EditorState = obCmView.state
+					const obView: MarkdownView|null = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
+					
+					// 方案1：直接clone state，只改doc. bug: 无法加入修改检测
+					const cmState = obCmState.update({
+						changes: { from: 0, to: obCmState.doc.length, insert: this.codeblockInfo.source ?? this.codeblockInfo.source_old },
+					}).state
+					new EditorView({ // const cmView =
+						state: cmState,
+						parent: divContent // targetEl
+					})
+					
+					// 方案2：只取extensions，生成新state. bug: 很难拿到全部的extension，拿到的那个基本没用
+					// const containerEl = document.createElement("div")
+					// const controller = makeFakeController(this.plugin.app, obView??null, () => this.editor)
+					// // @ts-expect-error
+					// const myEditor = new MyEditor(app, containerEl, controller)
+					// const extensions = myEditor.buildLocalExtensions()
+					// const cmState = EditorState.create({
+					// 	doc: this.codeblockInfo.source ?? this.codeblockInfo.source_old,
+					// 	extensions: [
+					// 		basicSetup,
+					// 		markdown(),
+					// 		...obExtensions,
+					// 		EditorView.updateListener.of(update => {
+					// 			if (update.docChanged) {
+					// 				this.codeblockInfo.source = update.state.doc.toString();
+					// 			}
+					// 		})
+					// 	]
+					// })
+					// new EditorView({ // const cmView =
+					// 	state: cmState,
+					// 	parent: divContent // targetEl
+					// })
+
+					// 方案3: 使用overload后的MarkdownEditor对象
+					// const controller = makeFakeController(this.plugin.app, obView??null, () => this.editor)
+					// const myEditor = new MyEditor(this.plugin.app, divContent, controller)
+				}
+				else {
+					const cmState = EditorState.create({
+						doc: this.codeblockInfo.source ?? this.codeblockInfo.source_old,
+						extensions: [
+							basicSetup,
+							// keymap.of(defaultKeymap),
+							markdown(),
+							EditorView.updateListener.of(update => {
+								if (update.docChanged) {
+									this.codeblockInfo.source = update.state.doc.toString();
+								}
+							})
+						]
+					})
+					new EditorView({ // const cmView =
+						state: cmState,
+						parent: divContent // targetEl
+					})
+				}
+				
+				// async // Maybe todo: async check
 				const elCmEditor: HTMLElement|null = divContent.querySelector('div[contenteditable=true]')
 				if (!elCmEditor) {
 					console.warn('can\'t find elCmEditor')
@@ -310,7 +371,7 @@ export class EditableCodeblock {
 			textarea.oninput = (ev): void => {
 				if (isComposing) return
 
-				this.editor = this.plugin.app.workspace.activeEditor?.editor;
+				this.editor = this.plugin.app.workspace.activeEditor?.editor ?? null;
 
 				const newValue = (ev.target as HTMLTextAreaElement).value
 				this.codeblockInfo.source = newValue
@@ -336,7 +397,7 @@ export class EditableCodeblock {
 			textarea.oninput = (ev): void => {
 				if (isComposing) return
 
-				this.editor = this.plugin.app.workspace.activeEditor?.editor;
+				this.editor = this.plugin.app.workspace.activeEditor?.editor ?? null;
 
 				const newValue = (ev.target as HTMLTextAreaElement).value
 				this.codeblockInfo.source = newValue
@@ -359,7 +420,7 @@ export class EditableCodeblock {
 			editInput.oninput = (ev): void => {
 				if (isComposing) return
 
-				this.editor = this.plugin.app.workspace.activeEditor?.editor;
+				this.editor = this.plugin.app.workspace.activeEditor?.editor ?? null;
 
 				const newValue = (ev.target as HTMLInputElement).value
 				const match = /^(\S*)(\s?.*)$/.exec(newValue)
@@ -452,7 +513,7 @@ export class EditableCodeblock {
 				if (isComposing) return
 				if (!pre || !code) { console.error('render failed. can\'t find pre/code 12'); return }
 
-				this.editor = this.plugin.app.workspace.activeEditor?.editor;
+				this.editor = this.plugin.app.workspace.activeEditor?.editor ?? null;
 
 				const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
 				this.codeblockInfo.source = newValue
@@ -495,7 +556,7 @@ export class EditableCodeblock {
 				if (isComposing) return
 				if (!pre || !code) { console.error('render failed. can\'t find pre/code 22'); return }
 
-				this.editor = this.plugin.app.workspace.activeEditor?.editor;
+				this.editor = this.plugin.app.workspace.activeEditor?.editor ?? null;
 
 				const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
 				this.codeblockInfo.source = newValue
