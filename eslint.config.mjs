@@ -29,7 +29,11 @@ export default tseslint.config(
 			'no-relative-import-paths': no_relative_import_paths,
 		},
 		rules: {
-			'@typescript-eslint/no-explicit-any': ['warn'],
+			'@typescript-eslint/no-explicit-any': 'off', // ['warn'],
+			'@typescript-eslint/no-unsafe-call': 'off',
+			'@typescript-eslint/no-unsafe-assignment': 'off',
+			'@typescript-eslint/no-unsafe-member-access': 'off',
+
 
 			'@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', destructuredArrayIgnorePattern: '^_' }],
 			'@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports', fixStyle: 'inline-type-imports' }],

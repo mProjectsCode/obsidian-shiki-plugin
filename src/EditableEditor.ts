@@ -1,10 +1,18 @@
-import { EditorState, Extension } from "@codemirror/state";
-import { EditorView, ViewUpdate } from "@codemirror/view";
-import { App, Editor, MarkdownView } from "obsidian";
+/*
+ * thanks https://github.com/Fevol/obsidian-criticmarkup/blob/6f2e8ed3fcf3a548875f7bd2fe09b9df2870e4fd/src/ui/embeddable-editor.ts
+ * thanks https://github.com/mgmeyers/obsidian-kanban/blob/main/src/components/Editor/MarkdownEditor.tsx#L134
+ *   view: KanbanView
+ *   plugin: KanbanPlugin https://github.com/mgmeyers/obsidian-kanban/blob/main/src/KanbanView.tsx
+ *   MarkdownEditor = Object.getPrototypeOf(Object.getPrototypeOf(md.editMode)).constructor; https://github.com/mgmeyers/obsidian-kanban/blob/main/src/main.ts#L41
+ */
 
-function getEditorClass(app: App) {
+import { Prec, type Extension } from "@codemirror/state";
+import { keymap, type EditorView } from "@codemirror/view";
+import { type App, type Editor, type TFile, type MarkdownView } from "obsidian";
+
+function getEditorClass(app: App): any {
 	// @ts-expect-error without embedRegistry
-	const md = app.embedRegistry.embedByExtension.md(
+	const md: any = app.embedRegistry.embedByExtension.md(
 		{ app: app, containerEl: createDiv(), state: {} },
 		null,
 		''
@@ -14,26 +22,26 @@ function getEditorClass(app: App) {
 	md.editable = true;
 	md.showEditor();
 
-	const MarkdownEditor = Object.getPrototypeOf(Object.getPrototypeOf(md.editMode)).constructor;
+	const MarkdownEditor: any = Object.getPrototypeOf(Object.getPrototypeOf(md.editMode)).constructor;
 
 	md.unload();
 
 	return MarkdownEditor;
 }
 
-// 伪造 controller 对象
+// 伪造 controller 对象 (构造错误不影响编辑功能，但影响保存功能)
 export function makeFakeController(app: App, view: MarkdownView|null, getEditor: () => Editor|null): Record<any, any> {
 	return {
 		app,
-		showSearch: () => { },
-		toggleMode: () => { },
-		onMarkdownScroll: () => { },
+		showSearch: (): void => { },
+		toggleMode: (): void => { },
+		onMarkdownScroll: (): void => { },
 		getMode: () => "source",
 		scroll: 0,
 		editMode: null,
-		get editor() { return getEditor(); },
-		get file() { return view?.file; },
-		get path() { return view?.file?.path ?? ""; }
+		get editor(): Editor | null { return getEditor(); },
+		get file(): TFile | null | undefined { return view?.file; },
+		get path(): string { return view?.file?.path ?? ""; }
 	}
 }
 
@@ -46,86 +54,88 @@ export function getMyEditor(app: App): any {
 
 	class MyEditor extends MarkdownEditor {
 		buildLocalExtensions(): Extension[] {
+			// obsidian自带扩展 (无法兼容插件扩展的行为)
 			const extensions = super.buildLocalExtensions();
 
+			// 管理和同步看板的状态
 			// extensions.push(stateManagerField.init(() => stateManager));
+
+			// 日期插件
 			// extensions.push(datePlugins);
-			/*extensions.push(
-				Prec.highest(
-					EditorView.domEventHandlers({
-						focus: (evt) => {
-							view.activeEditor = this.owner;
-							if (Platform.isMobile) {
-								view.contentEl.addClass('is-mobile-editing');
-							}
 
-							evt.win.setTimeout(() => {
-								this.app.workspace.activeEditor = this.owner;
-								if (Platform.isMobile) {
-									app.mobileToolbar.update();
-								}
-							});
-							return true;
-						},
-						blur: () => {
-							if (Platform.isMobile) {
-								view.contentEl.removeClass('is-mobile-editing');
-								app.mobileToolbar.update();
-							}
-							return true;
-						},
-					})
-				)
-			);
+			// 为编辑器添加 focus 和 blur 事件的监听器
+			// extensions.push(
+			// 	Prec.highest(
+			// 		EditorView.domEventHandlers({
+			// 			focus: (evt) => {
+			// 				view.activeEditor = this.owner;
+			// 				if (Platform.isMobile) {
+			// 					view.contentEl.addClass('is-mobile-editing');
+			// 				}
+			// 
+			// 				evt.win.setTimeout(() => {
+			// 					this.app.workspace.activeEditor = this.owner;
+			// 					if (Platform.isMobile) {
+			// 						app.mobileToolbar.update();
+			// 					}
+			// 				});
+			// 				return true;
+			// 			},
+			// 			blur: () => {
+			// 				if (Platform.isMobile) {
+			// 					view.contentEl.removeClass('is-mobile-editing');
+			// 					app.mobileToolbar.update();
+			// 				}
+			// 				return true;
+			// 			},
+			// 		})
+			// 	)
+			// );
 
-			if (placeholder) extensions.push(placeholderExt(placeholder));
-			if (onPaste) {
-				extensions.push(
-					Prec.high(
-						EditorView.domEventHandlers({
-							paste: onPaste,
-						})
-					)
-				);
-			}
+			// 如果传入了 placeholder，则为编辑器设置输入占位符提示文字
+			// if (placeholder) extensions.push(placeholderExt(placeholder));
 
-			const makeEnterHandler = (mod: boolean, shift: boolean) => (cm: EditorView) => {
-				const didRun = onEnter(cm, mod, shift);
-				if (didRun) return true;
-				if (this.app.vault.getConfig('smartIndentList')) {
-					this.editor.newlineAndIndentContinueMarkdownList();
-				} else {
-					insertBlankLine(cm as any);
-				}
-				return true;
-			};
+			// 添加 paste 事件监听，如果传入了 onPaste，则处理粘贴事件，例如自定义内容粘贴行为
+			// if (onPaste) {
+			// 	extensions.push(
+			// 		Prec.high(
+			// 			EditorView.domEventHandlers({
+			// 				paste: onPaste,
+			// 			})
+			// 		)
+			// 	);
+			// }
 
-			extensions.push(
-				Prec.highest(
-					keymap.of([
-						{
-							key: 'Enter',
-							run: makeEnterHandler(false, false),
-							shift: makeEnterHandler(false, true),
-							preventDefault: true,
-						},
-						{
-							key: 'Mod-Enter',
-							run: makeEnterHandler(true, false),
-							shift: makeEnterHandler(true, true),
-							preventDefault: true,
-						},
-						{
-							key: 'Escape',
-							run: (cm) => {
-								onEscape(cm);
-								return false;
-							},
-							preventDefault: true,
-						},
-					])
-				)
-			);*/
+			// 监听按键 (Esc/Enter退出编辑，Mod(Shift)+Enter才是换行)
+			// extensions.push(
+			// 	Prec.highest(
+			// 		keymap.of([
+			// 			{
+			// 				key: 'Enter',
+			// 				run: (): boolean => {
+			// 					return true
+			// 				},
+			// 				shift: (): boolean => { return true },
+			// 				preventDefault: true,
+			// 			},
+			// 			{
+			// 				key: 'Mod-Enter',
+			// 				run: (): boolean => {
+			// 					this.editor.newlineAndIndentContinueMarkdownList();
+			// 					return false
+			// 				},
+			// 				shift: (): boolean => { return false },
+			// 				preventDefault: true,
+			// 			},
+			// 			{
+			// 				key: 'Escape',
+			// 				run: (): boolean => { return true },
+			// 				shift: (): boolean => { return false },
+			// 				preventDefault: true,
+			// 			},
+			// 		])
+			// 	)
+			// )
 
 			return extensions;
 		}

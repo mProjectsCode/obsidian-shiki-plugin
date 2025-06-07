@@ -194,7 +194,6 @@ export class EditableCodeblock {
 
 		// #region divContent async part
 		if (!this.isReadingMode && !this.isMarkdownRendered) {
-
 			this.editor = this.plugin.app.workspace.activeEditor?.editor ?? null; // 这里，通常初始化和现在的activeEditor都拿不到editor，不知道为什么
 			const view = this.plugin.app.workspace.getActiveViewOfType(MarkdownView)
 			if (view) this.editor = view.editor
@@ -202,24 +201,25 @@ export class EditableCodeblock {
 			divContent.addEventListener('dblclick', () => {
 				divContent.innerHTML = ''
 				
-				// Strategy 1 - import { EditorView } from '@codemirror/view';, but it is difficult get all ob extensions.
-				/*
-				 * thanks https://github.com/Fevol/obsidian-criticmarkup/blob/6f2e8ed3fcf3a548875f7bd2fe09b9df2870e4fd/src/ui/embeddable-editor.ts
-				 * thanks https://github.com/mgmeyers/obsidian-kanban/blob/main/src/components/Editor/MarkdownEditor.tsx#L134
-				 *   view: KanbanView
-				 *   plugin: KanbanPlugin https://github.com/mgmeyers/obsidian-kanban/blob/main/src/KanbanView.tsx
-				 *   MarkdownEditor = Object.getPrototypeOf(Object.getPrototypeOf(md.editMode)).constructor; https://github.com/mgmeyers/obsidian-kanban/blob/main/src/main.ts#L41
-				 *   
-				 */
-				const MyEditor = getMyEditor(this.plugin.app)
+				const MyEditor: new (...args: any[]) => any = getMyEditor(this.plugin.app)
 				// console.log('extensionsC', MyEditor, this.editor, this.plugin.app.workspace.activeEditor, this.plugin.app.workspace.activeEditor?.editor)
-				if (false && MyEditor && this.editor) { // this.editor && 
+				if (false && MyEditor) {
+					// Strategy 1: 使用overload后的MarkdownEditor对象
+					const obView: MarkdownView|null = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
+					const controller = makeFakeController(this.plugin.app, obView??null, () => this.editor)
+					const myEditor: Editor = new MyEditor(this.plugin.app, divContent, controller)
+					// @ts-expect-error without set, if no set, cm style invalid
+					myEditor.set(this.codeblockInfo.source ?? '')
+					// // @ts-expect-error without cm
+					// const obCmView: EditorView = myEditor.cm;
+					// console.log('myEditor child component cm', obCmView)
+				}
+				else if (false && this.editor) {
 					// @ts-expect-error Editor without cm
 					const obCmView: EditorView = this.editor.cm
 					const obCmState: EditorState = obCmView.state
-					const obView: MarkdownView|null = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
 					
-					// 方案1：直接clone state，只改doc. bug: 无法加入修改检测
+					// Strategy 2：直接clone state，只改doc. bug: 无法加入修改检测
 					const cmState = obCmState.update({
 						changes: { from: 0, to: obCmState.doc.length, insert: this.codeblockInfo.source ?? this.codeblockInfo.source_old },
 					}).state
@@ -227,36 +227,34 @@ export class EditableCodeblock {
 						state: cmState,
 						parent: divContent // targetEl
 					})
-					
-					// 方案2：只取extensions，生成新state. bug: 很难拿到全部的extension，拿到的那个基本没用
-					// const containerEl = document.createElement("div")
+
+					// Strategy 3：只取extensions，生成新state. bug: ~~很难拿到全部的extension，拿到的那个基本没用~~ 有extension也似乎不起作用
+					// const obView: MarkdownView|null = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
 					// const controller = makeFakeController(this.plugin.app, obView??null, () => this.editor)
+					// const containerEl = document.createElement("div")
 					// // @ts-expect-error
-					// const myEditor = new MyEditor(app, containerEl, controller)
-					// const extensions = myEditor.buildLocalExtensions()
+					// const myEditor: MyEditor = new MyEditor(app, containerEl, controller)
+					// const obExtensions: any = myEditor.buildLocalExtensions()
 					// const cmState = EditorState.create({
 					// 	doc: this.codeblockInfo.source ?? this.codeblockInfo.source_old,
 					// 	extensions: [
-					// 		basicSetup,
-					// 		markdown(),
+					// 		// basicSetup,
+					// 		// markdown(),
 					// 		...obExtensions,
-					// 		EditorView.updateListener.of(update => {
-					// 			if (update.docChanged) {
-					// 				this.codeblockInfo.source = update.state.doc.toString();
-					// 			}
-					// 		})
+					// 		// EditorView.updateListener.of(update => {
+					// 		// 	if (update.docChanged) {
+					// 		// 		this.codeblockInfo.source = update.state.doc.toString();
+					// 		// 	}
+					// 		// })
 					// 	]
 					// })
 					// new EditorView({ // const cmView =
 					// 	state: cmState,
 					// 	parent: divContent // targetEl
 					// })
-
-					// 方案3: 使用overload后的MarkdownEditor对象
-					// const controller = makeFakeController(this.plugin.app, obView??null, () => this.editor)
-					// const myEditor = new MyEditor(this.plugin.app, divContent, controller)
 				}
 				else {
+					// Strategy 4 use ob extensions, but without ob style
 					const cmState = EditorState.create({
 						doc: this.codeblockInfo.source ?? this.codeblockInfo.source_old,
 						extensions: [
@@ -274,6 +272,22 @@ export class EditableCodeblock {
 						state: cmState,
 						parent: divContent // targetEl
 					})
+
+					// Strategy 5 - HyperMD, but need hyperMD and codemirror same orgin
+					// const divTextarea = document.createElement('textarea'); divContent.appendChild(divTextarea);
+					// divTextarea.textContent = this.codeblockInfo.source ?? this.codeblockInfo.source_old
+					// const editor = HyperMD.fromTextArea(divTextarea, {
+					// 	mode: 'text/x-hypermd',
+					// 	lineNumbers: false,
+					// })
+
+					// Strategy 6 - MarkdownEditView, but it is difficult to create within the specified div.
+					// const leaf = this.plugin.app.workspace.getLeaf(true);
+					// const mdView = new MarkdownView(leaf)
+					// const mdEditView = new MarkdownEditView(mdView)
+
+					// Strategy 7 - innerText, but without render
+					// divContent.innerText = this.codeblockInfo.source ?? this.codeblockInfo.source_old
 				}
 				
 				// async // Maybe todo: async check
@@ -291,22 +305,6 @@ export class EditableCodeblock {
 
 					void this.saveContent_safe(false, true) // if nochange, will not rerender. So the above code is needed.
 				})
-
-				// Strategy 1.2 - HyperMD, but need hyperMD and codemirror same orgin
-				// const divTextarea = document.createElement('textarea'); divContent.appendChild(divTextarea);
-				// divTextarea.textContent = this.codeblockInfo.source ?? this.codeblockInfo.source_old
-				// const editor = HyperMD.fromTextArea(divTextarea, {
-				// 	mode: 'text/x-hypermd',
-				// 	lineNumbers: false,
-				// })
-
-				// Strategy 2 - MarkdownEditView, but it is difficult to create within the specified div.
-				// const leaf = this.plugin.app.workspace.getLeaf(true);
-				// const mdView = new MarkdownView(leaf)
-				// const mdEditView = new MarkdownEditView(mdView)
-
-				// Strategy 3 - innerText, but without render
-				// divContent.innerText = this.codeblockInfo.source ?? this.codeblockInfo.source_old
 			})
 		}
 		// #endregion
