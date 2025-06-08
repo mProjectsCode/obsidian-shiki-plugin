@@ -389,3 +389,16 @@ code>span.line {
 .print .mod-frontmatter {
 	display: none !important;
 }
+
+.is-no-saved::before {
+	content: "";
+	position: absolute;
+	width: 2px;
+	height: 100%;
+	left: 0;
+	top: 0;
+	background-color: yellow;
+	opacity: 0.5;
+	
+	/* border-left: solid 2px yellow !important; */
+}

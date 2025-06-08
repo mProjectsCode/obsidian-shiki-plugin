@@ -23,7 +23,7 @@ import { type Settings } from 'src/settings/Settings';
 // 	ViewState, livePreviewState, editorEditorField
 // } from 'obsidian';
 import { EditorState } from '@codemirror/state';
-import { EditorView } from '@codemirror/view';
+import { EditorView, ViewUpdate } from '@codemirror/view';
 import { markdown } from "@codemirror/lang-markdown";
 import { basicSetup } from "@codemirror/basic-setup";
 import { getEmbedEditor, makeFakeController } from "src/EditableEditor"
@@ -64,7 +64,7 @@ export interface CodeblockInfo {
 
 // RAII, use: setValue -> refresh -> getValue -> reSetNull
 let global_refresh_cache: null|{start:number, end:number} = null
-let global_isLiveMode_cache: boolean = false
+let global_isLiveMode_cache: boolean = true // TODO can add option, default cm or readmode // TODO add a state show: isSaved
 
 // Class definitions in rust style, The object is separated from the implementation
 export class EditableCodeblock {
@@ -183,10 +183,7 @@ export class EditableCodeblock {
 		// divContent
 		const divContent = document.createElement('div'); divCallout.appendChild(divContent); divContent.classList.add('callout-content', 'admonition-content');
 		if (this.isReadingMode || this.isMarkdownRendered || !global_isLiveMode_cache) {
-			divContent.innerHTML = ''
-			const divRender = document.createElement('div'); divContent.appendChild(divRender); divRender.classList.add('markdown-rednered');
-			const mdrc: MarkdownRenderChild = new MarkdownRenderChild(divRender);
-			void MarkdownRenderer.render(this.plugin.app, this.codeblockInfo.source ?? this.codeblockInfo.source_old, divRender, this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.file?.path??"", mdrc)
+			void this.renderMarkdown(divContent)
 		}
 
 		// divEditBtn
@@ -206,21 +203,21 @@ export class EditableCodeblock {
 					this.plugin.app,
 					(cm: EditorView) => {
 						this.codeblockInfo.source = cm.state.doc.toString()
-						
-						divContent.innerHTML = ''
-						const divRender = document.createElement('div'); divContent.appendChild(divRender); divRender.classList.add('markdown-rednered');
-						const mdrc: MarkdownRenderChild = new MarkdownRenderChild(divRender);
-						void MarkdownRenderer.render(this.plugin.app, this.codeblockInfo.source ?? this.codeblockInfo.source_old, divRender, this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.file?.path??"", mdrc)
+						void this.renderMarkdown(divContent) // if save but nochange, will not rerender. So it is needed.
 
-						global_isLiveMode_cache = false
-						void this.saveContent_safe(false, true) // if nochange, will not rerender. So the above code is needed.
+						// global_isLiveMode_cache = false // TODO can add option, default cm or readmode
+						divCallout.classList.remove('is-no-saved'); void this.saveContent_safe(false, true);
 					},
 					(cm: EditorView) => {
 						this.codeblockInfo.source = cm.state.doc.toString()
 
-						global_isLiveMode_cache = true
-						void this.saveContent_safe(false, true)
-					}
+						// global_isLiveMode_cache = true // TODO can add option, default cm or readmode
+						divCallout.classList.remove('is-no-saved'); void this.saveContent_safe(false, true);
+					},
+					(update: ViewUpdate, changed: boolean) => {
+						if (!changed) return
+						divCallout.classList.add('is-no-saved');
+					},
 				)
 
 				if (EmbedEditor) {
@@ -242,6 +239,7 @@ export class EditableCodeblock {
 							EditorView.updateListener.of(update => {
 								if (update.docChanged) {
 									this.codeblockInfo.source = update.state.doc.toString();
+									divCallout.classList.add('is-no-saved');
 								}
 							})
 						]
@@ -258,18 +256,15 @@ export class EditableCodeblock {
 					}
 					elCmEditor.focus()
 					elCmEditor.addEventListener('blur', (): void => {
-						divContent.innerHTML = ''
-						const divRender = document.createElement('div'); divContent.appendChild(divRender); divRender.classList.add('markdown-rednered');
-						const mdrc: MarkdownRenderChild = new MarkdownRenderChild(divRender);
-						void MarkdownRenderer.render(this.plugin.app, this.codeblockInfo.source ?? this.codeblockInfo.source_old, divRender, this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.file?.path??"", mdrc)
+						void this.renderMarkdown(divContent) // if save but nochange, will not rerender. So it is needed.
 
-						void this.saveContent_safe(false, true) // if nochange, will not rerender. So the above code is needed.
+						divCallout.classList.remove('is-no-saved'); void this.saveContent_safe(false, true);
 					})
 				}
 			}
 
 			if (global_isLiveMode_cache) {
-				global_isLiveMode_cache = false
+				// global_isLiveMode_cache = false // TODO can add option, default cm or readmode
 				embedEditor()
 			}
 			divContent.addEventListener('dblclick', () => { embedEditor() })
@@ -675,6 +670,13 @@ export class EditableCodeblock {
 			code.textContent = source; // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
 			prism.highlightElement(code)
 		}
+	}
+
+	renderMarkdown(targetEl: HTMLElement): Promise<void> {
+		targetEl.innerHTML = ''
+		const divRender = document.createElement('div'); targetEl.appendChild(divRender); divRender.classList.add('markdown-rednered');
+		const mdrc: MarkdownRenderChild = new MarkdownRenderChild(divRender);
+		return MarkdownRenderer.render(this.plugin.app, this.codeblockInfo.source ?? this.codeblockInfo.source_old, divRender, this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.file?.path??"", mdrc)
 	}
 
 	// el: HTMLTextAreaElement|HTMLInputElement|HTMLPreElement

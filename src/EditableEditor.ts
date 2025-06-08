@@ -9,7 +9,7 @@
 
 import { insertBlankLine } from '@codemirror/commands'
 import { Prec, type Extension } from "@codemirror/state"
-import { EditorView, keymap } from "@codemirror/view"
+import { EditorView, keymap, ViewUpdate } from "@codemirror/view"
 import { type App, type Editor, type TFile, type MarkdownView } from "obsidian"
 
 function getEditorClass(app: App): any {
@@ -60,6 +60,7 @@ export function getEmbedEditor(
 	app: App,
 	emitFinish: (cm: EditorView) => void,
 	emitSave: (cm: EditorView) => void,
+	onChange: (cupdate: ViewUpdate, changed: boolean) => void,
 ): any {
 	// if (extensions !== null) return extensions
 
@@ -163,17 +164,10 @@ export function getEmbedEditor(
 			return extensions;
 		}
 
-		// onUpdate(update: ViewUpdate, changed: boolean): void {
-		// 	super.onUpdate(update, changed)
-		// 		onChange(update, changed)
-		// }
-		// (update: ViewUpdate, changed: boolean) => {
-		// 	if (!changed) return
-
-		// 	this.codeblockInfo.source = update.state.doc.toString()
-
-		// 	void this.saveContent_safe(false, true)
-		// }
+		onUpdate(update: ViewUpdate, changed: boolean): void {
+			super.onUpdate(update, changed)
+				onChange(update, changed)
+		}
 	}
 
 	return EmbedEditor
