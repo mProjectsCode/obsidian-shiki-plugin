@@ -1,5 +1,6 @@
 /*
- * thanks https://github.com/Fevol/obsidian-criticmarkup/blob/6f2e8ed3fcf3a548875f7bd2fe09b9df2870e4fd/src/ui/embeddable-editor.ts
+ * thanks ~~https://github.com/Fevol/obsidian-criticmarkup/blob/6f2e8ed3fcf3a548875f7bd2fe09b9df2870e4fd/src/ui/embeddable-editor.ts~~
+ *   https://github.com/Fevol/obsidian-criticmarkup/blob/6f2e8ed3fcf3a548875f7bd2fe09b9df2870e4fd/src/ui/embeddable-editor.ts
  * thanks https://github.com/mgmeyers/obsidian-kanban/blob/main/src/components/Editor/MarkdownEditor.tsx#L134
  *   view: KanbanView
  *   plugin: KanbanPlugin https://github.com/mgmeyers/obsidian-kanban/blob/main/src/KanbanView.tsx
@@ -8,7 +9,7 @@
 
 import { insertBlankLine } from '@codemirror/commands'
 import { Prec, type Extension } from "@codemirror/state"
-import { keymap, type EditorView } from "@codemirror/view"
+import { EditorView, keymap } from "@codemirror/view"
 import { type App, type Editor, type TFile, type MarkdownView } from "obsidian"
 
 function getEditorClass(app: App): any {
@@ -48,15 +49,23 @@ export function makeFakeController(app: App, view: MarkdownView|null, getEditor:
 
 // let extensions: any = null // global
 
-export function getMyEditor(
+/**
+ * event:
+ * - 'Enter'/'Shift Enter': newLine
+ * - 'Esc': (emitFinish) save and switch real-live-mode/read-mode
+ * - 'blur': (emitSave) save but no switch
+ * - 'update': no work
+ */
+export function getEmbedEditor(
 	app: App,
+	emitFinish: (cm: EditorView) => void,
 	emitSave: (cm: EditorView) => void,
 ): any {
 	// if (extensions !== null) return extensions
 
 	const MarkdownEditor = getEditorClass(app)
 
-	class MyEditor extends MarkdownEditor {
+	class EmbedEditor extends MarkdownEditor {
 		buildLocalExtensions(): Extension[] {
 			// obsidian自带扩展 (无法兼容插件扩展的行为)
 			const extensions = super.buildLocalExtensions();
@@ -68,33 +77,30 @@ export function getMyEditor(
 			// extensions.push(datePlugins);
 
 			// 为编辑器添加 focus 和 blur 事件的监听器
-			// extensions.push(
-			// 	Prec.highest(
-			// 		EditorView.domEventHandlers({
-			// 			focus: (evt) => {
-			// 				view.activeEditor = this.owner;
-			// 				if (Platform.isMobile) {
-			// 					view.contentEl.addClass('is-mobile-editing');
-			// 				}
-			// 
-			// 				evt.win.setTimeout(() => {
-			// 					this.app.workspace.activeEditor = this.owner;
-			// 					if (Platform.isMobile) {
-			// 						app.mobileToolbar.update();
-			// 					}
-			// 				});
-			// 				return true;
-			// 			},
-			// 			blur: () => {
-			// 				if (Platform.isMobile) {
-			// 					view.contentEl.removeClass('is-mobile-editing');
-			// 					app.mobileToolbar.update();
-			// 				}
-			// 				return true;
-			// 			},
-			// 		})
-			// 	)
-			// );
+			extensions.push(
+				Prec.highest(
+					EditorView.domEventHandlers({
+						// focus: (event: FocusEvent, view: EditorView) => {
+						// 	view.activeEditor = this.owner;
+						// 	if (Platform.isMobile) {
+						// 		view.contentEl.addClass('is-mobile-editing');
+						// 	}
+			
+						// 	evt.win.setTimeout(() => {
+						// 		this.app.workspace.activeEditor = this.owner;
+						// 		if (Platform.isMobile) {
+						// 			app.mobileToolbar.update();
+						// 		}
+						// 	});
+						// 	return true;
+						// },
+						blur: (event: FocusEvent, view: EditorView) => {
+							emitSave(view)
+							return true;
+						},
+					})
+				)
+			)
 
 			// 如果传入了 placeholder，则为编辑器设置输入占位符提示文字
 			// if (placeholder) extensions.push(placeholderExt(placeholder));
@@ -117,7 +123,12 @@ export function getMyEditor(
 						{
 							key: 'Enter',
 							run: (cm: EditorView): boolean => {
-								emitSave(cm)
+								// 根据 Obsidian 的智能缩进配置，决定换行方式
+								if (this.app.vault.getConfig('smartIndentList')) {
+									this.editor.newlineAndIndentContinueMarkdownList()
+								} else {
+									insertBlankLine(cm as any);
+								}
 								return true
 							},
 							shift: (): boolean => { return false },
@@ -140,7 +151,7 @@ export function getMyEditor(
 						{
 							key: 'Escape',
 							run: (cm: EditorView): boolean => {
-								emitSave(cm)
+								emitFinish(cm)
 								return false
 							},
 							preventDefault: true,
@@ -151,7 +162,19 @@ export function getMyEditor(
 
 			return extensions;
 		}
+
+		// onUpdate(update: ViewUpdate, changed: boolean): void {
+		// 	super.onUpdate(update, changed)
+		// 		onChange(update, changed)
+		// }
+		// (update: ViewUpdate, changed: boolean) => {
+		// 	if (!changed) return
+
+		// 	this.codeblockInfo.source = update.state.doc.toString()
+
+		// 	void this.saveContent_safe(false, true)
+		// }
 	}
 
-	return MyEditor
+	return EmbedEditor
 }

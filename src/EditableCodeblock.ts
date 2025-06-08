@@ -26,7 +26,7 @@ import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { markdown } from "@codemirror/lang-markdown";
 import { basicSetup } from "@codemirror/basic-setup";
-import { getMyEditor, makeFakeController } from "src/EditableEditor"
+import { getEmbedEditor, makeFakeController } from "src/EditableEditor"
 
 import {
 	transformerNotationDiff,
@@ -64,6 +64,7 @@ export interface CodeblockInfo {
 
 // RAII, use: setValue -> refresh -> getValue -> reSetNull
 let global_refresh_cache: null|{start:number, end:number} = null
+let global_isLiveMode_cache: boolean = false
 
 // Class definitions in rust style, The object is separated from the implementation
 export class EditableCodeblock {
@@ -181,7 +182,7 @@ export class EditableCodeblock {
 
 		// divContent
 		const divContent = document.createElement('div'); divCallout.appendChild(divContent); divContent.classList.add('callout-content', 'admonition-content');
-		{
+		if (this.isReadingMode || this.isMarkdownRendered || !global_isLiveMode_cache) {
 			divContent.innerHTML = ''
 			const divRender = document.createElement('div'); divContent.appendChild(divRender); divRender.classList.add('markdown-rednered');
 			const mdrc: MarkdownRenderChild = new MarkdownRenderChild(divRender);
@@ -197,11 +198,11 @@ export class EditableCodeblock {
 			this.editor = this.plugin.app.workspace.activeEditor?.editor ?? null; // 这里，通常初始化和现在的activeEditor都拿不到editor，不知道为什么
 			const view = this.plugin.app.workspace.getActiveViewOfType(MarkdownView)
 			if (view) this.editor = view.editor
-
-			divContent.addEventListener('dblclick', () => {
+			
+			const embedEditor = (): void => {
 				divContent.innerHTML = ''
 				
-				const MyEditor: new (...args: any[]) => any = getMyEditor(
+				const EmbedEditor: new (...args: any[]) => any = getEmbedEditor(
 					this.plugin.app,
 					(cm: EditorView) => {
 						this.codeblockInfo.source = cm.state.doc.toString()
@@ -211,20 +212,27 @@ export class EditableCodeblock {
 						const mdrc: MarkdownRenderChild = new MarkdownRenderChild(divRender);
 						void MarkdownRenderer.render(this.plugin.app, this.codeblockInfo.source ?? this.codeblockInfo.source_old, divRender, this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.file?.path??"", mdrc)
 
+						global_isLiveMode_cache = false
 						void this.saveContent_safe(false, true) // if nochange, will not rerender. So the above code is needed.
+					},
+					(cm: EditorView) => {
+						this.codeblockInfo.source = cm.state.doc.toString()
+
+						global_isLiveMode_cache = true
+						void this.saveContent_safe(false, true)
 					}
 				)
-				// console.log('extensionsC', MyEditor, this.editor, this.plugin.app.workspace.activeEditor, this.plugin.app.workspace.activeEditor?.editor)
-				if (MyEditor) {
+				// console.log('extensionsC', EmbedEditor, this.editor, this.plugin.app.workspace.activeEditor, this.plugin.app.workspace.activeEditor?.editor)
+				if (EmbedEditor) {
 					// Strategy 1: 使用overload后的MarkdownEditor对象
 					const obView: MarkdownView|null = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
 					const controller = makeFakeController(this.plugin.app, obView??null, () => this.editor)
-					const myEditor: Editor = new MyEditor(this.plugin.app, divContent, controller)
+					const embedEditor: Editor = new EmbedEditor(this.plugin.app, divContent, controller)
 					// @ts-expect-error without set, if no set, cm style invalid
-					myEditor.set(this.codeblockInfo.source ?? '')
+					embedEditor.set(this.codeblockInfo.source ?? '')
 					// // @ts-expect-error without cm
-					// const obCmView: EditorView = myEditor.cm;
-					// console.log('myEditor child component cm', obCmView)
+					// const obCmView: EditorView = embedEditor.cm;
+					// console.log('embedEditor child component cm', obCmView)
 				}
 				// else if (this.editor) {
 				// 	// @ts-expect-error Editor without cm
@@ -245,8 +253,8 @@ export class EditableCodeblock {
 				// 	// const controller = makeFakeController(this.plugin.app, obView??null, () => this.editor)
 				// 	// const containerEl = document.createElement("div")
 				// 	// // @ts-expect-error
-				// 	// const myEditor: MyEditor = new MyEditor(app, containerEl, controller)
-				// 	// const obExtensions: any = myEditor.buildLocalExtensions()
+				// 	// const embedEditor: EmbedEditor = new EmbedEditor(app, containerEl, controller)
+				// 	// const obExtensions: any = embedEditor.buildLocalExtensions()
 				// 	// const cmState = EditorState.create({
 				// 	// 	doc: this.codeblockInfo.source ?? this.codeblockInfo.source_old,
 				// 	// 	extensions: [
@@ -318,7 +326,13 @@ export class EditableCodeblock {
 
 				// 	void this.saveContent_safe(false, true) // if nochange, will not rerender. So the above code is needed.
 				// })
-			})
+			}
+
+			if (global_isLiveMode_cache) {
+				global_isLiveMode_cache = false
+				embedEditor()
+			}
+			divContent.addEventListener('dblclick', () => { embedEditor() })
 		}
 		// #endregion
 	}
