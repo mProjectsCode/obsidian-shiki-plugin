@@ -32,6 +32,7 @@ function getEditorClass(app: App): any {
 }
 
 // 伪造 controller 对象 (构造错误不影响编辑功能，但影响保存功能)
+// 对应 ctx.containerEl div.cm-scroller
 export function makeFakeController(app: App, view: MarkdownView|null, getEditor: () => Editor|null): Record<any, any> {
 	return {
 		app,

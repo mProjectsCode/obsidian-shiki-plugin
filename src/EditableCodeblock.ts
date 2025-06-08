@@ -23,7 +23,7 @@ import { type Settings } from 'src/settings/Settings';
 // 	ViewState, livePreviewState, editorEditorField
 // } from 'obsidian';
 import { EditorState } from '@codemirror/state';
-import { EditorView, ViewUpdate } from '@codemirror/view';
+import { EditorView, type ViewUpdate } from '@codemirror/view';
 import { markdown } from "@codemirror/lang-markdown";
 import { basicSetup } from "@codemirror/basic-setup";
 import { getEmbedEditor, makeFakeController } from "src/EditableEditor"
@@ -64,7 +64,7 @@ export interface CodeblockInfo {
 
 // RAII, use: setValue -> refresh -> getValue -> reSetNull
 let global_refresh_cache: null|{start:number, end:number} = null
-let global_isLiveMode_cache: boolean = true // TODO can add option, default cm or readmode // TODO add a state show: isSaved
+// let global_isLiveMode_cache: boolean = true // TODO can add option, default cm or readmode // TODO add a state show: isSaved
 
 // Class definitions in rust style, The object is separated from the implementation
 export class EditableCodeblock {
@@ -85,7 +85,7 @@ export class EditableCodeblock {
 		this.editor = this.plugin.app.workspace.activeEditor?.editor ?? null;
 
 		this.isReadingMode = ctx.containerEl.hasClass('markdown-preview-section') || ctx.containerEl.hasClass('markdown-preview-view');
-		this.isMarkdownRendered = !ctx.el.hasClass('.cm-preview-code-block') && ctx.el.hasClass('markdown-rednered')
+		this.isMarkdownRendered = !ctx.el.hasClass('.cm-preview-code-block') && ctx.el.hasClass('markdown-rendered') // TODO fix: can't check codeblock in Editor codeblock
 
 		this.codeblockInfo = EditableCodeblock.createCodeBlockInfo(language_old, source_old, el, ctx)
 		this.codeblockInfo.source = this.codeblockInfo.source_old
@@ -158,7 +158,7 @@ export class EditableCodeblock {
 		//       - divIcon
 		//       - divInner
 		//     - divContent
-		//       - ( ) b1 .markdown-rednered
+		//       - ( ) b1 .markdown-rendered
 		//       - ( ) b2 .cm-editor > .cm-scroller > div.contenteditable
 		//   - divEditBtn
 
@@ -182,7 +182,7 @@ export class EditableCodeblock {
 
 		// divContent
 		const divContent = document.createElement('div'); divCallout.appendChild(divContent); divContent.classList.add('callout-content', 'admonition-content');
-		if (this.isReadingMode || this.isMarkdownRendered || !global_isLiveMode_cache) {
+		if (this.isReadingMode || this.isMarkdownRendered) {
 			void this.renderMarkdown(divContent)
 		}
 
@@ -263,10 +263,9 @@ export class EditableCodeblock {
 				}
 			}
 
-			if (global_isLiveMode_cache) {
-				// global_isLiveMode_cache = false // TODO can add option, default cm or readmode
-				embedEditor()
-			}
+			// if (global_isLiveMode_cache) {
+			// global_isLiveMode_cache = false // TODO can add option, default cm or readmode
+			embedEditor()
 			divContent.addEventListener('dblclick', () => { embedEditor() })
 		}
 		// #endregion
@@ -674,7 +673,7 @@ export class EditableCodeblock {
 
 	renderMarkdown(targetEl: HTMLElement): Promise<void> {
 		targetEl.innerHTML = ''
-		const divRender = document.createElement('div'); targetEl.appendChild(divRender); divRender.classList.add('markdown-rednered');
+		const divRender = document.createElement('div'); targetEl.appendChild(divRender); divRender.classList.add('markdown-rendered');
 		const mdrc: MarkdownRenderChild = new MarkdownRenderChild(divRender);
 		return MarkdownRenderer.render(this.plugin.app, this.codeblockInfo.source ?? this.codeblockInfo.source_old, divRender, this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.file?.path??"", mdrc)
 	}
