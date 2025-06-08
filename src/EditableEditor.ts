@@ -178,3 +178,62 @@ export function getEmbedEditor(
 
 	return EmbedEditor
 }
+
+// old strategy backup
+/*else if (this.editor) {
+	// // @ts-expect-error Editor without cm
+	const obCmView: EditorView = this.editor.cm
+	const obCmState: EditorState = obCmView.state
+	
+	// Strategy 2：直接clone state，只改doc. bug: 无法加入修改检测
+	const cmState = obCmState.update({
+		changes: { from: 0, to: obCmState.doc.length, insert: this.codeblockInfo.source ?? this.codeblockInfo.source_old },
+	}).state
+	new EditorView({ // const cmView =
+		state: cmState,
+		parent: divContent // targetEl
+	})
+
+	// Strategy 3：只取extensions，生成新state. bug: ~~很难拿到全部的extension，拿到的那个基本没用~~ 有extension也似乎不起作用
+	const obView: MarkdownView|null = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
+	const controller = makeFakeController(this.plugin.app, obView??null, () => this.editor)
+	const containerEl = document.createElement("div")
+	// // @ts-expect-error
+	const embedEditor: EmbedEditor = new EmbedEditor(app, containerEl, controller)
+	const obExtensions: any = embedEditor.buildLocalExtensions()
+	const cmState = EditorState.create({
+		doc: this.codeblockInfo.source ?? this.codeblockInfo.source_old,
+		extensions: [
+			// basicSetup,
+			// markdown(),
+			...obExtensions,
+			// EditorView.updateListener.of(update => {
+			// 	if (update.docChanged) {
+			// 		this.codeblockInfo.source = update.state.doc.toString();
+			// 	}
+			// })
+		]
+	})
+	new EditorView({ // const cmView =
+		state: cmState,
+		parent: divContent // targetEl
+	})
+}
+else {
+	Strategy 5 - HyperMD, but need hyperMD and codemirror same orgin
+	const divTextarea = document.createElement('textarea'); divContent.appendChild(divTextarea);
+	divTextarea.textContent = this.codeblockInfo.source ?? this.codeblockInfo.source_old
+	const editor = HyperMD.fromTextArea(divTextarea, {
+		mode: 'text/x-hypermd',
+		lineNumbers: false,
+	})
+
+	Strategy 6 - MarkdownEditView, but it is difficult to create within the specified div.
+	const leaf = this.plugin.app.workspace.getLeaf(true);
+	const mdView = new MarkdownView(leaf)
+	const mdEditView = new MarkdownEditView(mdView)
+
+	Strategy 7 - innerText, but without render
+	divContent.innerText = this.codeblockInfo.source ?? this.codeblockInfo.source_old
+}
+*/
