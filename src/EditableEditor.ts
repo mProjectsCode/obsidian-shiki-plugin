@@ -6,9 +6,10 @@
  *   MarkdownEditor = Object.getPrototypeOf(Object.getPrototypeOf(md.editMode)).constructor; https://github.com/mgmeyers/obsidian-kanban/blob/main/src/main.ts#L41
  */
 
-import { Prec, type Extension } from "@codemirror/state";
-import { keymap, type EditorView } from "@codemirror/view";
-import { type App, type Editor, type TFile, type MarkdownView } from "obsidian";
+import { insertBlankLine } from '@codemirror/commands'
+import { Prec, type Extension } from "@codemirror/state"
+import { keymap, type EditorView } from "@codemirror/view"
+import { type App, type Editor, type TFile, type MarkdownView } from "obsidian"
 
 function getEditorClass(app: App): any {
 	// @ts-expect-error without embedRegistry
@@ -16,17 +17,17 @@ function getEditorClass(app: App): any {
 		{ app: app, containerEl: createDiv(), state: {} },
 		null,
 		''
-	);
+	)
 
-	md.load();
-	md.editable = true;
-	md.showEditor();
+	md.load()
+	md.editable = true
+	md.showEditor()
 
 	const MarkdownEditor: any = Object.getPrototypeOf(Object.getPrototypeOf(md.editMode)).constructor;
 
-	md.unload();
+	md.unload()
 
-	return MarkdownEditor;
+	return MarkdownEditor
 }
 
 // 伪造 controller 对象 (构造错误不影响编辑功能，但影响保存功能)
@@ -47,7 +48,10 @@ export function makeFakeController(app: App, view: MarkdownView|null, getEditor:
 
 // let extensions: any = null // global
 
-export function getMyEditor(app: App): any {
+export function getMyEditor(
+	app: App,
+	emitSave: (cm: EditorView) => void,
+): any {
 	// if (extensions !== null) return extensions
 
 	const MarkdownEditor = getEditorClass(app)
@@ -107,35 +111,43 @@ export function getMyEditor(app: App): any {
 			// }
 
 			// 监听按键 (Esc/Enter退出编辑，Mod(Shift)+Enter才是换行)
-			// extensions.push(
-			// 	Prec.highest(
-			// 		keymap.of([
-			// 			{
-			// 				key: 'Enter',
-			// 				run: (): boolean => {
-			// 					return true
-			// 				},
-			// 				shift: (): boolean => { return true },
-			// 				preventDefault: true,
-			// 			},
-			// 			{
-			// 				key: 'Mod-Enter',
-			// 				run: (): boolean => {
-			// 					this.editor.newlineAndIndentContinueMarkdownList();
-			// 					return false
-			// 				},
-			// 				shift: (): boolean => { return false },
-			// 				preventDefault: true,
-			// 			},
-			// 			{
-			// 				key: 'Escape',
-			// 				run: (): boolean => { return true },
-			// 				shift: (): boolean => { return false },
-			// 				preventDefault: true,
-			// 			},
-			// 		])
-			// 	)
-			// )
+			extensions.push(
+				Prec.highest(
+					keymap.of([
+						{
+							key: 'Enter',
+							run: (cm: EditorView): boolean => {
+								emitSave(cm)
+								return true
+							},
+							shift: (): boolean => { return false },
+							preventDefault: true,
+						},
+						{
+							key: 'Mod-Enter',
+							run: (cm: EditorView): boolean => {
+								// 根据 Obsidian 的智能缩进配置，决定换行方式
+								if (this.app.vault.getConfig('smartIndentList')) {
+									this.editor.newlineAndIndentContinueMarkdownList()
+								} else {
+									insertBlankLine(cm as any);
+								}
+								return true
+							},
+							shift: (): boolean => { return true },
+							preventDefault: true,
+						},
+						{
+							key: 'Escape',
+							run: (cm: EditorView): boolean => {
+								emitSave(cm)
+								return false
+							},
+							preventDefault: true,
+						},
+					])
+				)
+			)
 
 			return extensions;
 		}

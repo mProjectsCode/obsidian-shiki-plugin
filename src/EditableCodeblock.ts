@@ -22,11 +22,11 @@ import { type Settings } from 'src/settings/Settings';
 // 	WorkspaceLeaf, MarkdownEditView,
 // 	ViewState, livePreviewState, editorEditorField
 // } from 'obsidian';
-import { EditorState, Extension, StateField } from '@codemirror/state';
+import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { markdown } from "@codemirror/lang-markdown";
 import { basicSetup } from "@codemirror/basic-setup";
-import { getMyEditor, makeFakeController } from "./EditableEditor"
+import { getMyEditor, makeFakeController } from "src/EditableEditor"
 
 import {
 	transformerNotationDiff,
@@ -201,9 +201,21 @@ export class EditableCodeblock {
 			divContent.addEventListener('dblclick', () => {
 				divContent.innerHTML = ''
 				
-				const MyEditor: new (...args: any[]) => any = getMyEditor(this.plugin.app)
+				const MyEditor: new (...args: any[]) => any = getMyEditor(
+					this.plugin.app,
+					(cm: EditorView) => {
+						this.codeblockInfo.source = cm.state.doc.toString()
+						
+						divContent.innerHTML = ''
+						const divRender = document.createElement('div'); divContent.appendChild(divRender); divRender.classList.add('markdown-rednered');
+						const mdrc: MarkdownRenderChild = new MarkdownRenderChild(divRender);
+						void MarkdownRenderer.render(this.plugin.app, this.codeblockInfo.source ?? this.codeblockInfo.source_old, divRender, this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.file?.path??"", mdrc)
+
+						void this.saveContent_safe(false, true) // if nochange, will not rerender. So the above code is needed.
+					}
+				)
 				// console.log('extensionsC', MyEditor, this.editor, this.plugin.app.workspace.activeEditor, this.plugin.app.workspace.activeEditor?.editor)
-				if (false && MyEditor) {
+				if (MyEditor) {
 					// Strategy 1: 使用overload后的MarkdownEditor对象
 					const obView: MarkdownView|null = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
 					const controller = makeFakeController(this.plugin.app, obView??null, () => this.editor)
@@ -214,45 +226,45 @@ export class EditableCodeblock {
 					// const obCmView: EditorView = myEditor.cm;
 					// console.log('myEditor child component cm', obCmView)
 				}
-				else if (false && this.editor) {
-					// @ts-expect-error Editor without cm
-					const obCmView: EditorView = this.editor.cm
-					const obCmState: EditorState = obCmView.state
+				// else if (this.editor) {
+				// 	// @ts-expect-error Editor without cm
+				// 	const obCmView: EditorView = this.editor.cm
+				// 	const obCmState: EditorState = obCmView.state
 					
-					// Strategy 2：直接clone state，只改doc. bug: 无法加入修改检测
-					const cmState = obCmState.update({
-						changes: { from: 0, to: obCmState.doc.length, insert: this.codeblockInfo.source ?? this.codeblockInfo.source_old },
-					}).state
-					new EditorView({ // const cmView =
-						state: cmState,
-						parent: divContent // targetEl
-					})
+				// 	// Strategy 2：直接clone state，只改doc. bug: 无法加入修改检测
+				// 	const cmState = obCmState.update({
+				// 		changes: { from: 0, to: obCmState.doc.length, insert: this.codeblockInfo.source ?? this.codeblockInfo.source_old },
+				// 	}).state
+				// 	new EditorView({ // const cmView =
+				// 		state: cmState,
+				// 		parent: divContent // targetEl
+				// 	})
 
-					// Strategy 3：只取extensions，生成新state. bug: ~~很难拿到全部的extension，拿到的那个基本没用~~ 有extension也似乎不起作用
-					// const obView: MarkdownView|null = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
-					// const controller = makeFakeController(this.plugin.app, obView??null, () => this.editor)
-					// const containerEl = document.createElement("div")
-					// // @ts-expect-error
-					// const myEditor: MyEditor = new MyEditor(app, containerEl, controller)
-					// const obExtensions: any = myEditor.buildLocalExtensions()
-					// const cmState = EditorState.create({
-					// 	doc: this.codeblockInfo.source ?? this.codeblockInfo.source_old,
-					// 	extensions: [
-					// 		// basicSetup,
-					// 		// markdown(),
-					// 		...obExtensions,
-					// 		// EditorView.updateListener.of(update => {
-					// 		// 	if (update.docChanged) {
-					// 		// 		this.codeblockInfo.source = update.state.doc.toString();
-					// 		// 	}
-					// 		// })
-					// 	]
-					// })
-					// new EditorView({ // const cmView =
-					// 	state: cmState,
-					// 	parent: divContent // targetEl
-					// })
-				}
+				// 	// Strategy 3：只取extensions，生成新state. bug: ~~很难拿到全部的extension，拿到的那个基本没用~~ 有extension也似乎不起作用
+				// 	// const obView: MarkdownView|null = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
+				// 	// const controller = makeFakeController(this.plugin.app, obView??null, () => this.editor)
+				// 	// const containerEl = document.createElement("div")
+				// 	// // @ts-expect-error
+				// 	// const myEditor: MyEditor = new MyEditor(app, containerEl, controller)
+				// 	// const obExtensions: any = myEditor.buildLocalExtensions()
+				// 	// const cmState = EditorState.create({
+				// 	// 	doc: this.codeblockInfo.source ?? this.codeblockInfo.source_old,
+				// 	// 	extensions: [
+				// 	// 		// basicSetup,
+				// 	// 		// markdown(),
+				// 	// 		...obExtensions,
+				// 	// 		// EditorView.updateListener.of(update => {
+				// 	// 		// 	if (update.docChanged) {
+				// 	// 		// 		this.codeblockInfo.source = update.state.doc.toString();
+				// 	// 		// 	}
+				// 	// 		// })
+				// 	// 	]
+				// 	// })
+				// 	// new EditorView({ // const cmView =
+				// 	// 	state: cmState,
+				// 	// 	parent: divContent // targetEl
+				// 	// })
+				// }
 				else {
 					// Strategy 4 use ob extensions, but without ob style
 					const cmState = EditorState.create({
@@ -290,21 +302,22 @@ export class EditableCodeblock {
 					// divContent.innerText = this.codeblockInfo.source ?? this.codeblockInfo.source_old
 				}
 				
+				// only use when no use extensions event
 				// async // Maybe todo: async check
-				const elCmEditor: HTMLElement|null = divContent.querySelector('div[contenteditable=true]')
-				if (!elCmEditor) {
-					console.warn('can\'t find elCmEditor')
-					return
-				}
-				elCmEditor.focus()
-				elCmEditor.addEventListener('blur', (): void => {
-					divContent.innerHTML = ''
-					const divRender = document.createElement('div'); divContent.appendChild(divRender); divRender.classList.add('markdown-rednered');
-					const mdrc: MarkdownRenderChild = new MarkdownRenderChild(divRender);
-					void MarkdownRenderer.render(this.plugin.app, this.codeblockInfo.source ?? this.codeblockInfo.source_old, divRender, this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.file?.path??"", mdrc)
+				// const elCmEditor: HTMLElement|null = divContent.querySelector('div[contenteditable=true]')
+				// if (!elCmEditor) {
+				// 	console.warn('can\'t find elCmEditor')
+				// 	return
+				// }
+				// elCmEditor.focus()
+				// elCmEditor.addEventListener('blur', (): void => {
+				// 	divContent.innerHTML = ''
+				// 	const divRender = document.createElement('div'); divContent.appendChild(divRender); divRender.classList.add('markdown-rednered');
+				// 	const mdrc: MarkdownRenderChild = new MarkdownRenderChild(divRender);
+				// 	void MarkdownRenderer.render(this.plugin.app, this.codeblockInfo.source ?? this.codeblockInfo.source_old, divRender, this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.file?.path??"", mdrc)
 
-					void this.saveContent_safe(false, true) // if nochange, will not rerender. So the above code is needed.
-				})
+				// 	void this.saveContent_safe(false, true) // if nochange, will not rerender. So the above code is needed.
+				// })
 			})
 		}
 		// #endregion

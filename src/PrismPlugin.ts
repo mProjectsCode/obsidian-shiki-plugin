@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 /*
  * Taken from https://github.com/PrismJS/prism/blob/master/plugins/filter-highlight-all/prism-filter-highlight-all.js
  */
