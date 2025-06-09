@@ -152,7 +152,7 @@ export class EditableCodeblock {
 	}
 
 	renderCallout(): void {
-		// - divAd
+		// - div
 		//   - divCallout
 		//     - divTitle
 		//       - divIcon
@@ -162,13 +162,13 @@ export class EditableCodeblock {
 		//       - ( ) b2 .cm-editor > .cm-scroller > div.contenteditable
 		//   - divEditBtn
 
-		// divAd
-		const divAd = document.createElement('div'); this.el.appendChild(divAd); divAd.classList.add(
+		// div
+		const div = document.createElement('div'); this.el.appendChild(div); div.classList.add(
 			'cm-preview-code-block', 'cm-embed-block', 'markdown-rendered', 'admonition-parent', 'admonition-tip-parent',
 		)
 
 		// divCallout
-		const divCallout = document.createElement('div'); divAd.appendChild(divCallout); divCallout.classList.add(
+		const divCallout = document.createElement('div'); div.appendChild(divCallout); divCallout.classList.add(
 			'callout', 'admonition', 'admonition-tip', 'admonition-plugin'
 		);
 		divCallout.setAttribute('data-callout', this.codeblockInfo.language_type.slice(3)); divCallout.setAttribute('data-callout-fold', ''); divCallout.setAttribute('data-callout-metadata', '')
@@ -187,7 +187,7 @@ export class EditableCodeblock {
 		}
 
 		// divEditBtn
-		const divEditBtn = document.createElement('div'); divAd.appendChild(divEditBtn); divEditBtn.classList.add('edit-block-button')
+		const divEditBtn = document.createElement('div'); div.appendChild(divEditBtn); divEditBtn.classList.add('edit-block-button')
 		divEditBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-code-2"><path d="m18 16 4-4-4-4"></path><path d="m6 8-4 4 4 4"></path><path d="m14.5 4-5 16"></path></svg>`
 
 		// #region divContent async part
@@ -206,17 +206,17 @@ export class EditableCodeblock {
 						void this.renderMarkdown(divContent) // if save but nochange, will not rerender. So it is needed.
 
 						// global_isLiveMode_cache = false // TODO can add option, default cm or readmode
-						divCallout.classList.remove('is-no-saved'); void this.saveContent_safe(false, true);
+						div.classList.remove('is-no-saved'); void this.saveContent_safe(false, true);
 					},
 					(cm: EditorView) => {
 						this.codeblockInfo.source = cm.state.doc.toString()
 
 						// global_isLiveMode_cache = true // TODO can add option, default cm or readmode
-						divCallout.classList.remove('is-no-saved'); void this.saveContent_safe(false, true);
+						div.classList.remove('is-no-saved'); void this.saveContent_safe(false, true);
 					},
 					(update: ViewUpdate, changed: boolean) => {
 						if (!changed) return
-						divCallout.classList.add('is-no-saved');
+						div.classList.add('is-no-saved');
 					},
 				)
 
@@ -239,7 +239,7 @@ export class EditableCodeblock {
 							EditorView.updateListener.of(update => {
 								if (update.docChanged) {
 									this.codeblockInfo.source = update.state.doc.toString();
-									divCallout.classList.add('is-no-saved');
+									div.classList.add('is-no-saved');
 								}
 							})
 						]
@@ -258,7 +258,7 @@ export class EditableCodeblock {
 					elCmEditor.addEventListener('blur', (): void => {
 						void this.renderMarkdown(divContent) // if save but nochange, will not rerender. So it is needed.
 
-						divCallout.classList.remove('is-no-saved'); void this.saveContent_safe(false, true);
+						div.classList.remove('is-no-saved'); void this.saveContent_safe(false, true);
 					})
 				}
 			}
@@ -335,11 +335,12 @@ export class EditableCodeblock {
 				const newValue = (ev.target as HTMLTextAreaElement).value
 				this.codeblockInfo.source = newValue
 				void this.renderPre(span)
+				div.classList.add('is-no-saved');
 			}
 			textarea.onchange = (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 				const newValue = (ev.target as HTMLTextAreaElement).value
 				this.codeblockInfo.source = newValue
-				void this.saveContent_safe(false, true)
+				div.classList.remove('is-no-saved'); void this.saveContent_safe(false, true)
 			}
 		}
 		// refresh/save strategy2: cache and rebuild
@@ -366,7 +367,7 @@ export class EditableCodeblock {
 					start: textarea.selectionStart,
 					end: textarea.selectionEnd,
 				}
-				void this.saveContent_safe(false, true)
+				div.classList.remove('is-no-saved'); void this.saveContent_safe(false, true)
 			}
 		}
 		// #endregion
@@ -387,6 +388,7 @@ export class EditableCodeblock {
 				this.codeblockInfo.language_type = match[1]
 				this.codeblockInfo.language_meta = match[2]
 				void this.renderPre(span)
+				div.classList.add('is-no-saved'); 
 			}
 			editInput.onchange = (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 				const newValue = (ev.target as HTMLInputElement).value
@@ -394,7 +396,7 @@ export class EditableCodeblock {
 				if (!match) throw new Error('This is not a regular expression matching that may fail')
 				this.codeblockInfo.language_type = match[1]
 				this.codeblockInfo.language_meta = match[2]
-				void this.saveContent_safe(true, false)
+				div.classList.remove('is-no-saved'); void this.saveContent_safe(true, false)
 			}
 		}
 		// #endregion
@@ -487,6 +489,7 @@ export class EditableCodeblock {
 
 					// pre, code
 					await this.renderPre(div, code)
+					div.classList.add('is-no-saved');
 
 					// restore pos
 					code.setAttribute('contenteditable', 'true'); code.setAttribute('spellcheck', 'false')
@@ -500,7 +503,7 @@ export class EditableCodeblock {
 			code.addEventListener('blur', (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 				const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
 				this.codeblockInfo.source = newValue // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
-				void this.saveContent_safe(false, true)
+				div.classList.remove('is-no-saved'); void this.saveContent_safe(false, true)
 			})
 		}
 		// refresh/save strategy2: cache and rebuild
@@ -523,7 +526,7 @@ export class EditableCodeblock {
 
 
 				global_refresh_cache = this.renderEditablePre_saveCursorPosition(pre)
-				void this.saveContent_safe(false, true)
+				div.classList.remove('is-no-saved'); void this.saveContent_safe(false, true)
 			}
 		}
 		// #endregion
@@ -678,6 +681,7 @@ export class EditableCodeblock {
 		return MarkdownRenderer.render(this.plugin.app, this.codeblockInfo.source ?? this.codeblockInfo.source_old, divRender, this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.file?.path??"", mdrc)
 	}
 
+	// TODO: fix: after edit, can't up/down to root editor
 	// el: HTMLTextAreaElement|HTMLInputElement|HTMLPreElement
 	enableTabEmitIndent(el: HTMLElement, cb_tab?: (ev: KeyboardEvent)=>void, cb_up?: (ev: KeyboardEvent)=>void, cb_down?: (ev: KeyboardEvent)=>void): void {
 		if (!(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el.isContentEditable)) return
