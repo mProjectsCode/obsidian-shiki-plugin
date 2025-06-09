@@ -6,6 +6,7 @@
 	"scripts": {
 		"dev": "bun run automation/build/esbuild.dev.config.ts",
 		"build": "bun run tsc && bun run automation/build/esbuild.config.ts",
+		"build-min": "bun run tsc && bun run automation/build/esbuild.config.min.ts",
 		"tsc": "tsc -noEmit -skipLibCheck",
 		"test": "bun test",
 		"test:log": "LOG_TESTS=true bun test",
@@ -22,6 +23,8 @@
 	"author": "Moritz Jung",
 	"license": "MIT",
 	"devDependencies": {
+		"@codemirror/basic-setup": "^0.20.0",
+		"@codemirror/lang-markdown": "^6.3.2",
 		"@codemirror/language": "^6.11.0",
 		"@codemirror/state": "^6.5.2",
 		"@codemirror/view": "^6.36.8",
@@ -35,8 +38,10 @@
 		"@happy-dom/global-registrator": "^17.4.7",
 		"@lemons_dev/parsinom": "^0.0.12",
 		"@lezer/common": "^1.2.3",
+		"@shikijs/transformers": "^3.4.2",
 		"@tsconfig/svelte": "^5.0.4",
 		"@types/bun": "^1.2.13",
+		"@types/prismjs": "^1.26.5",
 		"builtin-modules": "^5.0.0",
 		"esbuild": "^0.25.4",
 		"esbuild-plugin-copy-watch": "^2.3.1",
