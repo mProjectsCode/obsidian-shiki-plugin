@@ -75,14 +75,37 @@ export class EditableCodeblock {
 	codeblockInfo: CodeblockInfo;
 
 	// redundancy
-	isReadingMode: boolean;
-	isMarkdownRendered: boolean;
+	isReadingMode: boolean = false; // uneditable when true
+	isMarkdownRendered: boolean = false;  // uneditable when true
+	settings: {
+		theme: string;
+		renderMode: 'textarea'|'pre'|'editablePre'|'codemirror';
+		renderEngine: 'shiki'|'prismjs';
+		saveMode: 'onchange'|'oninput'
+	} = {
+		theme: 'obsidian-theme',
+		renderMode: 'textarea',
+		renderEngine: 'shiki',
+		saveMode: 'onchange'
+	}
+	config: {
+		useTab: boolean;
+		tabSize: number;
+	} = {
+		useTab: true,
+		tabSize: 4,
+	}
 
 	constructor(plugin: { app: App; settings: Settings }, language_old:string, source_old:string, el:HTMLElement, ctx:MarkdownPostProcessorContext) {
 		this.plugin = plugin
 		this.el = el
 		this.ctx = ctx
 		this.editor = this.plugin.app.workspace.activeEditor?.editor ?? null;
+		this.settings = this.plugin.settings
+		this.config = {
+			useTab: this.plugin.app.vault.getConfig('useTab'),
+			tabSize: this.plugin.app.vault.getConfig('tabSize')
+		}
 
 		this.isReadingMode = ctx.containerEl.hasClass('markdown-preview-section') || ctx.containerEl.hasClass('markdown-preview-view');
 		this.isMarkdownRendered = !ctx.el.hasClass('.cm-preview-code-block') && ctx.el.hasClass('markdown-rendered') // TODO fix: can't check codeblock in Editor codeblock
@@ -151,6 +174,10 @@ export class EditableCodeblock {
 		return codeblockInfo
 	}
 
+	/** editable callout
+	 * 
+	 * onCall: language.startWith('sk-')
+	 */
 	renderCallout(): void {
 		// - div
 		//   - divCallout
@@ -161,6 +188,13 @@ export class EditableCodeblock {
 		//       - ( ) b1 .markdown-rendered
 		//       - ( ) b2 .cm-editor > .cm-scroller > div.contenteditable
 		//   - divEditBtn
+
+		const renderMarkdown = (targetEl: HTMLElement): Promise<void> => {
+			targetEl.innerHTML = ''
+			const divRender = document.createElement('div'); targetEl.appendChild(divRender); divRender.classList.add('markdown-rendered');
+			const mdrc: MarkdownRenderChild = new MarkdownRenderChild(divRender);
+			return MarkdownRenderer.render(this.plugin.app, this.codeblockInfo.source ?? this.codeblockInfo.source_old, divRender, this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.file?.path??"", mdrc)
+		}
 
 		// div
 		const div = document.createElement('div'); this.el.appendChild(div); div.classList.add(
@@ -183,7 +217,7 @@ export class EditableCodeblock {
 		// divContent
 		const divContent = document.createElement('div'); divCallout.appendChild(divContent); divContent.classList.add('callout-content', 'admonition-content');
 		if (this.isReadingMode || this.isMarkdownRendered) {
-			void this.renderMarkdown(divContent)
+			void renderMarkdown(divContent)
 		}
 
 		// divEditBtn
@@ -203,7 +237,7 @@ export class EditableCodeblock {
 					this.plugin.app,
 					(cm: EditorView) => {
 						this.codeblockInfo.source = cm.state.doc.toString()
-						void this.renderMarkdown(divContent) // if save but nochange, will not rerender. So it is needed.
+						void renderMarkdown(divContent) // if save but nochange, will not rerender. So it is needed.
 
 						// global_isLiveMode_cache = false // TODO can add option, default cm or readmode
 						div.classList.remove('is-no-saved'); void this.saveContent_safe(false, true);
@@ -256,7 +290,7 @@ export class EditableCodeblock {
 					}
 					elCmEditor.focus()
 					elCmEditor.addEventListener('blur', (): void => {
-						void this.renderMarkdown(divContent) // if save but nochange, will not rerender. So it is needed.
+						void renderMarkdown(divContent) // if save but nochange, will not rerender. So it is needed.
 
 						div.classList.remove('is-no-saved'); void this.saveContent_safe(false, true);
 					})
@@ -272,7 +306,9 @@ export class EditableCodeblock {
 	}
 
 	/**
-	 * param this.plugin.settings.saveMode onchange/oninput
+	 * param this.settings.saveMode onchange/oninput
+	 * 
+	 * onCall: renderMode === 'textarea'
 	 */
 	renderTextareaPre(): void {
 		// dom
@@ -326,7 +362,7 @@ export class EditableCodeblock {
 
 		// #region textarea - async part - oninput/onchange
 		// refresh/save strategy1: input no save
-		if (this.plugin.settings.saveMode == 'onchange') {
+		if (this.settings.saveMode == 'onchange') {
 			textarea.oninput = (ev): void => {
 				if (isComposing) return
 
@@ -337,6 +373,7 @@ export class EditableCodeblock {
 				void this.renderPre(span)
 				div.classList.add('is-no-saved');
 			}
+			// TODO: fix: not emit onchange when no change, and is-no-saved class will not remove. 
 			textarea.onchange = (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 				const newValue = (ev.target as HTMLTextAreaElement).value
 				this.codeblockInfo.source = newValue
@@ -373,7 +410,7 @@ export class EditableCodeblock {
 		// #endregion
 
 		// #region language-edit - async part
-		if (this.plugin.settings.saveMode != 'oninput') {
+		if (this.settings.saveMode != 'oninput') {
 			// no support
 		}
 		{
@@ -425,7 +462,9 @@ export class EditableCodeblock {
 	}
 
 	/**
-	 * param this.plugin.settings.saveMode onchange/oninput
+	 * param this.settings.saveMode onchange/oninput
+	 * 
+	 * onCall: renderMode === 'editablePre'
 	 */
 	async renderEditablePre(): Promise<void> {
 		// dom
@@ -463,7 +502,7 @@ export class EditableCodeblock {
 		
 		// #region code - async part - oninput/onchange
 		// refresh/save strategy1: input no save
-		if (this.plugin.settings.saveMode == 'onchange') {
+		if (this.settings.saveMode == 'onchange') {
 			void Promise.resolve().then(() => {
 				if (!global_refresh_cache) return
 				if (!pre || !code) { console.error('render failed. can\'t find pre/code 11'); global_refresh_cache = null; return }
@@ -587,20 +626,21 @@ export class EditableCodeblock {
 		selection?.addRange(range)
 	}
 
-	// There will be a strong sense of lag, and the experience is not good
 	/**
 	 * @deprecated There will be a strong sense of lag, and the experience is not good.
 	 * you should use `renderPre` version
 	 */
-	renderPre_debounced = debounce(async (targetEl:HTMLElement): Promise<void> => {
+	/*renderPre_debounced = debounce(async (targetEl:HTMLElement): Promise<void> => {
 		void this.renderPre(targetEl)
 		console.log('debug renderPre debounced')
-	}, 200)
+	}, 200)*/
 
 	/**
 	 * Render code to targetEl
 	 * 
-	 * param this.plugin.settings.renderEngine shiki/prism
+	 * onCall: renderMode === 'pre'
+	 * 
+	 * param this.settings.renderEngine shiki/prism
 	 * @param targetEl in which element should the result be rendered
 	 * - targetEl (usually a div)
 	 *   - pre
@@ -616,15 +656,15 @@ export class EditableCodeblock {
 		if (source.endsWith('\n')) source += '\n'
 
 		// pre html string - shiki, insert `<pre>...<pre/>`
-		if (this.plugin.settings.renderEngine == 'shiki') {
+		if (this.settings.renderEngine == 'shiki') {
 			// check theme, TODO: use more theme
 			let theme = ''
 			for (const item of bundledThemesInfo) {
-				if (item.id == this.plugin.settings.theme) { theme = this.plugin.settings.theme; break }
+				if (item.id == this.settings.theme) { theme = this.settings.theme; break }
 			}
 			if (theme === '') {
 				theme = 'andromeeda'
-				// console.warn(`no support theme '${this.plugin.settings.theme}' temp in this render mode`) // [!code error] TODO fix
+				// console.warn(`no support theme '${this.settings.theme}' temp in this render mode`) // [!code error] TODO fix
 			}
 
 			const preStr:string = await codeToHtml(source, {
@@ -674,13 +714,6 @@ export class EditableCodeblock {
 		}
 	}
 
-	renderMarkdown(targetEl: HTMLElement): Promise<void> {
-		targetEl.innerHTML = ''
-		const divRender = document.createElement('div'); targetEl.appendChild(divRender); divRender.classList.add('markdown-rendered');
-		const mdrc: MarkdownRenderChild = new MarkdownRenderChild(divRender);
-		return MarkdownRenderer.render(this.plugin.app, this.codeblockInfo.source ?? this.codeblockInfo.source_old, divRender, this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.file?.path??"", mdrc)
-	}
-
 	// TODO: fix: after edit, can't up/down to root editor
 	// el: HTMLTextAreaElement|HTMLInputElement|HTMLPreElement
 	enableTabEmitIndent(el: HTMLElement, cb_tab?: (ev: KeyboardEvent)=>void, cb_up?: (ev: KeyboardEvent)=>void, cb_down?: (ev: KeyboardEvent)=>void): void {
@@ -693,10 +726,8 @@ export class EditableCodeblock {
 				ev.preventDefault()
 
 				// get indent
-				const configUseTab = this.plugin.app.vault.getConfig('useTab')
-				const configTabSize = this.plugin.app.vault.getConfig('tabSize')
-				const indent_space = ' '.repeat(configTabSize)
-				let indent = configUseTab ? '\t' : indent_space
+				const indent_space = ' '.repeat(this.config.tabSize)
+				let indent = this.config.useTab ? '\t' : indent_space
 				
 				if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
 					const value = el.value
@@ -898,6 +929,13 @@ export class EditableCodeblock {
 	}
 
 	async saveContent_safe(isUpdateLanguage: boolean = true, isUpdateSource: boolean = true): Promise<void> {
+		/**
+		 * @deprecated You should use `saveContent_safe` version
+		 */
+		const saveContent_debounced = debounce(async (isUpdateLanguage: boolean = true, isUpdateSource: boolean = true) => {
+			void this.saveContent(isUpdateLanguage, isUpdateSource)
+		}, 200)
+
 		// [!code warn:3] The exception caused by the transaction cannot be caught.
 		// If it fails here, there will be an error print
 		// ~~so, use double save. Ensure both speed and safety at the same time.~~
@@ -905,20 +943,13 @@ export class EditableCodeblock {
 		// try {
 		// } catch {
 		// }
-		if (this.plugin.settings.saveMode == 'oninput') {
+		if (this.settings.saveMode == 'oninput') {
 			void this.saveContent(isUpdateLanguage, isUpdateSource)
 		}
-		else if (this.plugin.settings.saveMode == 'onchange') {
-			void this.saveContent_debounced(isUpdateLanguage, isUpdateSource)
+		else if (this.settings.saveMode == 'onchange') {
+			void saveContent_debounced(isUpdateLanguage, isUpdateSource)
 		}
 	}
-
-	/**
-	 * @deprecated You should use `saveContent_safe` version
-	 */
-	saveContent_debounced = debounce(async (isUpdateLanguage: boolean = true, isUpdateSource: boolean = true) => {
-		void this.saveContent(isUpdateLanguage, isUpdateSource)
-	}, 200)
 
 	/**
 	 * Save textarea text content to codeBlock markdown source
