@@ -5,7 +5,7 @@ import { DEFAULT_SETTINGS, type Settings } from 'src/settings/Settings';
 import { ShikiSettingsTab } from 'src/settings/SettingsTab';
 import { filterHighlightAllPlugin } from 'src/PrismPlugin';
 import { CodeHighlighter } from 'src/Highlighter';
-import { EditableCodeblock } from 'src/EditableCodeblock'
+import EditableCodeblock from 'src/general/EditableCodeblockInOb'
 
 declare module 'obsidian' {
 	interface MarkdownPostProcessorContext {
