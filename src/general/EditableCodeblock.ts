@@ -1,27 +1,9 @@
 /**
  * General editable code blocks based on shiki/prismjs
  * 
- * This will gradually be modified into a universal module that does not rely on obsidian
+ * This module previously relied on the `Obsidian` API,
+ * but has now been changed to a general module: editable code blocks.
  */ 
-
-// 丢弃依赖
-// import {
-// 	type App,
-// 	debounce,
-// 	type Editor,
-// 	loadPrism,
-// 	type MarkdownPostProcessorContext,
-// 	Notice,
-// 	MarkdownRenderer,
-// 	MarkdownRenderChild,
-// 	MarkdownView,
-// } from 'obsidian';
-// import { type Settings } from 'src/settings/Settings';
-// import { EditorState } from '@codemirror/state';
-// import { EditorView, type ViewUpdate } from '@codemirror/view';
-// import { markdown } from "@codemirror/lang-markdown";
-// import { basicSetup } from "@codemirror/basic-setup";
-// import { getEmbedEditor, makeFakeController } from "src/EditableEditor"
 
 import { LLOG } from 'src/general/LLogInOb';
 
@@ -40,13 +22,18 @@ import type Prism from 'prismjs';
 
 export const loadPrism2 = {
 	// can override
-	fn: async (): Promise<null> => { return null }
+	fn: async (): Promise<null> => {
+		// import Prism from "prismjs"
+		// return Prism
+
+		return null
+	}
 }
 
 /**
- * Codeblock Info.
+ * Outer info
  * 
- * outside editor (option, use when codeblock in another editable area)
+ * Outside editor (option, use when codeblock in another editable area)
  * from ctx.getSectionInfo(el) // [!code warning] There may be indentation
  * 
  * Life cycle: One codeblock has one.
@@ -55,22 +42,23 @@ export const loadPrism2 = {
 export interface OuterInfo {
 	prefix: string, // `> - * + ` // [!code warning] Because of the list nest, first-line indentation is not equal to universal indentation.
 	flag: string, // (```+|~~~+)
+
 	language_meta: string, // allow both end space, allow blank
 	language_type: string, // source code, can be an alias
+
 	source: string|null,
 }
 
 /**
- * Codeblock Info
+ * Inner info
  * 
- * inner editor
- * from obsidian callback args // [!code warning] It might be old data in oninput/onchange method
+ * From obsidian callback args // [!code warning] It might be old data in oninput/onchange method
  * 
  * Life cycle: One codeblock has one.
  * Pay attention to consistency.
  */
 export interface InnerInfo {
-	language_old: string, // to lib, can't be an alias
+	language_old: string, // to lib, can't be an alias (eg. c++ -> cpp, sh -> shell, ...)
 	source_old: string,
 }
 
@@ -78,7 +66,14 @@ export interface InnerInfo {
 let global_refresh_cache: null|{start:number, end:number} = null
 // let global_isLiveMode_cache: boolean = true // TODO can add option, default cm or readmode // TODO add a state show: isSaved
 
-// Class definitions in rust style, The object is separated from the implementation
+/** Class definitions in rust style, The object is separated from the implementation
+ *
+ * use by extends: export default class EditableCodebloc2 extends EditableCodeblock {
+ *     override enable_editarea_listener
+ *     override emit_render
+ *     override emit_save
+ * }
+ */
 export abstract class EditableCodeblock {
 	el: HTMLElement;
 
@@ -124,13 +119,12 @@ export abstract class EditableCodeblock {
 			language_old: language_old,
 			source_old: source_old,
 		}
-		this.outerInfo = this.init_outerInfo(language_old, source_old, el)
+		this.outerInfo = this.init_outerInfo(language_old)
 		this.outerInfo.source = this.innerInfo.source_old
-		this.update_outEditor()
 	}
 
 	/// (can override)
-	init_outerInfo(language_old:string, source_old:string, el:HTMLElement): OuterInfo {
+	init_outerInfo(language_old:string): OuterInfo {
 		return {
 			prefix: '',
 			flag: '', // null flag
@@ -139,10 +133,6 @@ export abstract class EditableCodeblock {
 			source: null, // null flag
 		}
 	}
-
-	/// (can override)
-	/// if editableCodeBlock in a editableArea, update outside editor
-	update_outEditor(): void {}
 
 	/**
 	 * param this.settings.saveMode onchange/oninput
@@ -161,7 +151,7 @@ export abstract class EditableCodeblock {
 
 		// span
 		const span = document.createElement('span'); div.appendChild(span);
-		void this.renderPre(span)
+		void this.emit_render(span)
 
 		// textarea
 		const textarea = document.createElement('textarea'); div.appendChild(textarea);
@@ -204,18 +194,17 @@ export abstract class EditableCodeblock {
 		if (this.settings.saveMode == 'onchange') {
 			textarea.oninput = (ev): void => {
 				if (isComposing) return
-				this.update_outEditor()
 
 				const newValue = (ev.target as HTMLTextAreaElement).value
 				this.outerInfo.source = newValue
-				void this.renderPre(span)
+				void this.emit_render(span)
 				div.classList.add('is-no-saved');
 			}
 			// TODO: fix: not emit onchange when no change, and is-no-saved class will not remove. 
 			textarea.onchange = (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 				const newValue = (ev.target as HTMLTextAreaElement).value
 				this.outerInfo.source = newValue
-				div.classList.remove('is-no-saved'); void this.saveContent_safe(false, true)
+				div.classList.remove('is-no-saved'); void this.emit_save(false, true)
 			}
 		}
 		// refresh/save strategy2: cache and rebuild
@@ -231,17 +220,16 @@ export abstract class EditableCodeblock {
 			})
 			textarea.oninput = (ev): void => {
 				if (isComposing) return
-				this.update_outEditor()
 
 				const newValue = (ev.target as HTMLTextAreaElement).value
 				this.outerInfo.source = newValue
-				void this.renderPre(span)
+				void this.emit_render(span)
 
 				global_refresh_cache = {
 					start: textarea.selectionStart,
 					end: textarea.selectionEnd,
 				}
-				div.classList.remove('is-no-saved'); void this.saveContent_safe(false, true)
+				div.classList.remove('is-no-saved'); void this.emit_save(false, true)
 			}
 		}
 		// #endregion
@@ -253,14 +241,13 @@ export abstract class EditableCodeblock {
 		{
 			editInput.oninput = (ev): void => {
 				if (isComposing) return
-				this.update_outEditor()
 
 				const newValue = (ev.target as HTMLInputElement).value
 				const match = /^(\S*)(\s?.*)$/.exec(newValue)
 				if (!match) throw new Error('This is not a regular expression matching that may fail')
 				this.outerInfo.language_type = match[1]
 				this.outerInfo.language_meta = match[2]
-				void this.renderPre(span)
+				void this.emit_render(span)
 				div.classList.add('is-no-saved'); 
 			}
 			editInput.onchange = (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
@@ -269,13 +256,13 @@ export abstract class EditableCodeblock {
 				if (!match) throw new Error('This is not a regular expression matching that may fail')
 				this.outerInfo.language_type = match[1]
 				this.outerInfo.language_meta = match[2]
-				div.classList.remove('is-no-saved'); void this.saveContent_safe(true, false)
+				div.classList.remove('is-no-saved'); void this.emit_save(true, false)
 			}
 		}
 		// #endregion
 
 		// #region textarea - async part - keydown
-		this.enableTabEmitIndent(textarea, undefined, undefined, (ev)=>{
+		this.enable_editarea_listener(textarea, undefined, undefined, (ev)=>{
 			const selectionEnd: number = textarea.selectionEnd
 			const textBefore = textarea.value.substring(0, selectionEnd)
 			const linesBefore = textBefore.split('\n')
@@ -288,7 +275,7 @@ export abstract class EditableCodeblock {
 		// #endregion
 
 		// #region language-edit - async part - keydown
-		this.enableTabEmitIndent(editInput, undefined, (ev)=>{
+		this.enable_editarea_listener(editInput, undefined, (ev)=>{
 			ev.preventDefault() // safe: tested: `prevent` can still trigger `onChange
 			const position = textarea.value.length
 			textarea.setSelectionRange(position, position)
@@ -312,7 +299,7 @@ export abstract class EditableCodeblock {
 		const div = document.createElement('div'); this.el.appendChild(div); div.classList.add('obsidian-shiki-plugin', 'editable-pre')
 
 		// pre, code
-		await this.renderPre(div)
+		await this.emit_render(div)
 		let pre: HTMLPreElement|null = div.querySelector(':scope>pre')
 		let code: HTMLPreElement|null = div.querySelector(':scope>pre>code')
 		if (!pre || !code) { LLOG.error('render failed. can\'t find pre/code 1'); return }
@@ -348,7 +335,6 @@ export abstract class EditableCodeblock {
 			code.oninput = (ev): void => {
 				if (isComposing) return
 				if (!pre || !code) { LLOG.error('render failed. can\'t find pre/code 12'); return }
-				this.update_outEditor()
 
 				const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
 				this.outerInfo.source = newValue
@@ -362,7 +348,7 @@ export abstract class EditableCodeblock {
 					global_refresh_cache = this.renderEditablePre_saveCursorPosition(pre)
 
 					// pre, code
-					await this.renderPre(div, code)
+					await this.emit_render(div, code)
 					div.classList.add('is-no-saved');
 
 					// restore pos
@@ -377,7 +363,7 @@ export abstract class EditableCodeblock {
 			code.addEventListener('blur', (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 				const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
 				this.outerInfo.source = newValue // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
-				div.classList.remove('is-no-saved'); void this.saveContent_safe(false, true)
+				div.classList.remove('is-no-saved'); void this.emit_save(false, true)
 			})
 		}
 		// refresh/save strategy2: cache and rebuild
@@ -391,21 +377,20 @@ export abstract class EditableCodeblock {
 			code.oninput = (ev): void => {
 				if (isComposing) return
 				if (!pre || !code) { LLOG.error('render failed. can\'t find pre/code 22'); return }
-				this.update_outEditor()
 
 				const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
 				this.outerInfo.source = newValue
-				void this.renderPre(div)
+				void this.emit_render(div)
 
 
 				global_refresh_cache = this.renderEditablePre_saveCursorPosition(pre)
-				div.classList.remove('is-no-saved'); void this.saveContent_safe(false, true)
+				div.classList.remove('is-no-saved'); void this.emit_save(false, true)
 			}
 		}
 		// #endregion
 	
 		// #region code - async part - keydown
-		this.enableTabEmitIndent(code)
+		this.enable_editarea_listener(code)
 		// #endregion
 	}
 
@@ -460,98 +445,14 @@ export abstract class EditableCodeblock {
 		selection?.addRange(range)
 	}
 
-	// /**
-	//  * @deprecated There will be a strong sense of lag, and the experience is not good.
-	//  * you should use `renderPre` version
-	//  */
-	// renderPre_debounced = debounce(async (targetEl:HTMLElement): Promise<void> => {
-	// 	void this.renderPre(targetEl)
-	// 	LLOG.log('debug renderPre debounced')
-	// }, 200)
-
-	/**
-	 * Render code to targetEl
-	 * 
-	 * onCall: renderMode === 'pre'
-	 * 
-	 * param this.settings.renderEngine shiki/prism
-	 * @param targetEl in which element should the result be rendered
-	 * - targetEl (usually a div)
-	 *   - pre
-	 *     - code
-	 * @param code (option) code element, can reduce the refresh rate, avoid code blur event
-	 */
-	async renderPre(targetEl:HTMLElement, code?:HTMLElement): Promise<void> {
-		// source correct.
-		// When the last line of the source is blank (with no Spaces either),
-		// prismjs and shiki will both ignore the line,
-		// this causes `textarea` and `pre` to fail to align.
-		let source: string = this.outerInfo.source ?? this.innerInfo.source_old
-		if (source.endsWith('\n')) source += '\n'
-
-		// pre html string - shiki, insert `<pre>...<pre/>`
-		if (this.settings.renderEngine == 'shiki') {
-			// check theme, TODO: use more theme
-			let theme = ''
-			for (const item of bundledThemesInfo) {
-				if (item.id == this.settings.theme) { theme = this.settings.theme; break }
-			}
-			if (theme === '') {
-				theme = 'andromeeda'
-				// LLOG.warn(`no support theme '${this.settings.theme}' temp in this render mode`) // [!code error] TODO fix
-			}
-
-			const preStr:string = await codeToHtml(source, {
-				lang: this.innerInfo.language_old,
-				theme: theme,
-				meta: { __raw: this.outerInfo.language_meta },
-				// https://shiki.style/packages/transformers
-				transformers: [
-					transformerNotationDiff({ matchAlgorithm: 'v3' }),
-					transformerNotationHighlight(),
-					transformerNotationFocus(),
-					transformerNotationErrorLevel(),
-					transformerNotationWordHighlight(),
-
-					transformerMetaHighlight(),
-					transformerMetaWordHighlight(),
-				],
-			})
-
-			if (!code) {
-				targetEl.innerHTML = preStr // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
-			}
-			else {
-				const parser = new DOMParser();
-  				const doc = parser.parseFromString(preStr, 'text/html');
-				const codeElement = doc.querySelector('pre>code')
-				if (!codeElement) { LLOG.error('shiki return preStr without code tag', doc); return }
-				code.innerHTML = codeElement.innerHTML
-			}
-		}
-		// pre html string - prism, insert `<pre>...<pre/>`
-		else {
-			const prism = await loadPrism2.fn() as typeof Prism|null;
-			if (!prism) {
-				LLOG.error('warning: withou Prism')
-				return
-			}
-
-			if (!code) {
-				targetEl.innerHTML = ''
-				const pre = document.createElement('pre'); targetEl.appendChild(pre);
-				code = document.createElement('code'); pre.appendChild(code); code.classList.add('language-'+this.outerInfo.language_type);
-			}
-
-			code.textContent = source; // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
-			prism.highlightElement(code)
-		}
-	}
-
 	/// TODO: fix: after edit, can't up/down to root editor
 	/// @param el: HTMLTextAreaElement|HTMLInputElement|HTMLPreElement
-	enableTabEmitIndent(el: HTMLElement, cb_tab?: (ev: KeyboardEvent)=>void, cb_up?: (ev: KeyboardEvent)=>void, cb_down?: (ev: KeyboardEvent)=>void): void {
+	enable_editarea_listener(el: HTMLElement, cb_tab?: (ev: KeyboardEvent)=>void, cb_up?: (ev: KeyboardEvent)=>void, cb_down?: (ev: KeyboardEvent)=>void): void {
 		if (!(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el.isContentEditable)) return
+
+		el.addEventListener('focus', () => {
+			// update about outter
+		})
 
 		// #region textarea - async part - keydown
 		el.addEventListener('keydown', (ev: KeyboardEvent) => { // `tab` key、~~`arrow` key~~
@@ -632,7 +533,93 @@ export abstract class EditableCodeblock {
 		// #endregion
 	}
 
-	abstract saveContent_safe(isUpdateLanguage: boolean, isUpdateSource: boolean): Promise<void>;
+	// /**
+	//  * @deprecated There will be a strong sense of lag, and the experience is not good.
+	//  * you should use `renderPre` version
+	//  */
+	// renderPre_debounced = debounce(async (targetEl:HTMLElement): Promise<void> => {
+	// 	void this.renderPre(targetEl)
+	// 	LLOG.log('debug renderPre debounced')
+	// }, 200)
+
+	/**
+	 * Render code to targetEl
+	 * 
+	 * onCall: renderMode === 'pre'
+	 * 
+	 * param this.settings.renderEngine shiki/prism
+	 * @param targetEl in which element should the result be rendered
+	 * - targetEl (usually a div)
+	 *   - pre
+	 *     - code
+	 * @param code (option) code element, can reduce the refresh rate, avoid code blur event
+	 */
+	async emit_render(targetEl:HTMLElement, code?:HTMLElement): Promise<void> {
+		// source correct.
+		// When the last line of the source is blank (with no Spaces either),
+		// prismjs and shiki will both ignore the line,
+		// this causes `textarea` and `pre` to fail to align.
+		let source: string = this.outerInfo.source ?? this.innerInfo.source_old
+		if (source.endsWith('\n')) source += '\n'
+
+		// pre html string - shiki, insert `<pre>...<pre/>`
+		if (this.settings.renderEngine == 'shiki') {
+			// check theme, TODO: use more theme
+			let theme = ''
+			for (const item of bundledThemesInfo) {
+				if (item.id == this.settings.theme) { theme = this.settings.theme; break }
+			}
+			if (theme === '') {
+				theme = 'andromeeda'
+				// LLOG.warn(`no support theme '${this.settings.theme}' temp in this render mode`) // [!code error] TODO fix
+			}
+
+			const preStr:string = await codeToHtml(source, {
+				lang: this.innerInfo.language_old,
+				theme: theme,
+				meta: { __raw: this.outerInfo.language_meta },
+				// https://shiki.style/packages/transformers
+				transformers: [
+					transformerNotationDiff({ matchAlgorithm: 'v3' }),
+					transformerNotationHighlight(),
+					transformerNotationFocus(),
+					transformerNotationErrorLevel(),
+					transformerNotationWordHighlight(),
+
+					transformerMetaHighlight(),
+					transformerMetaWordHighlight(),
+				],
+			})
+
+			if (!code) {
+				targetEl.innerHTML = preStr // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
+			}
+			else {
+				const parser = new DOMParser();
+  				const doc = parser.parseFromString(preStr, 'text/html');
+				const codeElement = doc.querySelector('pre>code')
+				if (!codeElement) { LLOG.error('shiki return preStr without code tag', doc); return }
+				code.innerHTML = codeElement.innerHTML
+			}
+		}
+		// pre html string - prism, insert `<pre>...<pre/>`
+		else {
+			const prism = await loadPrism2.fn() as typeof Prism|null;
+			if (!prism) {
+				LLOG.error('warning: withou Prism')
+				return
+			}
+
+			if (!code) {
+				targetEl.innerHTML = ''
+				const pre = document.createElement('pre'); targetEl.appendChild(pre);
+				code = document.createElement('code'); pre.appendChild(code); code.classList.add('language-'+this.outerInfo.language_type);
+			}
+
+			code.textContent = source; // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
+			prism.highlightElement(code)
+		}
+	}
 
 	/**
 	 * Save textarea text content to codeBlock markdown source
@@ -666,5 +653,5 @@ export abstract class EditableCodeblock {
 	 * @param isUpdateLanguage reduce modifications and minimize mistakes, can be used to increase stability
 	 * @param isUpdateSource   reduce modifications and minimize mistakes, can be used to increase stability
 	 */
-	abstract saveContent(isUpdateLanguage: boolean, isUpdateSource: boolean): Promise<void>;
+	abstract emit_save(isUpdateLanguage: boolean, isUpdateSource: boolean): Promise<void>;
 }

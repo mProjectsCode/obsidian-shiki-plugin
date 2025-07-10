@@ -131,7 +131,7 @@ export default class ShikiPlugin extends Plugin {
 						}
 						else if (this.settings.renderMode === 'pre') {
 							const editableCodeblock = new EditableCodeblock(this, language, source, el, ctx)
-							void editableCodeblock.renderPre(el)
+							void editableCodeblock.emit_render(el)
 							return
 						}
 						else if (this.settings.renderMode === 'editablePre') {
