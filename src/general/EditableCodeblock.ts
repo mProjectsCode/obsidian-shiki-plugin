@@ -30,8 +30,7 @@ export const loadPrism2 = {
 	}
 }
 
-/**
- * Outer info
+/** Outer info
  * 
  * Outside editor (option, use when codeblock in another editable area)
  * from ctx.getSectionInfo(el) // [!code warning] There may be indentation
@@ -49,8 +48,7 @@ export interface OuterInfo {
 	source: string|null,
 }
 
-/**
- * Inner info
+/** Inner info
  * 
  * From obsidian callback args // [!code warning] It might be old data in oninput/onchange method
  * 
@@ -134,8 +132,7 @@ export abstract class EditableCodeblock {
 		}
 	}
 
-	/**
-	 * param this.settings.saveMode onchange/oninput
+	/** param this.settings.saveMode onchange/oninput
 	 * 
 	 * onCall: renderMode === 'textarea'
 	 */
@@ -284,8 +281,7 @@ export abstract class EditableCodeblock {
 		// #endregion
 	}
 
-	/**
-	 * param this.settings.saveMode onchange/oninput
+	/** param this.settings.saveMode onchange/oninput
 	 * 
 	 * onCall: renderMode === 'editablePre'
 	 */
@@ -456,35 +452,79 @@ export abstract class EditableCodeblock {
 
 		// #region textarea - async part - keydown
 		el.addEventListener('keydown', (ev: KeyboardEvent) => { // `tab` key、~~`arrow` key~~
+			// TODO add shift tab
+			// var name: (`[` `]` represents the cursors at both ends)
+			//   ABCD
+			// (2)  AB[(1)CD(3)		// selectionStart, selectionStart_start, selectionStart_end
+			// (5)  AB](4)CD(6)    	// selectionEnd,   selectionEnd_start,   selectionEnd_end
+			//   ABCD
 			if (ev.key == 'Tab') {
 				if (cb_tab) { cb_tab(ev); return }
 				ev.preventDefault()
+				const isShiftTab: boolean = ev.shiftKey;
 
 				// get indent
 				const indent_space = ' '.repeat(this.config.tabSize)
 				let indent = this.config.useTab ? '\t' : indent_space
 				
 				if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
-					const value = el.value
+					const nodeText: string = el.value
 					const selectionStart: number = el.selectionStart ?? 0
 					const selectionEnd: number = el.selectionEnd ?? 0
+					const selectionStart_start: number = nodeText.lastIndexOf('\n', selectionStart - 1) + 1 // fix -1 by +1
+					let selectionEnd_end: number = nodeText.indexOf('\n', selectionEnd) // fix -1 by use text length
+					if (selectionEnd_end == -1) selectionEnd_end = nodeText.length
 
 					// auto indent (otpion)
 					{
-						const lineStart: number = value.lastIndexOf('\n', selectionStart - 1) + 1
-						const lineEnd: number = value.indexOf('\n', selectionStart)
-						const lineCurrent: string = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd)
-						// TODO enhamce: determine whether to insert the tab directly or the entire line of tabs based on the cursor
-						if (lineCurrent.startsWith('\t')) indent = '\t'
-						else if (lineCurrent.startsWith(' ')) indent = indent_space
+						const selectionStart_line: string = nodeText.substring(selectionStart_start, selectionEnd_end)
+						if (selectionStart_line.startsWith('\t')) indent = '\t'
+						else if (selectionStart_line.startsWith(' ')) indent = indent_space
 					}
-					
-					// change
-					// new value: cursorBefore + tab + cusrorAfter
-					el.value = el.value.substring(0, selectionStart) + indent + el.value.substring(selectionEnd)
-					// new cursor pos
-					el.selectionStart = el.selectionEnd = selectionStart + indent.length;
-					el.dispatchEvent(new InputEvent('input', {
+
+					// change - indent, if selected content
+					if (selectionStart != selectionEnd || isShiftTab) {
+						const before = nodeText.substring(0, selectionStart_start) // maybe with end `\n`
+						const after = nodeText.substring(selectionEnd_end) // maybe with start `\n`
+						let center = nodeText.substring(selectionStart_start, selectionEnd_end) // without both `\n`
+						const center_lines = center.split('\n')
+
+						if (isShiftTab) {
+							// new value: before + newCenter + after
+							let indent_subCount = 0
+							const indent_subCount_start: 0|1 = center_lines[0].startsWith(indent) ? 1 : 0
+							center = center_lines.map(line => {
+								if (line.startsWith(indent)) {
+									indent_subCount++
+									return line.slice(indent.length);
+								}
+								return line
+							}).join('\n')
+							el.value = before + center + after
+
+							// new cursor pos
+							el.selectionStart = selectionStart - indent.length * indent_subCount_start
+							el.selectionEnd = selectionEnd - indent.length * indent_subCount
+						}
+						else {
+							center = center_lines.map(line => indent + line).join('\n')
+							el.value = before + center + after
+
+							// new cursor pos
+							el.selectionStart = selectionStart + indent.length * 1
+							el.selectionEnd = selectionEnd + indent.length * center_lines.length
+						}
+					}
+					// change - insert
+					else {
+						// new value: cursorBefore + tab + cusrorAfter
+						el.value = el.value.substring(0, selectionStart) + indent + el.value.substring(selectionEnd)
+
+						// new cursor pos
+						el.selectionStart = el.selectionEnd = selectionStart + indent.length
+					}
+
+					el.dispatchEvent(new InputEvent('input', { // emit input event
 						inputType: 'insertText',
 						data: indent,
 						bubbles: true,
@@ -496,30 +536,58 @@ export abstract class EditableCodeblock {
 					const selection = window.getSelection();
 					if (!selection || selection.rangeCount === 0) return;
 					
+					const selectionRange = selection.getRangeAt(0) // .startOffset & .endOffset
+					const node: Node = selectionRange.startContainer
+					const nodeText: string = node.textContent ?? ''
+					const selectionStart_start: number = nodeText.lastIndexOf('\n', selectionRange.startOffset - 1) + 1 // fix -1 by +1
+					let selectionEnd_end: number = nodeText.indexOf('\n', selectionRange.endOffset) // fix -1 by use text length
+					if (selectionEnd_end == -1) selectionEnd_end = nodeText.length
+
 					// auto indent (otpion)
-					let range
 					{
-						range = selection.getRangeAt(0)
-						const container = range.startContainer
-						const lineText = container.textContent ?? ''
-						const lineStart = lineText.lastIndexOf('\n', range.startOffset - 1) + 1
-						const lineCurrent = lineText.slice(lineStart, range.startOffset)
+						const lineCurrent: string = nodeText.slice(selectionStart_start, selectionEnd_end)
 						if (lineCurrent.startsWith('\t')) indent = '\t'
 						else if (lineCurrent.startsWith(' ')) indent = indent_space
 					}
 					
-					// change
-					// new value
-					const textNode = document.createTextNode(indent)
-					range.deleteContents()
-					range.insertNode(textNode)
-					// new cursor pos
-					const newRange = document.createRange();
-					newRange.setStartAfter(textNode);
-					newRange.collapse(true);
-					selection.removeAllRanges();
-					selection.addRange(newRange);
-					el.dispatchEvent(new InputEvent('input', {
+					// change - indent, if selected content
+					if (selectionRange.startOffset != selectionRange.endOffset || isShiftTab) {
+
+						// 3. 创建带缩进的新行
+						// const parent = node.parentNode!;
+						const newLine = document.createElement('div');
+						newLine.appendChild(document.createTextNode(indent));
+						
+						// 4. 插入缩进并更新光标
+						selectionRange.insertNode(newLine);
+						const newRange = document.createRange();
+						newRange.setStart(newLine.firstChild!, indent.length);
+						newRange.collapse(true);
+						selection.removeAllRanges();
+						selection.addRange(newRange);
+
+						const before = nodeText.substring(0, selectionStart_start) // maybe with end `\n`
+						const after = nodeText.substring(selectionEnd_end) // maybe with start `\n`
+						const center = nodeText.substring(selectionStart_start, selectionEnd_end) // without both `\n`
+						console.log(`\n---before\n${before}\n---center\n${center}\n---after\n${after}\n---`, node)
+					}
+					// change - insert
+					else {
+						// new value
+						const textNode: Node = document.createTextNode(indent)
+						selectionRange.deleteContents()
+						selectionRange.insertNode(textNode)
+
+						// new cursor pos
+						const newRange = document.createRange();
+						newRange.setStartAfter(textNode);
+						newRange.collapse(true);
+						selection.removeAllRanges();
+						selection.addRange(newRange);
+					}
+					
+
+					el.dispatchEvent(new InputEvent('input', { // emit input event
 						inputType: 'insertText',
 						data: indent,
 						bubbles: true,
@@ -542,8 +610,7 @@ export abstract class EditableCodeblock {
 	// 	LLOG.log('debug renderPre debounced')
 	// }, 200)
 
-	/**
-	 * Render code to targetEl
+	/** Render code to targetEl
 	 * 
 	 * onCall: renderMode === 'pre'
 	 * 
@@ -621,8 +688,7 @@ export abstract class EditableCodeblock {
 		}
 	}
 
-	/**
-	 * Save textarea text content to codeBlock markdown source
+	/** Save textarea text content to codeBlock markdown source
 	 * 
 	 * @deprecated can't save when cursor in codeblock and use short-key switch to source mode.
 	 * You should use `saveContent_safe` version
