@@ -1,4 +1,4 @@
-import { EditableCodeblock, loadPrism2, type CodeblockInfo } from 'src/general/EditableCodeblock'
+import { EditableCodeblock, loadPrism2, type InnerInfo, type OuterInfo } from 'src/general/EditableCodeblock'
 
 // 新增依赖
 import {
@@ -42,24 +42,22 @@ export default class EditableCodeblockInOb extends EditableCodeblock {
 		this.isMarkdownRendered = !ctx.el.hasClass('.cm-preview-code-block') && ctx.el.hasClass('markdown-rendered') // TODO fix: can't check codeblock in Editor codeblock
 
 		// override
-		this.codeblockInfo = EditableCodeblockInOb.createCodeBlockInfo2(language_old, source_old, el, ctx)
+		this.outerInfo = this.init_outerInfo2(language_old, source_old, el, ctx)
 	}
 
-	static createCodeBlockInfo2(language_old:string, source_old:string, el:HTMLElement, ctx: MarkdownPostProcessorContext): CodeblockInfo {
+	/// (can override)
+	init_outerInfo2(language_old:string, source_old:string, el:HTMLElement, ctx: MarkdownPostProcessorContext): OuterInfo {
 		const sectionInfo = ctx.getSectionInfo(el);
 		if (!sectionInfo) {
 			// This is possible. when rerender
-			const codeblockInfo:CodeblockInfo = {
+			const outerInfo:OuterInfo = {
 				prefix: '',
 				flag: '', // null flag
 				language_meta: '',
 				language_type: language_old,
 				source: null, // null flag
-
-				language_old: language_old,
-				source_old: source_old,
 			}
-			return codeblockInfo
+			return outerInfo
 		}
 		// sectionInfo.lineStart; // index in (```<language>)
 		// sectionInfo.lineEnd;   // index in (```), Let's not modify the fence part
@@ -77,30 +75,24 @@ export default class EditableCodeblockInOb extends EditableCodeblock {
 			// This is possible.
 			// When the code block is nested and the first line is not a code block
 			// (The smallest section of getSectionInfo is `markdown-preview-section>div`)
-			const codeblockInfo:CodeblockInfo = {
+			const outerInfo:OuterInfo = {
 				prefix: '',
 				flag: '', // null flag
 				language_meta: '',
 				language_type: language_old,
 				source: null, // null flag
-
-				language_old: language_old,
-				source_old: source_old,
 			}
-			return codeblockInfo
+			return outerInfo
 		}
 
-		const codeblockInfo:CodeblockInfo = {
+		const outerInfo:OuterInfo = {
 			prefix: match[1],
 			flag: match[3],
 			language_meta: match[5],
 			language_type: match[4],
 			source: lines.slice(sectionInfo.lineStart + 1, sectionInfo.lineEnd).join('\n'),
-
-			language_old: language_old,
-			source_old: source_old,
 		}
-		return codeblockInfo
+		return outerInfo
 	}
 
 	override update_outEditor(): void {
@@ -126,7 +118,7 @@ export default class EditableCodeblockInOb extends EditableCodeblock {
 			targetEl.innerHTML = ''
 			const divRender = document.createElement('div'); targetEl.appendChild(divRender); divRender.classList.add('markdown-rendered');
 			const mdrc: MarkdownRenderChild = new MarkdownRenderChild(divRender);
-			return MarkdownRenderer.render(this.plugin.app, this.codeblockInfo.source ?? this.codeblockInfo.source_old, divRender, this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.file?.path??"", mdrc)
+			return MarkdownRenderer.render(this.plugin.app, this.outerInfo.source ?? this.innerInfo.source_old, divRender, this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.file?.path??"", mdrc)
 		}
 
 		// div
@@ -138,14 +130,14 @@ export default class EditableCodeblockInOb extends EditableCodeblock {
 		const divCallout = document.createElement('div'); div.appendChild(divCallout); divCallout.classList.add(
 			'callout', 'admonition', 'admonition-tip', 'admonition-plugin'
 		);
-		divCallout.setAttribute('data-callout', this.codeblockInfo.language_type.slice(3)); divCallout.setAttribute('data-callout-fold', ''); divCallout.setAttribute('data-callout-metadata', '')
+		divCallout.setAttribute('data-callout', this.outerInfo.language_type.slice(3)); divCallout.setAttribute('data-callout-fold', ''); divCallout.setAttribute('data-callout-metadata', '')
 
 		// divTitle
 		const divTitle = document.createElement('div'); divCallout.appendChild(divTitle); divTitle.classList.add('callout-title', 'admonition-title');
 		const divIcon = document.createElement('div'); divTitle.appendChild(divIcon); divIcon.classList.add('callout-icon', 'admonition-title-icon');
 		divIcon.innerHTML = `<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="fire" class="svg-inline--fa fa-fire fa-w-12" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M216 23.86c0-23.8-30.65-32.77-44.15-13.04C48 191.85 224 200 224 288c0 35.63-29.11 64.46-64.85 63.99-35.17-.45-63.15-29.77-63.15-64.94v-85.51c0-21.7-26.47-32.23-41.43-16.5C27.8 213.16 0 261.33 0 320c0 105.87 86.13 192 192 192s192-86.13 192-192c0-170.29-168-193-168-296.14z"></path></svg>`
 		const divInner = document.createElement('div'); divTitle.appendChild(divInner); divInner.classList.add('callout-title-inner', 'admonition-title-content');
-		divInner.textContent = this.codeblockInfo.language_type.slice(3)
+		divInner.textContent = this.outerInfo.language_type.slice(3)
 
 		// divContent
 		const divContent = document.createElement('div'); divCallout.appendChild(divContent); divContent.classList.add('callout-content', 'admonition-content');
@@ -169,14 +161,14 @@ export default class EditableCodeblockInOb extends EditableCodeblock {
 				const EmbedEditor: new (...args: any[]) => any = getEmbedEditor(
 					this.plugin.app,
 					(cm: EditorView) => {
-						this.codeblockInfo.source = cm.state.doc.toString()
+						this.outerInfo.source = cm.state.doc.toString()
 						void renderMarkdown(divContent) // if save but nochange, will not rerender. So it is needed.
 
 						// global_isLiveMode_cache = false // TODO can add option, default cm or readmode
 						div.classList.remove('is-no-saved'); void this.saveContent_safe(false, true);
 					},
 					(cm: EditorView) => {
-						this.codeblockInfo.source = cm.state.doc.toString()
+						this.outerInfo.source = cm.state.doc.toString()
 
 						// global_isLiveMode_cache = true // TODO can add option, default cm or readmode
 						div.classList.remove('is-no-saved'); void this.saveContent_safe(false, true);
@@ -193,19 +185,19 @@ export default class EditableCodeblockInOb extends EditableCodeblock {
 					const controller = makeFakeController(this.plugin.app, obView??null, () => this.editor)
 					const embedEditor: Editor = new EmbedEditor(this.plugin.app, divContent, controller)
 					// @ts-expect-error without set, if no set, cm style invalid
-					embedEditor.set(this.codeblockInfo.source ?? '')
+					embedEditor.set(this.outerInfo.source ?? '')
 				}
 				else {
 					// Strategy 4 use ob extensions, but without ob style
 					const cmState = EditorState.create({
-						doc: this.codeblockInfo.source ?? this.codeblockInfo.source_old,
+						doc: this.outerInfo.source ?? this.innerInfo.source_old,
 						extensions: [
 							basicSetup,
 							// keymap.of(defaultKeymap),
 							markdown(),
 							EditorView.updateListener.of(update => {
 								if (update.docChanged) {
-									this.codeblockInfo.source = update.state.doc.toString();
+									this.outerInfo.source = update.state.doc.toString();
 									div.classList.add('is-no-saved');
 								}
 							})
@@ -425,7 +417,7 @@ export default class EditableCodeblockInOb extends EditableCodeblock {
 				changes: [{
 					from: {line: sectionInfo.lineStart, ch: 0},
 					to: {line: sectionInfo.lineStart+1, ch: 0},
-					text: this.codeblockInfo.flag + this.codeblockInfo.language_type + this.codeblockInfo.language_meta + '\n'
+					text: this.outerInfo.flag + this.outerInfo.language_type + this.outerInfo.language_meta + '\n'
 				}],
 			});
 		}
@@ -436,7 +428,7 @@ export default class EditableCodeblockInOb extends EditableCodeblock {
 				changes: [{
 					from: {line: sectionInfo.lineStart+1, ch: 0},
 					to: {line: sectionInfo.lineEnd, ch: 0},
-					text: (this.codeblockInfo.source ?? this.codeblockInfo.source_old) + '\n'
+					text: (this.outerInfo.source ?? this.innerInfo.source_old) + '\n'
 				}],
 			});
 		}

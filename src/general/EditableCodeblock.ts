@@ -45,20 +45,31 @@ export const loadPrism2 = {
 
 /**
  * Codeblock Info.
+ * 
+ * outside editor (option, use when codeblock in another editable area)
+ * from ctx.getSectionInfo(el) // [!code warning] There may be indentation
+ * 
  * Life cycle: One codeblock has one.
  * Pay attention to consistency.
  */
-export interface CodeblockInfo {
-	// outside editor (option, use when codeblock in another editable area)
-	// from ctx.getSectionInfo(el) // [!code warning] There may be indentation
+export interface OuterInfo {
 	prefix: string, // `> - * + ` // [!code warning] Because of the list nest, first-line indentation is not equal to universal indentation.
 	flag: string, // (```+|~~~+)
 	language_meta: string, // allow both end space, allow blank
 	language_type: string, // source code, can be an alias
 	source: string|null,
+}
 
-	// inner editor
-	// from obsidian callback args // [!code warning] It might be old data in oninput/onchange method
+/**
+ * Codeblock Info
+ * 
+ * inner editor
+ * from obsidian callback args // [!code warning] It might be old data in oninput/onchange method
+ * 
+ * Life cycle: One codeblock has one.
+ * Pay attention to consistency.
+ */
+export interface InnerInfo {
 	language_old: string, // to lib, can't be an alias
 	source_old: string,
 }
@@ -98,7 +109,8 @@ export abstract class EditableCodeblock {
 		tabSize: 4,
 	}
 
-	codeblockInfo: CodeblockInfo;
+	innerInfo: InnerInfo;
+	outerInfo: OuterInfo;
 
 	constructor(language_old:string, source_old:string, el:HTMLElement) {
 		// 丢弃依赖
@@ -108,28 +120,29 @@ export abstract class EditableCodeblock {
 		// this.isMarkdownRendered = !ctx.el.hasClass('.cm-preview-code-block') && ctx.el.hasClass('markdown-rendered') // TODO fix: can't check codeblock in Editor codeblock
 
 		this.el = el
-		this.codeblockInfo = EditableCodeblock.createCodeBlockInfo(language_old, source_old, el)
-		this.codeblockInfo.source = this.codeblockInfo.source_old
+		this.innerInfo = {
+			language_old: language_old,
+			source_old: source_old,
+		}
+		this.outerInfo = this.init_outerInfo(language_old, source_old, el)
+		this.outerInfo.source = this.innerInfo.source_old
 		this.update_outEditor()
 	}
 
-	/// if editableCodeBlock in a editableArea, update outside editor
-	update_outEditor(): void {}
-
-	// Data related to codeblock
-	static createCodeBlockInfo(language_old:string, source_old:string, el:HTMLElement): CodeblockInfo {
-		const codeblockInfo:CodeblockInfo = {
+	/// (can override)
+	init_outerInfo(language_old:string, source_old:string, el:HTMLElement): OuterInfo {
+		return {
 			prefix: '',
 			flag: '', // null flag
 			language_meta: '',
 			language_type: language_old,
 			source: null, // null flag
-
-			language_old: language_old,
-			source_old: source_old,
 		}
-		return codeblockInfo
 	}
+
+	/// (can override)
+	/// if editableCodeBlock in a editableArea, update outside editor
+	update_outEditor(): void {}
 
 	/**
 	 * param this.settings.saveMode onchange/oninput
@@ -158,13 +171,13 @@ export abstract class EditableCodeblock {
 		Object.entries(attributes).forEach(([key, val]) => {
 			textarea.setAttribute(key, val);
 		});
-		textarea.value = this.codeblockInfo.source ?? this.codeblockInfo.source_old;
+		textarea.value = this.outerInfo.source ?? this.innerInfo.source_old;
 
 		// language-edit
 		const editEl = document.createElement('div'); div.appendChild(editEl); editEl.classList.add('language-edit');
 		editEl.setAttribute('align', 'right');
 		const editInput = document.createElement('input'); editEl.appendChild(editInput);
-		editInput.value = this.codeblockInfo.language_type + this.codeblockInfo.language_meta
+		editInput.value = this.outerInfo.language_type + this.outerInfo.language_meta
 
 		// readmode and markdown reRender not shouldn't change
 		if (this.isReadingMode || this.isMarkdownRendered) {
@@ -194,14 +207,14 @@ export abstract class EditableCodeblock {
 				this.update_outEditor()
 
 				const newValue = (ev.target as HTMLTextAreaElement).value
-				this.codeblockInfo.source = newValue
+				this.outerInfo.source = newValue
 				void this.renderPre(span)
 				div.classList.add('is-no-saved');
 			}
 			// TODO: fix: not emit onchange when no change, and is-no-saved class will not remove. 
 			textarea.onchange = (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 				const newValue = (ev.target as HTMLTextAreaElement).value
-				this.codeblockInfo.source = newValue
+				this.outerInfo.source = newValue
 				div.classList.remove('is-no-saved'); void this.saveContent_safe(false, true)
 			}
 		}
@@ -221,7 +234,7 @@ export abstract class EditableCodeblock {
 				this.update_outEditor()
 
 				const newValue = (ev.target as HTMLTextAreaElement).value
-				this.codeblockInfo.source = newValue
+				this.outerInfo.source = newValue
 				void this.renderPre(span)
 
 				global_refresh_cache = {
@@ -245,8 +258,8 @@ export abstract class EditableCodeblock {
 				const newValue = (ev.target as HTMLInputElement).value
 				const match = /^(\S*)(\s?.*)$/.exec(newValue)
 				if (!match) throw new Error('This is not a regular expression matching that may fail')
-				this.codeblockInfo.language_type = match[1]
-				this.codeblockInfo.language_meta = match[2]
+				this.outerInfo.language_type = match[1]
+				this.outerInfo.language_meta = match[2]
 				void this.renderPre(span)
 				div.classList.add('is-no-saved'); 
 			}
@@ -254,8 +267,8 @@ export abstract class EditableCodeblock {
 				const newValue = (ev.target as HTMLInputElement).value
 				const match = /^(\S*)(\s?.*)$/.exec(newValue)
 				if (!match) throw new Error('This is not a regular expression matching that may fail')
-				this.codeblockInfo.language_type = match[1]
-				this.codeblockInfo.language_meta = match[2]
+				this.outerInfo.language_type = match[1]
+				this.outerInfo.language_meta = match[2]
 				div.classList.remove('is-no-saved'); void this.saveContent_safe(true, false)
 			}
 		}
@@ -338,7 +351,7 @@ export abstract class EditableCodeblock {
 				this.update_outEditor()
 
 				const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
-				this.codeblockInfo.source = newValue
+				this.outerInfo.source = newValue
 				
 				void Promise.resolve().then(async () => { // like vue nextTick, ensure that the cursor is behind
 					pre = div.querySelector(':scope>pre')
@@ -363,7 +376,7 @@ export abstract class EditableCodeblock {
 			//   pre/code without onchange, use blur event
 			code.addEventListener('blur', (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
 				const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
-				this.codeblockInfo.source = newValue // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
+				this.outerInfo.source = newValue // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
 				div.classList.remove('is-no-saved'); void this.saveContent_safe(false, true)
 			})
 		}
@@ -381,7 +394,7 @@ export abstract class EditableCodeblock {
 				this.update_outEditor()
 
 				const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
-				this.codeblockInfo.source = newValue
+				this.outerInfo.source = newValue
 				void this.renderPre(div)
 
 
@@ -473,7 +486,7 @@ export abstract class EditableCodeblock {
 		// When the last line of the source is blank (with no Spaces either),
 		// prismjs and shiki will both ignore the line,
 		// this causes `textarea` and `pre` to fail to align.
-		let source: string = this.codeblockInfo.source ?? this.codeblockInfo.source_old
+		let source: string = this.outerInfo.source ?? this.innerInfo.source_old
 		if (source.endsWith('\n')) source += '\n'
 
 		// pre html string - shiki, insert `<pre>...<pre/>`
@@ -489,9 +502,9 @@ export abstract class EditableCodeblock {
 			}
 
 			const preStr:string = await codeToHtml(source, {
-				lang: this.codeblockInfo.language_old,
+				lang: this.innerInfo.language_old,
 				theme: theme,
-				meta: { __raw: this.codeblockInfo.language_meta },
+				meta: { __raw: this.outerInfo.language_meta },
 				// https://shiki.style/packages/transformers
 				transformers: [
 					transformerNotationDiff({ matchAlgorithm: 'v3' }),
@@ -527,7 +540,7 @@ export abstract class EditableCodeblock {
 			if (!code) {
 				targetEl.innerHTML = ''
 				const pre = document.createElement('pre'); targetEl.appendChild(pre);
-				code = document.createElement('code'); pre.appendChild(code); code.classList.add('language-'+this.codeblockInfo.language_type);
+				code = document.createElement('code'); pre.appendChild(code); code.classList.add('language-'+this.outerInfo.language_type);
 			}
 
 			code.textContent = source; // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
