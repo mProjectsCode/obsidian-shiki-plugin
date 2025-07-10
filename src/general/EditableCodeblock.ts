@@ -378,7 +378,6 @@ export abstract class EditableCodeblock {
 				this.outerInfo.source = newValue
 				void this.emit_render(div)
 
-
 				global_refresh_cache = this.renderEditablePre_saveCursorPosition(pre)
 				div.classList.remove('is-no-saved'); void this.emit_save(false, true)
 			}
@@ -394,7 +393,7 @@ export abstract class EditableCodeblock {
 		const selection = window.getSelection()
 		if (!selection || selection.rangeCount === 0) return null
 
-		const range: Range = selection.getRangeAt(0)
+		const range: Range = selection.getRangeAt(0) // first node, startOffset is range, endOffset maybe error
 
 		// get start
 		const preRange: Range = document.createRange()
@@ -523,57 +522,71 @@ export abstract class EditableCodeblock {
 						// new cursor pos
 						el.selectionStart = el.selectionEnd = selectionStart + indent.length
 					}
-
-					el.dispatchEvent(new InputEvent('input', { // emit input event
-						inputType: 'insertText',
-						data: indent,
-						bubbles: true,
-						cancelable: true
-					}))
-					return
 				}
 				else { // pre/code
 					const selection = window.getSelection();
-					if (!selection || selection.rangeCount === 0) return;
-					
-					const selectionRange = selection.getRangeAt(0) // .startOffset & .endOffset
-					const node: Node = selectionRange.startContainer
-					const nodeText: string = node.textContent ?? ''
-					const selectionStart_start: number = nodeText.lastIndexOf('\n', selectionRange.startOffset - 1) + 1 // fix -1 by +1
-					let selectionEnd_end: number = nodeText.indexOf('\n', selectionRange.endOffset) // fix -1 by use text length
+					if (!selection || selection.rangeCount === 0) return
+
+					const nodeText = el.textContent ?? ''
+					const pos = this.renderEditablePre_saveCursorPosition(el)
+					if (!pos) return
+					const selectionStart: number = pos.start
+					const selectionEnd: number = pos.end
+					const selectionStart_start: number = nodeText.lastIndexOf('\n', selectionStart - 1) + 1 // fix -1 by +1
+					let selectionEnd_end: number = nodeText.indexOf('\n', selectionEnd) // fix -1 by use text length
 					if (selectionEnd_end == -1) selectionEnd_end = nodeText.length
 
 					// auto indent (otpion)
 					{
-						const lineCurrent: string = nodeText.slice(selectionStart_start, selectionEnd_end)
-						if (lineCurrent.startsWith('\t')) indent = '\t'
-						else if (lineCurrent.startsWith(' ')) indent = indent_space
+						const selectionStart_line: string = nodeText.substring(selectionStart_start, selectionEnd_end)
+						if (selectionStart_line.startsWith('\t')) indent = '\t'
+						else if (selectionStart_line.startsWith(' ')) indent = indent_space
 					}
 					
 					// change - indent, if selected content
-					if (selectionRange.startOffset != selectionRange.endOffset || isShiftTab) {
-
-						// 3. 创建带缩进的新行
-						// const parent = node.parentNode!;
-						const newLine = document.createElement('div');
-						newLine.appendChild(document.createTextNode(indent));
-						
-						// 4. 插入缩进并更新光标
-						selectionRange.insertNode(newLine);
-						const newRange = document.createRange();
-						newRange.setStart(newLine.firstChild!, indent.length);
-						newRange.collapse(true);
-						selection.removeAllRanges();
-						selection.addRange(newRange);
-
+					if (selectionStart != selectionEnd || isShiftTab) {
 						const before = nodeText.substring(0, selectionStart_start) // maybe with end `\n`
 						const after = nodeText.substring(selectionEnd_end) // maybe with start `\n`
-						const center = nodeText.substring(selectionStart_start, selectionEnd_end) // without both `\n`
-						console.log(`\n---before\n${before}\n---center\n${center}\n---after\n${after}\n---`, node)
+						let center = nodeText.substring(selectionStart_start, selectionEnd_end) // without both `\n`
+						const center_lines = center.split('\n')
+
+						if (isShiftTab) {
+							// new value: before + newCenter + after
+							let indent_subCount = 0
+							const indent_subCount_start: 0|1 = center_lines[0].startsWith(indent) ? 1 : 0
+							center = center_lines.map(line => {
+								if (line.startsWith(indent)) {
+									indent_subCount++
+									return line.slice(indent.length);
+								}
+								return line
+							}).join('\n')
+							this.outerInfo.source = before + center + after
+
+							// new cursor pos TODO
+							global_refresh_cache = {
+								start: selectionStart - indent.length * indent_subCount_start,
+								end: selectionEnd - indent.length * indent_subCount
+							}
+						}
+						else {
+							center = center_lines.map(line => indent + line).join('\n')
+							this.outerInfo.source = before + center + after
+
+							// new cursor pos TODO
+							global_refresh_cache = {
+								start: selectionStart + indent.length * 1,
+								end: selectionEnd + indent.length * center_lines.length
+							}
+						}
+
+						if (el.tagName === 'PRE') el = el.querySelector(':scope>code') ?? el
+						el.innerText = before + center + after
 					}
 					// change - insert
 					else {
 						// new value
+						const selectionRange = selection.getRangeAt(0) // first node, .startOffset is right, .endOffset maybe error
 						const textNode: Node = document.createTextNode(indent)
 						selectionRange.deleteContents()
 						selectionRange.insertNode(textNode)
@@ -585,16 +598,14 @@ export abstract class EditableCodeblock {
 						selection.removeAllRanges();
 						selection.addRange(newRange);
 					}
-					
-
-					el.dispatchEvent(new InputEvent('input', { // emit input event
-						inputType: 'insertText',
-						data: indent,
-						bubbles: true,
-						cancelable: true
-					}));
-					return
 				}
+
+				el.dispatchEvent(new InputEvent('input', { // emit input event
+					inputType: 'insertText',
+					data: indent,
+					bubbles: true,
+					cancelable: true
+				}));
 				return
 			}
 		})
