@@ -34,6 +34,8 @@ exampleVault/.obsidian/plugins/*
 exampleVault/.obsidian/plugins/lemons-plugin-template/*
 !exampleVault/.obsidian/plugins/lemons-plugin-template/.hotreload
 
+/main.css
+/styles.css
 /tmp
 /temp
 /backup

@@ -52,4 +52,14 @@ const build = await esbuild.build({
 const file = Bun.file('meta.txt');
 await Bun.write(file, JSON.stringify(build.metafile, null, '\t'));
 
+// css
+await esbuild.build({
+    entryPoints: ["custom.css"],
+    outfile: "styles.css",
+    // watch: !prod, // 似乎若升级esbuild后不再支持
+    bundle: true,
+    allowOverwrite: true,
+    minify: false,
+});
+
 process.exit(0);

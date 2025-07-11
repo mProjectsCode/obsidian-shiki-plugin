@@ -1,0 +1,139 @@
+/* Direct editing of styles.css is not allowed. Instead, the file should be edited. */
+
+@import url("src/general/EditableCodeblock.css");
+
+body {
+	--shiki-code-background: var(--code-background);
+	--shiki-code-normal: var(--text-muted);
+	--shiki-code-comment: var(--text-faint);
+	--shiki-code-function: var(--color-green);
+	--shiki-code-important: var(--color-orange);
+	--shiki-code-keyword: var(--color-pink);
+	--shiki-code-property: var(--color-cyan);
+	--shiki-code-punctuation: var(--text-muted);
+	--shiki-code-string: var(--color-yellow);
+	--shiki-code-value: var(--color-purple);
+
+	/*--shiki-code-border-color: var(--background-modifier-border);*/
+	--shiki-code-block-border-color: transparent;
+	--shiki-code-block-border-radius: var(--code-radius);
+	--shiki-code-block-border-width: 0px; /* this has to have a unit */
+
+	--shiki-code-block-spacing: var(--p-spacing);
+
+	--shiki-highlight-red: rgba(var(--color-red-rgb), 0.5);
+	--shiki-highlight-green: rgba(var(--color-green-rgb), 0.5);
+	--shiki-highlight-neutral: var(--shiki-code-normal);
+	--shiki-highlight-red-background: rgba(var(--color-red-rgb), 0.1);
+	--shiki-highlight-green-background: rgba(var(--color-green-rgb), 0.1);
+	--shiki-highlight-neutral-background: rgba(var(--mono-rgb-100), 0.05);
+
+	--shiki-terminal-dots-color: var(--text-faint);
+
+	--shiki-tooltip-background: var(--background-modifier-message);
+	--shiki-tooltip-text-color: #fafafa;
+
+	--shiki-gutter-border-color: var(--background-modifier-border);
+	--shiki-gutter-border-width: var(--border-width);
+	--shiki-gutter-text-color: var(--text-faint);
+	--shiki-gutter-text-color-highlight: var(--shiki-code-normal);
+
+	--shiki-active-tab-border-width: 2px;
+	--shiki-active-tab-border-color: var(--shiki-highlight-neutral);
+}
+
+.edit-block-button {
+	pointer-events: all;
+
+	& > svg {
+		pointer-events: all;
+	}
+}
+
+/* Disable ligatures in code blocks, as they can cause incorrect highlighting */
+div.expressive-code {
+	font-variant-ligatures: no-contextual;
+
+	& > figure > pre {
+		/* Fix for shimmering focus */
+		margin: 0 !important;
+	}
+
+	& > figure.frame {
+		&.has-title > figcaption.header::before {
+			pointer-events: all !important;
+		}
+
+		& > figcaption.header {
+			z-index: unset;
+		}
+
+		& > div.copy {
+			/* Move the copy button to the bottom right */
+			inset-block-end: calc(var(--ec-brdWd) + var(--ec-uiPadInl) / 2);
+		}
+	}
+}
+
+.markdown-preview-view {
+	div.expressive-code {
+		margin-block: var(--shiki-code-block-spacing);
+	}
+}
+
+/* Hide the frontmatter code block in reading view again */
+div.markdown-preview-view > div > div.mod-header + div > div.block-language-yaml.shiki-hide-in-reading-mode {
+	display: none;
+}
+
+span.shiki-bold {
+	font-weight: var(--bold-weight, 600);
+}
+span.shiki-italic {
+	font-style: italic;
+}
+span.shiki-ul {
+	text-decoration: underline;
+}
+
+/* Settings tab  */
+.setting-item-control input.shiki-custom-theme-folder {
+	min-width: 250px;
+}
+
+/* read mode / rendered */
+.markdown-preview-view .editable-codeblock textarea,
+.markdown-rendered:not(.cm-preview-code-block.cm-embed-block) .editable-codeblock textarea {
+	display: none;
+}
+.markdown-preview-view .editable-codeblock pre,
+.markdown-rendered:not(.cm-preview-code-block.cm-embed-block) .editable-codeblock pre {
+	margin-top: 16px !important;
+	margin-bottom: 16px !important;
+}
+
+/* language-type-btn */
+.editable-codeblock .language-edit {
+	position: absolute;
+	bottom: 1px;
+	right: 0;
+	margin: 0;
+	padding: 0;
+	line-height: var(--shiki-line-height);
+	min-height: var(--shiki-line-height);
+	font-size: 13px;
+	opacity: 0.5;
+}
+.editable-codeblock .language-edit>input {
+	margin: 0;
+	padding: 0 14px;
+	border: none;
+	background: none;
+	box-shadow: none;
+	text-align: right;
+}
+
+/* pdf. Avoid displaying metadata in pdf exports. */
+.print .mod-frontmatter {
+	display: none !important;
+}

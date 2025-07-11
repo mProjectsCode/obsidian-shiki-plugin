@@ -5,6 +5,7 @@
  * but has now been changed to a general module: editable code blocks.
  */ 
 
+import 'src/general/EditableCodeblock.css'
 import { LLOG } from 'src/general/LLogInOb';
 
 import {
@@ -72,7 +73,7 @@ let global_refresh_cache: null|{start:number, end:number} = null
  *     override emit_save
  * }
  */
-export abstract class EditableCodeblock {
+export class EditableCodeblock {
 	el: HTMLElement;
 
 	// 丢弃依赖
@@ -138,13 +139,13 @@ export abstract class EditableCodeblock {
 	 */
 	renderTextareaPre(): void {
 		// dom
-		// - div.obsidian-shiki-plugin
+		// - div.editable-codeblock
 		//   - span > pre > code
 		//   - textarea
 		//   - div.language-edit
 		
 		// div
-		const div = document.createElement('div'); this.el.appendChild(div); div.classList.add('obsidian-shiki-plugin')
+		const div = document.createElement('div'); this.el.appendChild(div); div.classList.add('editable-codeblock')
 
 		// span
 		const span = document.createElement('span'); div.appendChild(span);
@@ -287,12 +288,12 @@ export abstract class EditableCodeblock {
 	 */
 	async renderEditablePre(): Promise<void> {
 		// dom
-		// - div.obsidian-shiki-plugin.editable-pre
+		// - div.editable-codeblock.editable-pre
 		//   - pre
 		//     - code.language-<codeType>
 
 		// div
-		const div = document.createElement('div'); this.el.appendChild(div); div.classList.add('obsidian-shiki-plugin', 'editable-pre')
+		const div = document.createElement('div'); this.el.appendChild(div); div.classList.add('editable-codeblock', 'editable-pre')
 
 		// pre, code
 		await this.emit_render(div)
@@ -730,5 +731,7 @@ export abstract class EditableCodeblock {
 	 * @param isUpdateLanguage reduce modifications and minimize mistakes, can be used to increase stability
 	 * @param isUpdateSource   reduce modifications and minimize mistakes, can be used to increase stability
 	 */
-	abstract emit_save(isUpdateLanguage: boolean, isUpdateSource: boolean): Promise<void>;
+	emit_save(isUpdateLanguage: boolean, isUpdateSource: boolean): Promise<void> {
+		return new Promise<void>((resolve, reject) => {})
+	}
 }
