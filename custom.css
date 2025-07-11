@@ -112,27 +112,6 @@ span.shiki-ul {
 	margin-bottom: 16px !important;
 }
 
-/* language-type-btn */
-.editable-codeblock .language-edit {
-	position: absolute;
-	bottom: 1px;
-	right: 0;
-	margin: 0;
-	padding: 0;
-	line-height: var(--shiki-line-height);
-	min-height: var(--shiki-line-height);
-	font-size: 13px;
-	opacity: 0.5;
-}
-.editable-codeblock .language-edit>input {
-	margin: 0;
-	padding: 0 14px;
-	border: none;
-	background: none;
-	box-shadow: none;
-	text-align: right;
-}
-
 /* pdf. Avoid displaying metadata in pdf exports. */
 .print .mod-frontmatter {
 	display: none !important;

@@ -2,6 +2,19 @@
  * shiki transformers style
  * https://shiki.style/packages/transformers#unstyled
  */
+
+/* ----------------------------- adapt obsidian --------------------- */
+
+/* var(--indent-size)
+var(--code-size)
+var(--font-monospace)
+--text-selection*/
+/* :root {
+	--font-monospace: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+} */
+
+/* ----------------------------- adapt vuepress --------------------- */
+
 /* color perset */
 :root {
 	--vp-c-gray-1: #dddde3;
@@ -131,6 +144,8 @@
 	--vp-code-tab-active-bar-color: var(--vp-c-brand-1)
 }
 
+/* ----------------------------- line flag -------------------------- */
+
 code>span.line.diff {
 	transition: background-color .5s;
 	margin: 0 calc(-1 * var(--shiki-x-padding));
@@ -187,34 +202,10 @@ code>span.line.highlighted.warning {
 	opacity:1
 }
 
-/* chore fix: keep color magin zero */
-code>span.line {
-	line-height: var(--shiki-line-height);
-}
-
-.editable-codeblock {
-	position: relative;
-	min-width: 100%;
-}
-
-/* shiki attr style */
-.editable-codeblock textarea {
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	resize: none;
-	overflow: auto;
-	background-color: transparent;
-	/* color: transparent; */
-	color: #ffffff22;
-}
+/* ----------------------------- keep same in textarePre ------------ */
 
 /*
- * keep same: pre & textare
+ * keep same: pre & textarea
  * 
  * It is necessary to ensure that the style of this part is not overwritten,
  * Otherwise, `textarea` and `code` won't align
@@ -240,6 +231,7 @@ code>span.line {
 	border: 0 !important;
 }
 .editable-codeblock pre, .editable-codeblock textarea {
+	box-sizing: border-box !important;
 	margin: 0 !important;
 	padding: 12px var(--shiki-x-padding) !important;
 	border: 0 !important;
@@ -253,6 +245,56 @@ code>span.line {
 .editable-codeblock code > span {
 	vertical-align: top !important;
 	min-height: var(--shiki-line-height) !important;
+}
+
+/* ----------------------------- other ------------------------------ */
+
+/* language-type-btn */
+.editable-codeblock .language-edit {
+	position: absolute;
+	bottom: 1px;
+	right: 0;
+	margin: 0;
+	padding: 0;
+	line-height: var(--shiki-line-height);
+	min-height: var(--shiki-line-height);
+	font-size: 13px;
+	opacity: 0.5;
+}
+.editable-codeblock .language-edit>input {
+	margin: 0;
+	padding: 0 14px;
+	border: none;
+	background: none;
+	box-shadow: none;
+	text-align: right;
+	color: currentColor;
+}
+
+/* chore fix: keep color magin zero */
+code>span.line {
+	line-height: var(--shiki-line-height);
+}
+
+.editable-codeblock {
+	position: relative;
+	min-width: 100%;
+}
+
+/* shiki attr style */
+.editable-codeblock textarea {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	resize: none;
+	overflow: auto;
+	background-color: transparent;
+	/* color: transparent; */
+	color: #ffffff22;
 }
 
 .is-no-saved::before {
