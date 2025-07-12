@@ -190,19 +190,12 @@ export class EditableCodeblock {
 		// #region textarea - async part - oninput/onchange
 		// refresh/save strategy1: input no save
 		if (this.settings.saveMode == 'onchange') {
-			textarea.oninput = (ev): void => {
-				if (isComposing) return
-
-				const newValue = (ev.target as HTMLTextAreaElement).value
-				this.outerInfo.source = newValue
-				void this.emit_render(span)
-				div.classList.add('is-no-saved');
+			textarea.oninput = (ev): void => {			
+				emit_change((ev.target as HTMLTextAreaElement).value, true, false, false)
 			}
 			// TODO: fix: not emit onchange when no change, and is-no-saved class will not remove. 
 			textarea.onchange = (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
-				const newValue = (ev.target as HTMLTextAreaElement).value
-				this.outerInfo.source = newValue
-				div.classList.remove('is-no-saved'); void this.emit_save(false, true)
+				emit_change((ev.target as HTMLTextAreaElement).value, false, true, false)
 			}
 		}
 		// refresh/save strategy2: cache and rebuild
@@ -217,16 +210,24 @@ export class EditableCodeblock {
 				// return
 			})
 			textarea.oninput = (ev): void => {
-				if (isComposing) return
+				emit_change((ev.target as HTMLTextAreaElement).value, false, true, true) // old: isRender is true
+			}
+		}
 
-				const newValue = (ev.target as HTMLTextAreaElement).value
-				this.outerInfo.source = newValue
+		const emit_change = (newValue: string, isRender: boolean, isSave: boolean, isSavePos: boolean): void => {
+			if (isComposing) return
+			this.outerInfo.source = newValue
+			if (isRender) {
 				void this.emit_render(span)
-
+				div.classList.add('is-no-saved');
+			}
+			if (isSavePos) {
 				global_refresh_cache = {
 					start: textarea.selectionStart,
 					end: textarea.selectionEnd,
 				}
+			}
+			if (isSave) {
 				div.classList.remove('is-no-saved'); void this.emit_save(false, true)
 			}
 		}
@@ -330,12 +331,34 @@ export class EditableCodeblock {
 				global_refresh_cache = null
 			})
 			code.oninput = (ev): void => {
-				if (isComposing) return
-				if (!pre || !code) { LLOG.error('render failed. can\'t find pre/code 12'); return }
+				emit_change((ev.target as HTMLPreElement).innerText, true, false, false) // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
+			}
+			//   pre/code without onchange, use blur event
+			code.addEventListener('blur', (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
+				emit_change((ev.target as HTMLPreElement).innerText, false, true, false) // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
+			})
+		}
+		// refresh/save strategy2: cache and rebuild
+		else {
+			void Promise.resolve().then(() => {
+				if (!global_refresh_cache) return
+				if (!pre || !code) { LLOG.error('render failed. can\'t find pre/code 21'); global_refresh_cache = null; return }
+				this.renderEditablePre_restoreCursorPosition(pre, global_refresh_cache.start, global_refresh_cache.end)
+				global_refresh_cache = null
+			})
+			code.oninput = (ev): void => {
+				emit_change((ev.target as HTMLPreElement).innerText, false, true, true) // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
+				// old save more simple: void this.emit_render(div)
+			}
+		}
 
-				const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
-				this.outerInfo.source = newValue
-				
+		const emit_change = (newValue: string, isRender: boolean, isSave: boolean, isSavePos: boolean): void => {
+			if (isComposing) return
+			if (!pre || !code) { LLOG.error('render failed. can\'t find pre/code 12'); return }
+
+
+			this.outerInfo.source = newValue // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
+			if (isRender) {
 				void Promise.resolve().then(async () => { // like vue nextTick, ensure that the cursor is behind
 					pre = div.querySelector(':scope>pre')
 					code = div.querySelector(':scope>pre>code')
@@ -356,30 +379,10 @@ export class EditableCodeblock {
 					global_refresh_cache = null
 				})
 			}
-			//   pre/code without onchange, use blur event
-			code.addEventListener('blur', (ev): void => { // save must on oninput: avoid: textarea --update--> source update --update--> textarea (lose curosr position)
-				const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
-				this.outerInfo.source = newValue // prism use textContent and shiki use innerHTML, Their escapes from `</>` are different
-				div.classList.remove('is-no-saved'); void this.emit_save(false, true)
-			})
-		}
-		// refresh/save strategy2: cache and rebuild
-		else {
-			void Promise.resolve().then(() => {
-				if (!global_refresh_cache) return
-				if (!pre || !code) { LLOG.error('render failed. can\'t find pre/code 21'); global_refresh_cache = null; return }
-				this.renderEditablePre_restoreCursorPosition(pre, global_refresh_cache.start, global_refresh_cache.end)
-				global_refresh_cache = null
-			})
-			code.oninput = (ev): void => {
-				if (isComposing) return
-				if (!pre || !code) { LLOG.error('render failed. can\'t find pre/code 22'); return }
-
-				const newValue = (ev.target as HTMLPreElement).innerText // .textContent more fast, but can't get new line by 'return' (\n yes, br no)
-				this.outerInfo.source = newValue
-				void this.emit_render(div)
-
+			if (isSavePos) {
 				global_refresh_cache = this.renderEditablePre_saveCursorPosition(pre)
+			}
+			if (isSave) {
 				div.classList.remove('is-no-saved'); void this.emit_save(false, true)
 			}
 		}
