@@ -3,17 +3,19 @@
  * https://shiki.style/packages/transformers#unstyled
  */
 
-/* ----------------------------- adapt obsidian --------------------- */
+/* ----------------------------- adapt without obsidian ------------ */
 
 /* var(--indent-size)
 var(--code-size)
 var(--font-monospace)
---text-selection*/
-/* :root {
+*/
+:root {
 	--font-monospace: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-} */
+	--text-selection: #0078D788;
+	/* #4814ff44; */
+}
 
-/* ----------------------------- adapt vuepress --------------------- */
+/* ----------------------------- adapt without vuepress ------------- */
 
 /* color perset */
 :root {
@@ -295,6 +297,15 @@ code>span.line {
 	background-color: transparent;
 	/* color: transparent; */
 	color: #ffffff22;
+	caret-color: #ffffffdd;
+}
+.editable-codeblock textarea:focus {
+	/* outline: none; */
+	outline: 1px solid #0060DF;
+	border-radius: 4px;
+}
+.editable-codeblock code:focus {
+	outline: none;
 }
 
 .is-no-saved::before {

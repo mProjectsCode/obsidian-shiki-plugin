@@ -40,6 +40,7 @@ export default class EditableCodeblockInOb extends EditableCodeblock {
 		this.editor = this.plugin.app.workspace.activeEditor?.editor ?? null
 		this.isReadingMode = ctx.containerEl.hasClass('markdown-preview-section') || ctx.containerEl.hasClass('markdown-preview-view');
 		this.isMarkdownRendered = !ctx.el.hasClass('.cm-preview-code-block') && ctx.el.hasClass('markdown-rendered') // TODO fix: can't check codeblock in Editor codeblock
+		this.settings = this.plugin.settings
 
 		// override
 		this.outerInfo = this.init_outerInfo2(language_old, source_old, el, ctx)

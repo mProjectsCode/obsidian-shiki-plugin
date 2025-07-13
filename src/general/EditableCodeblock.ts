@@ -3,6 +3,8 @@
  * 
  * This module previously relied on the `Obsidian` API,
  * but has now been changed to a general module: editable code blocks.
+ * 
+ * TODO: fix textareaPre x-scrool
  */ 
 
 import 'src/general/EditableCodeblock.css'
