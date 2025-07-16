@@ -164,19 +164,7 @@ export class ShikiSettingsTab extends PluginSettingTab {
 
 	async renderLiveCodeblock(): Promise<void> {
 		const codeBlockContainer = this.containerEl.createDiv();
-		const codeBlockMarkdownString = `
-### Live Preview
-\`\`\`typescript\n
-// Example TypeScript code
-function greet(name: string): string {
-	return \`Hello, \${name}!\`;
-}
-
-const result = greet('World');
-console.log(result);
-\`\`\`
-> [!warning] Reload Highlighter to see the current theme in action.
-		`;
+		const codeBlockMarkdownString = `### Live Preview\n\`\`\`typescript\n// Example TypeScript code\nfunction greet(name: string): string {\nreturn \`Hello, \${name}!\`;\n}\n\nconst result = greet('World');\nconsole.log(result);\n\`\`\`\n> [!warning] Reload Highlighter to see the current theme in action.\n`;
 
 		await MarkdownRenderer.render(this.plugin.app, codeBlockMarkdownString, codeBlockContainer, codeBlockMarkdownString, this.plugin);
 	}
