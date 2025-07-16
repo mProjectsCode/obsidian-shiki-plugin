@@ -5,15 +5,15 @@
 
 /* ----------------------------- adapt without obsidian ------------ */
 
-/* var(--indent-size)
+/*
+[!code hl]
 var(--code-size)
-var(--font-monospace)
 */
-:root {
+/* :root {
 	--font-monospace: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 	--text-selection: #0078D788;
-	/* #4814ff44; */
-}
+	--indent-size: 4;
+} */
 
 /* ----------------------------- adapt without vuepress ------------- */
 
@@ -228,11 +228,13 @@ code>span.line.highlighted.warning {
 	color: currentColor !important
 }
 .editable-codeblock code {
+	display: block !important;
 	margin: 0 !important;
 	padding: 0 !important;
 	border: 0 !important;
 }
 .editable-codeblock pre, .editable-codeblock textarea {
+	display: block !important;
 	box-sizing: border-box !important;
 	margin: 0 !important;
 	padding: 12px var(--shiki-x-padding) !important;
@@ -303,6 +305,9 @@ code>span.line {
 	/* outline: none; */
 	outline: 1px solid #0060DF;
 	border-radius: 4px;
+}
+.editable-codeblock pre:focus, .editable-codeblock pre:has(> code:focus) {
+	outline: 1px solid #0060DF;
 }
 .editable-codeblock code:focus {
 	outline: none;

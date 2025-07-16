@@ -116,11 +116,24 @@ export default class ShikiPlugin extends Plugin {
 						}
 						
 						// able edit live
-						// disadvantage: First screen CLS (Page jitter)
+						if (language.startsWith('sk-')) { // editable callout
+							const editableCodeblock = new EditableCodeblock(this, language, source, el, ctx)
+							editableCodeblock.renderCallout()
+							return
+						}
+						// else if (this.settings.renderMode === 'textarea'
+						// 	|| this.settings.renderMode === 'pre'
+						// 	|| this.settings.renderMode === 'editablePre')
 						{
 							const editableCodeblock = new EditableCodeblock(this, language, source, el, ctx)
-							editableCodeblock.renderTextareaPre()
+							editableCodeblock.render()
+							return
 						}
+						// else {
+						// 	const codeBlock = new CodeBlock(this, el, source, language, ctx);
+						// 	ctx.addChild(codeBlock)
+						// 	return
+						// }
 					},
 					1000,
 				);

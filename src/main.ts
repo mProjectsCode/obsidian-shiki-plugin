@@ -124,19 +124,12 @@ export default class ShikiPlugin extends Plugin {
 							editableCodeblock.renderCallout()
 							return
 						}
-						else if (this.settings.renderMode === 'textarea') { // disadvantage: First screen CLS (Page jitter)
+						else if (this.settings.renderMode === 'textarea'
+							|| this.settings.renderMode === 'pre'
+							|| this.settings.renderMode === 'editablePre')
+						{
 							const editableCodeblock = new EditableCodeblock(this, language, source, el, ctx)
-							editableCodeblock.renderTextareaPre()
-							return
-						}
-						else if (this.settings.renderMode === 'pre') {
-							const editableCodeblock = new EditableCodeblock(this, language, source, el, ctx)
-							void editableCodeblock.emit_render(el)
-							return
-						}
-						else if (this.settings.renderMode === 'editablePre') {
-							const editableCodeblock = new EditableCodeblock(this, language, source, el, ctx)
-							void editableCodeblock.renderEditablePre()
+							editableCodeblock.render()
 							return
 						}
 						else {
