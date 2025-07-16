@@ -5,7 +5,6 @@ import { bundledThemesInfo } from 'shiki';
 
 export class ShikiSettingsTab extends PluginSettingTab {
 	plugin: ShikiPlugin;
-	//exampleCodeblockContainer: HTMLElement;
 
 	constructor(plugin: ShikiPlugin) {
 		super(plugin.app, plugin);
