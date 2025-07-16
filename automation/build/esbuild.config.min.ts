@@ -9,7 +9,7 @@ const build = await esbuild.build({
 	banner: {
 		js: banner,
 	},
-	entryPoints: ['src/main.ts'],
+	entryPoints: ['src/main.min.ts'],
 	bundle: true,
 	external: [
 		'obsidian',
@@ -26,13 +26,14 @@ const build = await esbuild.build({
 		'@lezer/highlight',
 		'@lezer/lr',
 		...builtins,
+		'shiki', // [!code hl]
 	],
 	format: 'cjs',
 	target: 'es2018',
 	logLevel: 'info',
 	sourcemap: false,
 	treeShaking: true,
-	outfile: 'main.js',
+	outfile: 'dist-min/main.js', // [!code hl]
 	minify: true,
 	metafile: true,
 	define: {
@@ -51,15 +52,5 @@ const build = await esbuild.build({
 
 const file = Bun.file('meta.txt');
 await Bun.write(file, JSON.stringify(build.metafile, null, '\t'));
-
-// css
-await esbuild.build({
-    entryPoints: ["custom.css"],
-    outfile: "styles.css",
-    // watch: !prod, // 似乎若升级esbuild后不再支持
-    bundle: true,
-    allowOverwrite: true,
-    minify: false,
-});
 
 process.exit(0);

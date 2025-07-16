@@ -1,3 +1,7 @@
+/* Direct editing of styles.css is not allowed. Instead, the file should be edited. */
+
+@import url("src/general/EditableCodeblock.css");
+
 body {
 	--shiki-code-background: var(--code-background);
 	--shiki-code-normal: var(--text-muted);
@@ -95,4 +99,20 @@ span.shiki-ul {
 /* Settings tab  */
 .setting-item-control input.shiki-custom-theme-folder {
 	min-width: 250px;
+}
+
+/* read mode / rendered */
+.markdown-preview-view .editable-codeblock textarea,
+.markdown-rendered:not(.cm-preview-code-block.cm-embed-block) .editable-codeblock textarea {
+	display: none;
+}
+.markdown-preview-view .editable-codeblock pre,
+.markdown-rendered:not(.cm-preview-code-block.cm-embed-block) .editable-codeblock pre {
+	margin-top: 16px !important;
+	margin-bottom: 16px !important;
+}
+
+/* pdf. Avoid displaying metadata in pdf exports. */
+.print .mod-frontmatter {
+	display: none !important;
 }

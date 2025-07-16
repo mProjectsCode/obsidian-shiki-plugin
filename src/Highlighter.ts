@@ -179,6 +179,7 @@ export class CodeHighlighter {
 		this.shiki = await createHighlighter({
 			themes: [await this.themeMapper.getTheme()],
 			langs: this.customLanguages,
+
 		});
 	}
 

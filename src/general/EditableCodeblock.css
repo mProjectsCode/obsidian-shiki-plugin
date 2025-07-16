@@ -1,0 +1,328 @@
+/*
+ * shiki transformers style
+ * https://shiki.style/packages/transformers#unstyled
+ */
+
+/* ----------------------------- adapt without obsidian ------------ */
+
+/*
+[!code hl]
+var(--code-size)
+*/
+/* :root {
+	--font-monospace: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+	--text-selection: #0078D788;
+	--indent-size: 4;
+} */
+
+/* ----------------------------- adapt without vuepress ------------- */
+
+/* color perset */
+:root {
+	--vp-c-gray-1: #dddde3;
+	--vp-c-gray-2: #e4e4e9;
+	--vp-c-gray-3: #ebebef;
+	--vp-c-gray-soft: rgba(142, 150, 170, .14);
+	--vp-c-indigo-1: #3451b2;
+	--vp-c-indigo-2: #3a5ccc;
+	--vp-c-indigo-3: #5672cd;
+	--vp-c-indigo-soft: rgba(100, 108, 255, .14);
+	--vp-c-purple-1: #6f42c1;
+	--vp-c-purple-2: #7e4cc9;
+	--vp-c-purple-3: #8e5cd9;
+	--vp-c-purple-soft: rgba(159, 122, 234, .14);
+	--vp-c-green-1: #18794e;;
+	--vp-c-green-2: #299764;
+	--vp-c-green-3: #30a46c;
+	--vp-c-green-soft: rgba(16, 185, 129, .14);;
+	--vp-c-yellow-1: #915930;
+	--vp-c-yellow-2: #946300;
+	--vp-c-yellow-3: #9f6a00;
+	--vp-c-yellow-soft: rgba(234, 179, 8, .14);
+	--vp-c-red-1: #b8272c;
+	--vp-c-red-2: #d5393e;
+	--vp-c-red-3: #e0575b;
+	--vp-c-red-soft: rgba(244, 63, 94, .14);
+}
+.dark {
+	--vp-c-gray-1: #515c67;
+	--vp-c-gray-2: #414853;
+	--vp-c-gray-3: #32363f;
+	--vp-c-gray-soft: rgba(101, 117, 133, .16);
+	--vp-c-indigo-1: #a8b1ff;
+	--vp-c-indigo-2: #5c73e7;
+	--vp-c-indigo-3: #3e63dd;
+	--vp-c-indigo-soft: rgba(100, 108, 255, .16);
+	--vp-c-purple-1: #c8abfa;
+	--vp-c-purple-2: #a879e6;
+	--vp-c-purple-3: #8e5cd9;
+	--vp-c-purple-soft: rgba(159, 122, 234, .16);
+	--vp-c-green-1: #3dd68c;;
+	--vp-c-green-2: #30a46c;
+	--vp-c-green-3: #298459;
+	--vp-c-green-soft: rgba(16, 185, 129, .16);;
+	--vp-c-yellow-1: #f9b44e;
+	--vp-c-yellow-2: #da8b17;
+	--vp-c-yellow-3: #a46a0a;
+	--vp-c-yellow-soft: rgba(234, 179, 8, .16);
+	--vp-c-red-1: #f66f81;;
+	--vp-c-red-2: #f14158;
+	--vp-c-red-3: #b62a3c;
+	--vp-c-red-soft: rgba(244, 63, 94, .16);;
+}
+
+/* Adapt to color preset */
+:root {
+	--vp-c-default-1: var(--vp-c-gray-1);
+	--vp-c-default-2: var(--vp-c-gray-2);
+	--vp-c-default-3: var(--vp-c-gray-3);
+	--vp-c-default-soft: var(--vp-c-gray-soft);;
+	--vp-c-brand-1: var(--vp-c-indigo-1);
+	--vp-c-brand-2: var(--vp-c-indigo-2);
+	--vp-c-brand-3: var(--vp-c-indigo-3);
+	--vp-c-brand-soft: var(--vp-c-indigo-soft);
+	--vp-c-brand: var(--vp-c-brand-1);
+	--vp-c-tip-1: var(--vp-c-brand-1);
+	--vp-c-tip-2: var(--vp-c-brand-2);
+	--vp-c-tip-3: var(--vp-c-brand-3);
+	--vp-c-tip-soft: var(--vp-c-brand-soft);
+	--vp-c-note-1: var(--vp-c-brand-1);
+	--vp-c-note-2: var(--vp-c-brand-2);
+	--vp-c-note-3: var(--vp-c-brand-3);
+	--vp-c-note-soft: var(--vp-c-brand-soft);
+	--vp-c-success-1: var(--vp-c-green-1);;
+	--vp-c-success-2: var(--vp-c-green-2);
+	--vp-c-success-3: var(--vp-c-green-3);
+	--vp-c-success-soft: var(--vp-c-green-soft);;
+	--vp-c-important-1: var(--vp-c-purple-1);
+	--vp-c-important-2: var(--vp-c-purple-2);
+	--vp-c-important-3: var(--vp-c-purple-3);
+	--vp-c-important-soft: var(--vp-c-purple-soft);
+	--vp-c-warning-1: var(--vp-c-yellow-1);
+	--vp-c-warning-2: var(--vp-c-yellow-2);
+	--vp-c-warning-3: var(--vp-c-yellow-3);
+	--vp-c-warning-soft: var(--vp-c-yellow-soft);;
+	--vp-c-danger-1: var(--vp-c-red-1);;
+	--vp-c-danger-2: var(--vp-c-red-2);
+	--vp-c-danger-3: var(--vp-c-red-3);
+	--vp-c-danger-soft: var(--vp-c-red-soft);;
+	--vp-c-caution-1: var(--vp-c-red-1);
+	--vp-c-caution-2: var(--vp-c-red-2);
+	--vp-c-caution-3: var(--vp-c-red-3);
+	--vp-c-caution-soft: var(--vp-c-red-soft)
+}
+
+/* Adapt to vuepress */
+:root {
+	--vp-code-line-height: 1.7;
+	--vp-code-font-size: .875em;
+	--vp-code-color: var(--vp-c-brand-1);
+	--vp-code-link-color: var(--vp-c-brand-1);
+	--vp-code-link-hover-color: var(--vp-c-brand-2);
+	--vp-code-bg: var(--vp-c-default-soft);
+	--vp-code-block-color: var(--vp-c-text-2);
+	--vp-code-block-bg: var(--vp-c-bg-alt);
+	--vp-code-block-divider-color: var(--vp-c-gutter);
+	--vp-code-lang-color: var(--vp-c-text-2);
+	--vp-code-line-highlight-color: var(--vp-c-default-soft);;
+	--vp-code-line-number-color: var(--vp-c-text-2);
+	--vp-code-line-diff-add-color: var(--vp-c-success-soft);;
+	--vp-code-line-diff-add-symbol-color: var(--vp-c-success-1);;
+	--vp-code-line-diff-remove-color: var(--vp-c-danger-soft);;
+	--vp-code-line-diff-remove-symbol-color: var(--vp-c-danger-1);;
+	--vp-code-line-warning-color: var(--vp-c-warning-soft);;
+	--vp-code-line-error-color: var(--vp-c-danger-soft);;
+	--vp-code-copy-code-border-color: var(--vp-c-divider);
+	--vp-code-copy-code-bg: var(--vp-c-bg-soft);
+	--vp-code-copy-code-hover-border-color: var(--vp-c-divider);
+	--vp-code-copy-code-hover-bg: var(--vp-c-bg);
+	--vp-code-copy-code-active-text: var(--vp-c-text-2);
+	--vp-code-copy-copied-text-content: "Copied";
+	--vp-code-tab-divider: var(--vp-code-block-divider-color);
+	--vp-code-tab-text-color: var(--vp-c-text-2);
+	--vp-code-tab-bg: var(--vp-code-block-bg);
+	--vp-code-tab-hover-text-color: var(--vp-c-text-1);
+	--vp-code-tab-active-text-color: var(--vp-c-text-1);
+	--vp-code-tab-active-bar-color: var(--vp-c-brand-1)
+}
+
+/* ----------------------------- line flag -------------------------- */
+
+code>span.line.diff {
+	transition: background-color .5s;
+	margin: 0 calc(-1 * var(--shiki-x-padding));
+	padding: 0 var(--shiki-x-padding);
+	width: calc(100% + 2 * var(--shiki-x-padding));
+	display: inline-block
+}
+code>span.line.diff:before {
+	position: absolute;
+	left: 5px; /*old 10*/
+}
+code>span.line.diff.add {
+	background-color: var(--vp-code-line-diff-add-color);
+}
+code>span.line.diff.add:before {
+	content: "+";
+	color: var(--vp-code-line-diff-add-symbol-color)
+}
+code>span.line.diff.remove {
+	background-color: var(--vp-code-line-diff-remove-color);
+}
+code>span.line.diff.remove:before {
+	content: "-";
+	color: var(--vp-code-line-diff-remove-symbol-color)
+}
+code>span.line.highlighted {
+	background-color: var(--vp-code-line-highlight-color);
+	transition: background-color .5s;
+	margin: 0 calc(-1 * var(--shiki-x-padding));
+	padding: 0 var(--shiki-x-padding);
+	width: calc(100% + 2 * var(--shiki-x-padding));
+	display: inline-block
+}
+code>span.line.highlighted.error {
+	background-color: var(--vp-code-line-error-color)
+}
+code>span.line.highlighted.warning {
+	background-color: var(--vp-code-line-warning-color)
+}
+.has-focused code>span.line:not(.focused),
+.has-focused-lines code>span.line:not(.has-focus) {
+	filter:blur(.095rem);
+	opacity:.4;
+	transition:filter .35s,opacity .35s
+}
+.has-focused code>span.line:not(.focused),
+.has-focused-lines code>span.line:not(.has-focus) {
+	opacity:.7;
+	transition:filter .35s,opacity .35s
+}
+.has-focused:hover code>span.line:not(.focused),
+.has-focused-lines:hover code>span.line:not(.has-focus) {
+	filter:blur(0);
+	opacity:1
+}
+
+/* ----------------------------- keep same in textarePre ------------ */
+
+/*
+ * keep same: pre & textarea
+ * 
+ * It is necessary to ensure that the style of this part is not overwritten,
+ * Otherwise, `textarea` and `code` won't align
+ */
+:root {
+	--shiki-x-padding: 16px;
+	--shiki-line-height: 24px;
+ }
+.editable-codeblock code, .editable-codeblock textarea {
+	line-height: var(--shiki-line-height) !important;
+	tab-size: var(--indent-size) !important;
+	font-size: var(--code-size) !important;
+	font-family: var(--font-monospace) !important;
+	white-space: pre !important;
+}
+.editable-codeblock code::selection, .editable-codeblock textarea::selection {
+	background-color: var(--text-selection) !important;
+	color: currentColor !important
+}
+.editable-codeblock code {
+	display: block !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+}
+.editable-codeblock pre, .editable-codeblock textarea {
+	display: block !important;
+	box-sizing: border-box !important;
+	margin: 0 !important;
+	padding: 12px var(--shiki-x-padding) !important;
+	border: 0 !important;
+	white-space: pre !important;
+	cursor: text;
+}
+/* edit-block-button > textarea > pre */
+.editable-codeblock pre { z-index: 0; }
+.editable-codeblock textarea { z-index: 0; }
+/* fix black line zero height */
+.editable-codeblock code > span {
+	vertical-align: top !important;
+	min-height: var(--shiki-line-height) !important;
+}
+
+/* ----------------------------- other ------------------------------ */
+
+/* language-type-btn */
+.editable-codeblock .language-edit {
+	position: absolute;
+	bottom: 1px;
+	right: 0;
+	margin: 0;
+	padding: 0;
+	line-height: var(--shiki-line-height);
+	min-height: var(--shiki-line-height);
+	font-size: 13px;
+	opacity: 0.5;
+}
+.editable-codeblock .language-edit>input {
+	margin: 0;
+	padding: 0 14px;
+	border: none;
+	background: none;
+	box-shadow: none;
+	text-align: right;
+	color: currentColor;
+}
+
+/* chore fix: keep color magin zero */
+code>span.line {
+	line-height: var(--shiki-line-height);
+}
+
+.editable-codeblock {
+	position: relative;
+	min-width: 100%;
+}
+
+/* shiki attr style */
+.editable-codeblock textarea {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	resize: none;
+	overflow: auto;
+	background-color: transparent;
+	/* color: transparent; */
+	color: #ffffff22;
+	caret-color: #ffffffdd;
+}
+.editable-codeblock textarea:focus {
+	/* outline: none; */
+	outline: 1px solid #0060DF;
+	border-radius: 4px;
+}
+.editable-codeblock pre:focus, .editable-codeblock pre:has(> code:focus) {
+	outline: 1px solid #0060DF;
+}
+.editable-codeblock code:focus {
+	outline: none;
+}
+
+.is-no-saved::before {
+	content: "";
+	position: absolute;
+	width: 2px;
+	height: 100%;
+	left: 0;
+	top: 0;
+	background-color: currentColor;
+	opacity: 0.5;
+	z-index: 10;
+	
+	/* border-left: solid 2px yellow !important; */
+}

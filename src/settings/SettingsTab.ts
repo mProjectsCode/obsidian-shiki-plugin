@@ -23,6 +23,18 @@ export class ShikiSettingsTab extends PluginSettingTab {
 			...builtInThemes,
 		};
 
+		this.containerEl.createEl('a', {
+			text: 'Settings Panel Document',
+			href: 'https://github.com/mProjectsCode/obsidian-shiki-plugin/blob/master/docs/README.md'
+		});
+		this.containerEl.createEl('span', {
+			text: ' | '
+		})
+		this.containerEl.createEl('a', {
+			text: 'Visual select theme',
+			href: 'https://textmate-grammars-themes.netlify.app'
+		});
+
 		new Setting(this.containerEl)
 			.setName('Reload Highlighter')
 			.setDesc('Reload the syntax highlighter. REQUIRED AFTER SETTINGS CHANGES.')
@@ -39,11 +51,55 @@ export class ShikiSettingsTab extends PluginSettingTab {
 
 		new Setting(this.containerEl)
 			.setName('Theme')
-			.setDesc('Select the theme for the code blocks.')
+			.setDesc('Select the theme for the code blocks (shiki).')
 			.addDropdown(dropdown => {
 				dropdown.addOptions(themes);
 				dropdown.setValue(this.plugin.settings.theme).onChange(async value => {
 					this.plugin.settings.theme = value;
+					await this.plugin.saveSettings();
+				});
+			});
+
+		new Setting(this.containerEl)
+			.setName('Render Engine')
+			.setDesc('Select the render engine for the code blocks.')
+			.addDropdown(dropdown => {
+				dropdown.addOptions({
+					'shiki': 'Shiki',
+					'prismjs': 'PrismJs',
+				});
+				dropdown.setValue(this.plugin.settings.renderEngine).onChange(async value => {
+					this.plugin.settings.renderEngine = value as 'shiki'|'prismjs';
+					await this.plugin.saveSettings();
+				});
+			});
+
+		new Setting(this.containerEl)
+			.setName('Render Mode')
+			.setDesc('Select the render mode for the code blocks.')
+			.addDropdown(dropdown => {
+				dropdown.addOptions({
+					'textarea': 'textarea pre',
+					'pre': 'pre',
+					'editablePre': 'editable pre (beta)',
+					'codemirror': 'codemirror',
+				});
+				dropdown.setValue(this.plugin.settings.renderMode).onChange(async value => {
+					this.plugin.settings.renderMode = value as 'textarea'|'pre'|'editablePre'|'codemirror';
+					await this.plugin.saveSettings();
+				});
+			});
+
+		new Setting(this.containerEl)
+			.setName('Auto Save Mode')
+			.setDesc('Select the auto save mode for the code blocks.')
+			.addDropdown(dropdown => {
+				dropdown.addOptions({
+					'onchange': 'when change',
+					'oninput': 'when input',
+				});
+				dropdown.setValue(this.plugin.settings.saveMode).onChange(async value => {
+					this.plugin.settings.saveMode = value as 'onchange'|'oninput';
 					await this.plugin.saveSettings();
 				});
 			});
