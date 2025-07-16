@@ -1,10 +1,11 @@
-import { PluginSettingTab, Setting, Platform, Notice, normalizePath } from 'obsidian';
+import { PluginSettingTab, Setting, Platform, Notice, normalizePath, MarkdownRenderer } from 'obsidian';
 import type ShikiPlugin from 'src/main';
 import { StringSelectModal } from 'src/settings/StringSelectModal';
 import { bundledThemesInfo } from 'shiki';
 
 export class ShikiSettingsTab extends PluginSettingTab {
 	plugin: ShikiPlugin;
+	//exampleCodeblockContainer: HTMLElement;
 
 	constructor(plugin: ShikiPlugin) {
 		super(plugin.app, plugin);
@@ -22,6 +23,9 @@ export class ShikiSettingsTab extends PluginSettingTab {
 			...customThemes,
 			...builtInThemes,
 		};
+
+		//add live preview
+		void this.renderLiveCodeblock();
 
 		new Setting(this.containerEl)
 			.setName('Reload Highlighter')
@@ -156,5 +160,24 @@ export class ShikiSettingsTab extends PluginSettingTab {
 					});
 			});
 		}
+	}
+
+	async renderLiveCodeblock(): Promise<void> {
+		const codeBlockContainer = this.containerEl.createDiv();
+		const codeBlockMarkdownString = `
+### Live Preview
+\`\`\`typescript\n
+// Example TypeScript code
+function greet(name: string): string {
+	return \`Hello, \${name}!\`;
+}
+
+const result = greet('World');
+console.log(result);
+\`\`\`
+> [!warning] Reload Highlighter to see the current theme in action.
+		`;
+
+		await MarkdownRenderer.render(this.plugin.app, codeBlockMarkdownString, codeBlockContainer, codeBlockMarkdownString, this.plugin);
 	}
 }
