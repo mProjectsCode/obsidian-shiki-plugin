@@ -1,4 +1,4 @@
-import { PluginSettingTab, Setting, Platform, Notice, normalizePath, MarkdownRenderer } from 'obsidian';
+import { PluginSettingTab, Setting, Platform, Notice, normalizePath } from 'obsidian';
 import type ShikiPlugin from 'src/main';
 import { StringSelectModal } from 'src/settings/StringSelectModal';
 import { bundledThemesInfo } from 'shiki';
@@ -162,9 +162,12 @@ export class ShikiSettingsTab extends PluginSettingTab {
 	}
 
 	async renderLiveCodeblock(): Promise<void> {
-		const codeBlockContainer = this.containerEl.createDiv();
-		const codeBlockMarkdownString = `### Live Preview\n\`\`\`typescript\n// Example TypeScript code\nfunction greet(name: string): string {\nreturn \`Hello, \${name}!\`;\n}\n\nconst result = greet('World');\nconsole.log(result);\n\`\`\`\n> [!warning] Reload Highlighter to see the current theme in action.\n`;
+		const codeBlockContainer = this.containerEl.createDiv({cls: "shiki-highkight-live-preview"});
 
-		await MarkdownRenderer.render(this.plugin.app, codeBlockMarkdownString, codeBlockContainer, codeBlockMarkdownString, this.plugin);
+		const codeString = `//Example TypeScript code\nfunction greet(name: string): string {\nreturn \`Hello, \${name}!\`;\n}\n\nconst result = greet('World');\nconsole.log(result);\n//Very very very very very very very very very very very very very very long line to test how works the code block wrapping\n`;
+
+		await this.plugin.highlighter.renderWithEc(codeString, "typescript", "", codeBlockContainer);
+
+		codeBlockContainer.createEl("p", {text: "Reload Highlighter to see the current theme in action.", cls: "setting-item-description"});
 	}
 }
