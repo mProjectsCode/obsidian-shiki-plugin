@@ -21,11 +21,10 @@ import {
 	transformerMetaWordHighlight,
 } from '@shikijs/transformers';
 import { bundledThemesInfo, codeToHtml } from 'shiki'; // 8.6MB
-import type Prism from 'prismjs';
 
 export const loadPrism2 = {
 	// can override
-	fn: async (): Promise<null> => {
+	fn: async (): Promise<any> => {
 		// import Prism from "prismjs"
 		// return Prism
 
@@ -740,7 +739,7 @@ export class EditableCodeblock {
 		}
 		// pre html string - prism, insert `<pre>...<pre/>`
 		else {
-			const prism = await loadPrism2.fn() as typeof Prism|null;
+			const prism = await loadPrism2.fn()
 			if (!prism) {
 				LLOG.error('warning: withou Prism')
 				return

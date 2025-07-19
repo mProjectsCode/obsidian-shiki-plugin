@@ -29,6 +29,7 @@ Shiki, PrismJS，CodeMirror
     同为块内编辑的obsidian新版本md表格，采用的是这种方式 (但ob表格编辑时不触发重渲染)
   - 缺点:
     原理上是将textarea和pre完美重叠在一起，但容易受主题和样式影响导致不完全重叠
+    textarea的横向滚动无法与pre的同步
 - pre
   - 缺点:
     不允许实时编辑

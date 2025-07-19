@@ -29,6 +29,7 @@ Shiki, PrismJS, CodeMirror
     The new version of Obsidian's md table within block editing uses this approach. (However, the ob table editing does not trigger a re-rendering.)
   - Disadvantage:
     In principle, textarea and pre are perfectly overlapped together, but they are prone to incomplete overlap due to the influence of themes and styles
+    The horizontal scrolling of the textarea cannot be synchronized with that of the pre.
 - pre
   - Disadvantage:
     Real-time editing is not allowed. The rendering effect is more similar to the textarea method
