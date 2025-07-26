@@ -24,7 +24,8 @@ export class ShikiSettingsTab extends PluginSettingTab {
 		};
 
 		//add live preview
-		void this.renderLiveCodeblock();
+		const codeBlockContainer = this.containerEl.createDiv({cls: "shiki-highkight-live-preview"});
+		void this.renderLiveCodeblock(codeBlockContainer);
 
 		new Setting(this.containerEl)
 			.setName('Reload Highlighter')
@@ -36,6 +37,7 @@ export class ShikiSettingsTab extends PluginSettingTab {
 					.onClick(async () => {
 						button.setDisabled(true);
 						await this.plugin.reloadHighlighter();
+						await this.renderLiveCodeblock(codeBlockContainer);
 						button.setDisabled(false);
 					});
 			});
@@ -161,8 +163,8 @@ export class ShikiSettingsTab extends PluginSettingTab {
 		}
 	}
 
-	async renderLiveCodeblock(): Promise<void> {
-		const codeBlockContainer = this.containerEl.createDiv({cls: "shiki-highkight-live-preview"});
+	async renderLiveCodeblock(codeBlockContainer: HTMLElement): Promise<void> {
+		codeBlockContainer.empty();
 
 		const codeString = `//Example TypeScript code\nfunction greet(name: string): string {\nreturn \`Hello, \${name}!\`;\n}\n\nconst result = greet('World');\nconsole.log(result);\n//Very very very very very very very very very very very very very very long line to test how works the code block wrapping\n`;
 
