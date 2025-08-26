@@ -2,7 +2,7 @@
 test: hello
 ---
 
-TypeScript codearsiNOM
+TypeScript code parsiNOM
 
 ```ts title="A part of ParsiNOM" {13-15, 22-29} showLineNumbers
 export class Parser<const SType extends STypeBase> {

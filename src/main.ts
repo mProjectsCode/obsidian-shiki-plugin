@@ -49,6 +49,14 @@ export default class ShikiPlugin extends Plugin {
 			}),
 		);
 
+		this.addCommand({
+			id: 'reload-highlighter',
+			name: 'Reload highlighter',
+			callback: () => {
+				void this.reloadHighlighter();
+			},
+		});
+
 		await this.registerPrismPlugin();
 	}
 
@@ -86,20 +94,9 @@ export default class ShikiPlugin extends Plugin {
 				this.registerMarkdownCodeBlockProcessor(
 					language,
 					async (source, el, ctx) => {
-						// @ts-expect-error
-						const isReadingMode = ctx.containerEl.hasClass('markdown-preview-section') || ctx.containerEl.hasClass('markdown-preview-view');
-						// this seems to indicate whether we are in the pdf export mode
-						// sadly there is no section info in this mode
-						// thus we can't check if the codeblock is at the start of the note and thus frontmatter
-						// const isPdfExport = ctx.displayMode === true;
-
-						// this is so that we leave the hidden frontmatter code block in reading mode alone
-						if (language === 'yaml' && isReadingMode && ctx.frontmatter) {
-							const sectionInfo = ctx.getSectionInfo(el);
-
-							if (sectionInfo && sectionInfo.lineStart === 0) {
-								return;
-							}
+						// we need to avoid making the hidden frontmatter code block visible
+						if (el.parentElement?.classList.contains('mod-frontmatter')) {
+							return;
 						}
 
 						const codeBlock = new CodeBlock(this, el, source, language, ctx);
@@ -115,23 +112,25 @@ export default class ShikiPlugin extends Plugin {
 	}
 
 	registerInlineCodeProcessor(): void {
-		this.registerMarkdownPostProcessor(async (el, ctx) => {
+		this.registerMarkdownPostProcessor(async (el, _) => {
 			const inlineCodes = el.findAll(':not(pre) > code');
 			for (let codeElm of inlineCodes) {
 				let match = codeElm.textContent?.match(SHIKI_INLINE_REGEX); // format: `{lang} code`
-				if (match) {
-					const highlight = await this.highlighter.getHighlightTokens(match[2], match[1]);
-					const tokens = highlight?.tokens.flat(1);
-					if (!tokens?.length) {
-						continue;
-					}
+				if (!match) {
+					continue;
+				}
 
-					codeElm.empty();
-					codeElm.addClass('shiki-inline');
+				const highlight = await this.highlighter.getHighlightTokens(match[2], match[1]);
+				const tokens = highlight?.tokens.flat(1);
+				if (!tokens?.length) {
+					continue;
+				}
 
-					for (let token of tokens) {
-						this.highlighter.tokenToSpan(token, codeElm);
-					}
+				codeElm.empty();
+				codeElm.addClass('shiki-inline');
+
+				for (let token of tokens) {
+					this.highlighter.tokenToSpan(token, codeElm);
 				}
 			}
 		});
