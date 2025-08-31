@@ -14,6 +14,8 @@ export default class ShikiPlugin extends Plugin {
 	settings!: Settings;
 	loadedSettings!: Settings;
 	updateCm6Plugin!: () => Promise<void>;
+	theme!: string;
+	themeObserver!: MutationObserver;
 
 	codeBlockProcessors: MarkdownPostProcessor[] = [];
 
@@ -21,6 +23,21 @@ export default class ShikiPlugin extends Plugin {
 		await this.loadSettings();
 		this.loadedSettings = structuredClone(this.settings);
 		this.addSettingTab(new ShikiSettingsTab(this));
+
+		this.updateTheme();
+		this.themeObserver = new MutationObserver(mutations => {
+			for (const mut of mutations) {
+				if (mut.type === 'attributes' && mut.attributeName === 'class') {
+					const themeBeforeUpdate = this.theme;
+					this.updateTheme();
+
+					if (themeBeforeUpdate != this.theme) {
+						void this.reloadHighlighter();
+					}
+				}
+			}
+		});
+		this.themeObserver.observe(document.body, { attributes: true });
 
 		this.highlighter = new CodeHighlighter(this);
 		await this.highlighter.load();
@@ -138,6 +155,7 @@ export default class ShikiPlugin extends Plugin {
 
 	onunload(): void {
 		this.highlighter.unload();
+		this.themeObserver.disconnect();
 	}
 
 	addActiveCodeBlock(codeBlock: CodeBlock): void {
@@ -167,5 +185,16 @@ export default class ShikiPlugin extends Plugin {
 
 	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
+	}
+
+	updateTheme(): void {
+		if (document.body.classList.contains('theme-light')) {
+			this.theme = this.loadedSettings.lightTheme;
+		} else if (document.body.classList.contains('theme-dark')) {
+			this.theme = this.loadedSettings.darkTheme;
+		} else {
+			// TODO: maybe the fallback should be an option?
+			this.theme = this.loadedSettings.darkTheme;
+		}
 	}
 }
