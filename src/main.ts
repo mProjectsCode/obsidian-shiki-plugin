@@ -167,6 +167,13 @@ export default class ShikiPlugin extends Plugin {
 
 	async loadSettings(): Promise<void> {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData()) as Settings;
+
+		// migrate the theme to darkTheme and lightTheme
+		if (this.settings.theme !== undefined) {
+			this.settings.darkTheme = this.settings.theme;
+			this.settings.lightTheme = this.settings.theme;
+			this.settings.theme = undefined;
+		}
 	}
 
 	async saveSettings(): Promise<void> {
