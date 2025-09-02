@@ -2,6 +2,7 @@ import { PluginSettingTab, Setting, Platform, Notice, normalizePath } from 'obsi
 import type ShikiPlugin from 'src/main';
 import { StringSelectModal } from 'src/settings/StringSelectModal';
 import { bundledThemesInfo } from 'shiki';
+import { OBSIDIAN_THEME_IDENTIFIER } from 'src/themes/ThemeMapper';
 
 export class ShikiSettingsTab extends PluginSettingTab {
 	plugin: ShikiPlugin;
@@ -18,7 +19,7 @@ export class ShikiSettingsTab extends PluginSettingTab {
 		const customThemes = Object.fromEntries(this.plugin.highlighter.customThemes.map(theme => [theme.name, `${theme.displayName} (${theme.type})`]));
 		const builtInThemes = Object.fromEntries(bundledThemesInfo.map(theme => [theme.id, `${theme.displayName} (${theme.type})`]));
 		const themes = {
-			'obsidian-theme': 'Obsidian built-in (both)',
+			[OBSIDIAN_THEME_IDENTIFIER]: 'Obsidian built-in (both)',
 			...customThemes,
 			...builtInThemes,
 		};

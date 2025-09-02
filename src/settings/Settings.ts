@@ -1,7 +1,12 @@
+import { OBSIDIAN_THEME_IDENTIFIER } from 'src/themes/ThemeMapper';
+
 export interface Settings {
 	disabledLanguages: string[];
 	customThemeFolder: string;
 	customLanguageFolder: string;
+	/**
+	 * @deprecated use darkTheme and lightTheme instead
+	 */
 	theme: string | undefined;
 	darkTheme: string;
 	lightTheme: string;
@@ -14,8 +19,8 @@ export const DEFAULT_SETTINGS: Settings = {
 	customThemeFolder: '',
 	customLanguageFolder: '',
 	theme: undefined,
-	darkTheme: 'obsidian-theme',
-	lightTheme: 'obsidian-theme',
+	darkTheme: OBSIDIAN_THEME_IDENTIFIER,
+	lightTheme: OBSIDIAN_THEME_IDENTIFIER,
 	preferThemeColors: true,
 	inlineHighlighting: true,
 };

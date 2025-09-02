@@ -1,22 +1,29 @@
 import { type ExpressiveCodeEngineConfig, type ExpressiveCodeTheme, type StyleValueOrValues, type UnresolvedStyleValue } from '@expressive-code/core';
-import { type Settings } from 'src/settings/Settings';
 
-export function getECTheme(theme: string, settings: Settings): ExpressiveCodeEngineConfig['styleOverrides'] {
-	const useThemeColors = settings.preferThemeColors && theme !== 'obsidian-theme';
+export function getECTheme(useThemeColors: boolean): ExpressiveCodeEngineConfig['styleOverrides'] {
+	let backgroundColor: UnresolvedStyleValue;
+	let foregroundColor: UnresolvedStyleValue;
+	let gutterBorderColor: UnresolvedStyleValue;
+	let gutterTextColor: UnresolvedStyleValue;
+	let gutterTextActiveColor: UnresolvedStyleValue;
 
-	const backgroundColor: UnresolvedStyleValue = ({ theme }: { theme: ExpressiveCodeTheme }): StyleValueOrValues =>
-		useThemeColors ? (theme.colors['editor.background'] ?? 'var(--shiki-code-background)') : 'var(--shiki-code-background)';
-	const foregroundColor: UnresolvedStyleValue = ({ theme }: { theme: ExpressiveCodeTheme }): StyleValueOrValues =>
-		theme.colors['editor.foreground'] ?? 'var(--shiki-code-normal)';
-
-	const gutterBorderColor: UnresolvedStyleValue = ({ theme }: { theme: ExpressiveCodeTheme }): StyleValueOrValues =>
-		useThemeColors ? (theme.colors['editorLineNumber.foreground'] ?? 'var(--shiki-gutter-border-color)') : 'var(--shiki-gutter-border-color)';
-	const gutterTextColor: UnresolvedStyleValue = ({ theme }: { theme: ExpressiveCodeTheme }): StyleValueOrValues =>
-		useThemeColors ? (theme.colors['editorLineNumber.foreground'] ?? 'var(--shiki-gutter-text-color)') : 'var(--shiki-gutter-text-color)';
-	const gutterTextActiveColor: UnresolvedStyleValue = ({ theme }: { theme: ExpressiveCodeTheme }): StyleValueOrValues =>
-		useThemeColors
-			? ((theme.colors['editorLineNumber.activeForeground'] || theme.colors['editorLineNumber.foreground']) ?? 'var(--shiki-gutter-text-color-highlight)')
-			: 'var(--shiki-gutter-text-color-highlight)';
+	if (useThemeColors) {
+		backgroundColor = ({ theme }: { theme: ExpressiveCodeTheme }): StyleValueOrValues =>
+			theme.colors['editor.background'] ?? 'var(--shiki-code-background)';
+		foregroundColor = ({ theme }: { theme: ExpressiveCodeTheme }): StyleValueOrValues => theme.colors['editor.foreground'] ?? 'var(--shiki-code-normal)';
+		gutterBorderColor = ({ theme }: { theme: ExpressiveCodeTheme }): StyleValueOrValues =>
+			theme.colors['editorLineNumber.foreground'] ?? 'var(--shiki-gutter-border-color)';
+		gutterTextColor = ({ theme }: { theme: ExpressiveCodeTheme }): StyleValueOrValues =>
+			theme.colors['editorLineNumber.foreground'] ?? 'var(--shiki-gutter-text-color)';
+		gutterTextActiveColor = ({ theme }: { theme: ExpressiveCodeTheme }): StyleValueOrValues =>
+			(theme.colors['editorLineNumber.activeForeground'] || theme.colors['editorLineNumber.foreground']) ?? 'var(--shiki-gutter-text-color-highlight)';
+	} else {
+		backgroundColor = 'var(--shiki-code-background)';
+		foregroundColor = 'var(--shiki-code-normal)';
+		gutterBorderColor = 'var(--shiki-gutter-border-color)';
+		gutterTextColor = 'var(--shiki-gutter-text-color)';
+		gutterTextActiveColor = 'var(--shiki-gutter-text-color-highlight)';
+	}
 
 	return {
 		borderColor: 'var(--shiki-code-block-border-color)',

@@ -92,7 +92,7 @@ export class CodeHighlighter {
 	}
 
 	async loadCustomThemes(): Promise<void> {
-		const activeTheme = this.plugin.getTheme();
+		const activeTheme = this.themeMapper.getThemeIdentifier();
 		this.customThemes = [];
 
 		// custom themes are disabled unless users specify a folder for them in plugin settings
@@ -128,7 +128,7 @@ export class CodeHighlighter {
 		}
 
 		// if the user's set theme cannot be loaded (e.g. it was deleted), fall back to default theme
-		if (this.usesCustomTheme() && !this.customThemes.find(theme => theme.name === activeTheme)) {
+		if (this.themeMapper.usingCustomTheme() && !this.customThemes.find(theme => theme.name === activeTheme)) {
 			// ony reset the theme that's currently broken
 			if (activeTheme == this.plugin.loadedSettings.darkTheme) {
 				this.plugin.settings.darkTheme = DEFAULT_SETTINGS.darkTheme;
@@ -145,6 +145,8 @@ export class CodeHighlighter {
 	}
 
 	async loadEC(): Promise<void> {
+		const useThemeColors = this.plugin.loadedSettings.preferThemeColors && !this.themeMapper.usingObsidianTheme();
+
 		this.ec = new ExpressiveCodeEngine({
 			themes: [new ExpressiveCodeTheme(await this.themeMapper.getThemeForEC())],
 			plugins: [
@@ -156,7 +158,7 @@ export class CodeHighlighter {
 				pluginLineNumbers(),
 				pluginFrames(),
 			],
-			styleOverrides: getECTheme(this.plugin.getTheme(), this.plugin.loadedSettings),
+			styleOverrides: getECTheme(useThemeColors),
 			minSyntaxHighlightingColorContrast: 0,
 			themeCssRoot: 'div.expressive-code',
 			defaultProps: {
@@ -187,10 +189,6 @@ export class CodeHighlighter {
 			themes: [await this.themeMapper.getTheme()],
 			langs: this.customLanguages,
 		});
-	}
-
-	usesCustomTheme(): boolean {
-		return this.plugin.getTheme().endsWith('.json');
 	}
 
 	/**
@@ -224,8 +222,14 @@ export class CodeHighlighter {
 		}
 		return this.shiki.codeToTokens(code, {
 			lang: lang as BundledLanguage,
-			theme: this.plugin.getTheme(),
+			theme: this.themeMapper.getThemeIdentifier(),
 		});
+	}
+
+	renderTokens(tokens: ThemedToken[], parent: HTMLElement): void {
+		for (const token of tokens) {
+			this.tokenToSpan(token, parent);
+		}
 	}
 
 	tokenToSpan(token: ThemedToken, parent: HTMLElement): void {

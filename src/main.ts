@@ -5,12 +5,13 @@ import { DEFAULT_SETTINGS, type Settings } from 'src/settings/Settings';
 import { ShikiSettingsTab } from 'src/settings/SettingsTab';
 import { filterHighlightAllPlugin } from 'src/PrismPlugin';
 import { CodeHighlighter } from 'src/Highlighter';
+import { InlineCodeBlock } from 'src/InlineCodeBlock';
 
 export const SHIKI_INLINE_REGEX = /^\{([^\s]+)\} (.*)/i; // format: `{lang} code`
 
 export default class ShikiPlugin extends Plugin {
 	highlighter!: CodeHighlighter;
-	activeCodeBlocks!: Map<string, CodeBlock[]>;
+	activeCodeBlocks!: Map<string, (CodeBlock | InlineCodeBlock)[]>;
 	settings!: Settings;
 	loadedSettings!: Settings;
 	updateCm6Plugin!: () => Promise<void>;
@@ -49,9 +50,11 @@ export default class ShikiPlugin extends Plugin {
 			}),
 		);
 
-		this.app.workspace.on('css-change', () => {
-			void this.reloadHighlighter();
-		});
+		this.registerEvent(
+			this.app.workspace.on('css-change', () => {
+				void this.reloadHighlighter();
+			}),
+		);
 
 		this.addCommand({
 			id: 'reload-highlighter',
@@ -116,7 +119,7 @@ export default class ShikiPlugin extends Plugin {
 	}
 
 	registerInlineCodeProcessor(): void {
-		this.registerMarkdownPostProcessor(async (el, _) => {
+		this.registerMarkdownPostProcessor(async (el, ctx) => {
 			const inlineCodes = el.findAll(':not(pre) > code');
 			for (let codeElm of inlineCodes) {
 				let match = codeElm.textContent?.match(SHIKI_INLINE_REGEX); // format: `{lang} code`
@@ -124,18 +127,9 @@ export default class ShikiPlugin extends Plugin {
 					continue;
 				}
 
-				const highlight = await this.highlighter.getHighlightTokens(match[2], match[1]);
-				const tokens = highlight?.tokens.flat(1);
-				if (!tokens?.length) {
-					continue;
-				}
+				const codeBlock = new InlineCodeBlock(this, codeElm, match[2], match[1], ctx);
 
-				codeElm.empty();
-				codeElm.addClass('shiki-inline');
-
-				for (let token of tokens) {
-					this.highlighter.tokenToSpan(token, codeElm);
-				}
+				ctx.addChild(codeBlock);
 			}
 		});
 	}
@@ -144,7 +138,7 @@ export default class ShikiPlugin extends Plugin {
 		this.highlighter.unload();
 	}
 
-	addActiveCodeBlock(codeBlock: CodeBlock): void {
+	addActiveCodeBlock(codeBlock: CodeBlock | InlineCodeBlock): void {
 		const filePath = codeBlock.ctx.sourcePath;
 
 		if (!this.activeCodeBlocks.has(filePath)) {
@@ -154,7 +148,7 @@ export default class ShikiPlugin extends Plugin {
 		}
 	}
 
-	removeActiveCodeBlock(codeBlock: CodeBlock): void {
+	removeActiveCodeBlock(codeBlock: CodeBlock | InlineCodeBlock): void {
 		const filePath = codeBlock.ctx.sourcePath;
 
 		if (this.activeCodeBlocks.has(filePath)) {
@@ -178,13 +172,5 @@ export default class ShikiPlugin extends Plugin {
 
 	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
-	}
-
-	getTheme(): string {
-		if (document.body.classList.contains('theme-light')) {
-			return this.loadedSettings.lightTheme;
-		} else {
-			return this.loadedSettings.darkTheme;
-		}
 	}
 }

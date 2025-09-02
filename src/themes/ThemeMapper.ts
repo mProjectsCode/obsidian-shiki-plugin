@@ -3,6 +3,8 @@ import type * as hast_types from 'hast';
 import { OBSIDIAN_THEME } from 'src/themes/ObsidianTheme';
 import type ShikiPlugin from 'src/main';
 
+export const OBSIDIAN_THEME_IDENTIFIER = 'obsidian-theme';
+
 export class ThemeMapper {
 	plugin: ShikiPlugin;
 	mapCounter: number;
@@ -16,11 +18,11 @@ export class ThemeMapper {
 	}
 
 	async getThemeForEC(): Promise<ThemeRegistration> {
-		const activeTheme = this.plugin.getTheme();
+		const activeTheme = this.getThemeIdentifier();
 
-		if (activeTheme.endsWith('.json')) {
+		if (this.usingCustomTheme()) {
 			return this.plugin.highlighter.customThemes.find(theme => theme.name === activeTheme) as ThemeRegistration;
-		} else if (activeTheme !== 'obsidian-theme') {
+		} else if (!this.usingObsidianTheme()) {
 			return (await bundledThemes[activeTheme as BundledTheme]()).default;
 		}
 
@@ -46,15 +48,31 @@ export class ThemeMapper {
 	}
 
 	async getTheme(): Promise<ThemeRegistration> {
-		const activeTheme = this.plugin.getTheme();
+		const activeTheme = this.getThemeIdentifier();
 
-		if (activeTheme.endsWith('.json')) {
+		if (this.usingCustomTheme()) {
 			return this.plugin.highlighter.customThemes.find(theme => theme.name === activeTheme) as ThemeRegistration;
-		} else if (activeTheme !== 'obsidian-theme') {
+		} else if (!this.usingObsidianTheme()) {
 			return (await bundledThemes[activeTheme as BundledTheme]()).default;
 		}
 
 		return OBSIDIAN_THEME;
+	}
+
+	getThemeIdentifier(): string {
+		if (document.body.classList.contains('theme-light')) {
+			return this.plugin.loadedSettings.lightTheme;
+		} else {
+			return this.plugin.loadedSettings.darkTheme;
+		}
+	}
+
+	usingObsidianTheme(): boolean {
+		return this.getThemeIdentifier() === OBSIDIAN_THEME_IDENTIFIER;
+	}
+
+	usingCustomTheme(): boolean {
+		return this.getThemeIdentifier().endsWith('.json');
 	}
 
 	/**
@@ -75,7 +93,7 @@ export class ThemeMapper {
 	 * Maps the placeholder colors in the AST to CSS variables.
 	 */
 	fixAST(ast: hast_types.Parents): hast_types.Parents {
-		if (this.plugin.getTheme() !== 'obsidian-theme') {
+		if (!this.usingObsidianTheme()) {
 			return ast;
 		}
 
