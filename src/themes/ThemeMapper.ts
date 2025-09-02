@@ -16,10 +16,12 @@ export class ThemeMapper {
 	}
 
 	async getThemeForEC(): Promise<ThemeRegistration> {
-		if (this.plugin.loadedSettings.theme.endsWith('.json')) {
-			return this.plugin.highlighter.customThemes.find(theme => theme.name === this.plugin.loadedSettings.theme) as ThemeRegistration;
-		} else if (this.plugin.loadedSettings.theme !== 'obsidian-theme') {
-			return (await bundledThemes[this.plugin.loadedSettings.theme as BundledTheme]()).default;
+		const activeTheme = this.plugin.getTheme();
+
+		if (activeTheme.endsWith('.json')) {
+			return this.plugin.highlighter.customThemes.find(theme => theme.name === activeTheme) as ThemeRegistration;
+		} else if (activeTheme !== 'obsidian-theme') {
+			return (await bundledThemes[activeTheme as BundledTheme]()).default;
 		}
 
 		return {
@@ -44,10 +46,12 @@ export class ThemeMapper {
 	}
 
 	async getTheme(): Promise<ThemeRegistration> {
-		if (this.plugin.loadedSettings.theme.endsWith('.json')) {
-			return this.plugin.highlighter.customThemes.find(theme => theme.name === this.plugin.loadedSettings.theme) as ThemeRegistration;
-		} else if (this.plugin.loadedSettings.theme !== 'obsidian-theme') {
-			return (await bundledThemes[this.plugin.loadedSettings.theme as BundledTheme]()).default;
+		const activeTheme = this.plugin.getTheme();
+
+		if (activeTheme.endsWith('.json')) {
+			return this.plugin.highlighter.customThemes.find(theme => theme.name === activeTheme) as ThemeRegistration;
+		} else if (activeTheme !== 'obsidian-theme') {
+			return (await bundledThemes[activeTheme as BundledTheme]()).default;
 		}
 
 		return OBSIDIAN_THEME;
@@ -71,7 +75,7 @@ export class ThemeMapper {
 	 * Maps the placeholder colors in the AST to CSS variables.
 	 */
 	fixAST(ast: hast_types.Parents): hast_types.Parents {
-		if (this.plugin.loadedSettings.theme !== 'obsidian-theme') {
+		if (this.plugin.getTheme() !== 'obsidian-theme') {
 			return ast;
 		}
 

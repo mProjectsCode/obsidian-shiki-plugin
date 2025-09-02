@@ -49,6 +49,10 @@ export default class ShikiPlugin extends Plugin {
 			}),
 		);
 
+		this.app.workspace.on('css-change', () => {
+			void this.reloadHighlighter();
+		});
+
 		this.addCommand({
 			id: 'reload-highlighter',
 			name: 'Reload highlighter',
@@ -163,9 +167,24 @@ export default class ShikiPlugin extends Plugin {
 
 	async loadSettings(): Promise<void> {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData()) as Settings;
+
+		// migrate the theme to darkTheme and lightTheme
+		if (this.settings.theme !== undefined) {
+			this.settings.darkTheme = this.settings.theme;
+			this.settings.lightTheme = this.settings.theme;
+			this.settings.theme = undefined;
+		}
 	}
 
 	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
+	}
+
+	getTheme(): string {
+		if (document.body.classList.contains('theme-light')) {
+			return this.loadedSettings.lightTheme;
+		} else {
+			return this.loadedSettings.darkTheme;
+		}
 	}
 }

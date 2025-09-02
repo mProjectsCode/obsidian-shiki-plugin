@@ -92,6 +92,7 @@ export class CodeHighlighter {
 	}
 
 	async loadCustomThemes(): Promise<void> {
+		const activeTheme = this.plugin.getTheme();
 		this.customThemes = [];
 
 		// custom themes are disabled unless users specify a folder for them in plugin settings
@@ -127,9 +128,15 @@ export class CodeHighlighter {
 		}
 
 		// if the user's set theme cannot be loaded (e.g. it was deleted), fall back to default theme
-		if (this.usesCustomTheme() && !this.customThemes.find(theme => theme.name === this.plugin.loadedSettings.theme)) {
-			this.plugin.settings.theme = DEFAULT_SETTINGS.theme;
-			this.plugin.loadedSettings.theme = DEFAULT_SETTINGS.theme;
+		if (this.usesCustomTheme() && !this.customThemes.find(theme => theme.name === activeTheme)) {
+			// ony reset the theme that's currently broken
+			if (activeTheme == this.plugin.loadedSettings.darkTheme) {
+				this.plugin.settings.darkTheme = DEFAULT_SETTINGS.darkTheme;
+				this.plugin.loadedSettings.darkTheme = DEFAULT_SETTINGS.darkTheme;
+			} else if (activeTheme == this.plugin.loadedSettings.lightTheme) {
+				this.plugin.settings.lightTheme = DEFAULT_SETTINGS.lightTheme;
+				this.plugin.loadedSettings.lightTheme = DEFAULT_SETTINGS.lightTheme;
+			}
 
 			await this.plugin.saveSettings();
 		}
@@ -149,7 +156,7 @@ export class CodeHighlighter {
 				pluginLineNumbers(),
 				pluginFrames(),
 			],
-			styleOverrides: getECTheme(this.plugin.loadedSettings),
+			styleOverrides: getECTheme(this.plugin.getTheme(), this.plugin.loadedSettings),
 			minSyntaxHighlightingColorContrast: 0,
 			themeCssRoot: 'div.expressive-code',
 			defaultProps: {
@@ -183,7 +190,7 @@ export class CodeHighlighter {
 	}
 
 	usesCustomTheme(): boolean {
-		return this.plugin.loadedSettings.theme.endsWith('.json');
+		return this.plugin.getTheme().endsWith('.json');
 	}
 
 	/**
@@ -217,7 +224,7 @@ export class CodeHighlighter {
 		}
 		return this.shiki.codeToTokens(code, {
 			lang: lang as BundledLanguage,
-			theme: this.plugin.settings.theme,
+			theme: this.plugin.getTheme(),
 		});
 	}
 

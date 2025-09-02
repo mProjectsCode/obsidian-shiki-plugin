@@ -38,12 +38,23 @@ export class ShikiSettingsTab extends PluginSettingTab {
 			});
 
 		new Setting(this.containerEl)
-			.setName('Theme')
-			.setDesc('Select the theme for the code blocks.')
+			.setName('Dark theme')
+			.setDesc('Select the dark theme for the code blocks.')
 			.addDropdown(dropdown => {
 				dropdown.addOptions(themes);
-				dropdown.setValue(this.plugin.settings.theme).onChange(async value => {
-					this.plugin.settings.theme = value;
+				dropdown.setValue(this.plugin.settings.darkTheme).onChange(async value => {
+					this.plugin.settings.darkTheme = value;
+					await this.plugin.saveSettings();
+				});
+			});
+
+		new Setting(this.containerEl)
+			.setName('Light theme')
+			.setDesc('Select the light theme for the code blocks.')
+			.addDropdown(dropdown => {
+				dropdown.addOptions(themes);
+				dropdown.setValue(this.plugin.settings.lightTheme).onChange(async value => {
+					this.plugin.settings.lightTheme = value;
 					await this.plugin.saveSettings();
 				});
 			});
