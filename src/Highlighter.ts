@@ -29,7 +29,7 @@ interface CustomTheme {
 }
 
 // some languages break obsidian's `registerMarkdownCodeBlockProcessor`, so we blacklist them
-const languageNameBlacklist = new Set(['c++', 'c#', 'f#', 'mermaid']);
+const LANGUAGE_BLACKLIST = new Set(['c++', 'c#', 'f#', 'mermaid']);
 
 export class CodeHighlighter {
 	plugin: ShikiPlugin;
@@ -162,7 +162,9 @@ export class CodeHighlighter {
 			minSyntaxHighlightingColorContrast: 0,
 			themeCssRoot: 'div.expressive-code',
 			defaultProps: {
-				showLineNumbers: false,
+				showLineNumbers: this.plugin.loadedSettings.ecDefaultShowLineNumbers,
+				wrap: this.plugin.loadedSettings.ecDefaultWrap,
+				frame: this.plugin.loadedSettings.ecDefaultFrame,
 			},
 		});
 
@@ -195,8 +197,7 @@ export class CodeHighlighter {
 	 * All languages that are safe to use with Obsidian's `registerMarkdownCodeBlockProcessor`.
 	 */
 	obsidianSafeLanguageNames(): string[] {
-		return this.supportedLanguages.filter(lang => !languageNameBlacklist.has(lang) && !this.plugin.loadedSettings.disabledLanguages.includes(lang));
-		// .concat(this.customLanguages.map(lang => lang.name));
+		return this.supportedLanguages.filter(lang => !LANGUAGE_BLACKLIST.has(lang) && !this.plugin.loadedSettings.disabledLanguages.includes(lang));
 	}
 
 	/**
