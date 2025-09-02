@@ -31,6 +31,9 @@ interface CustomTheme {
 // some languages break obsidian's `registerMarkdownCodeBlockProcessor`, so we blacklist them
 const LANGUAGE_BLACKLIST = new Set(['c++', 'c#', 'f#', 'mermaid']);
 
+// some languages are considered "special" by shiki.isSpecialLang
+const LANGUAGE_SPECIAL = new Set(['plaintext', 'txt', 'text', 'plain', 'ansi']);
+
 export class CodeHighlighter {
 	plugin: ShikiPlugin;
 	themeMapper: ThemeMapper;
@@ -54,7 +57,7 @@ export class CodeHighlighter {
 		await this.loadEC();
 		await this.loadShiki();
 
-		this.supportedLanguages = [...Object.keys(bundledLanguages), ...this.customLanguages.map(i => i.name)];
+		this.supportedLanguages = [...Object.keys(bundledLanguages), ...LANGUAGE_SPECIAL, ...this.customLanguages.map(i => i.name)];
 	}
 
 	async unload(): Promise<void> {
