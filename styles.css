@@ -92,7 +92,30 @@ span.shiki-ul {
 	text-decoration: underline;
 }
 
+/* Row edit buttons in live preview mode */
+.ec-line:hover .ec-edit-btn {
+	cursor: pointer;
+	position: fixed;
+	right: 0;
+	&::before {
+		content: var(--ec-edit-btn-content, "✏️");
+		padding-inline: var(--ec-edit-btn-padding, 3px 5px);
+		background: var(--tmLineBgCol, var(--shiki-code-background));
+	}
+}
+
 /* Settings tab  */
 .setting-item-control input.shiki-custom-theme-folder {
 	min-width: 250px;
+}
+
+.shiki-foldable-setting {
+	transition: opacity 1s ease-out;
+    
+	&.is-disabled {
+        padding: 0;
+		opacity: 0;
+        height: 0;
+        overflow: hidden;
+	}
 }

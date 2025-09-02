@@ -12,6 +12,9 @@ export interface Settings {
 	lightTheme: string;
 	preferThemeColors: boolean;
 	inlineHighlighting: boolean;
+	rowEditButtons: boolean;
+	hideNativeBlockEdit: boolean;
+	hideNativeCopy: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -23,4 +26,7 @@ export const DEFAULT_SETTINGS: Settings = {
 	lightTheme: OBSIDIAN_THEME_IDENTIFIER,
 	preferThemeColors: true,
 	inlineHighlighting: true,
+	rowEditButtons: false,
+	hideNativeBlockEdit: false,
+	hideNativeCopy: false
 };

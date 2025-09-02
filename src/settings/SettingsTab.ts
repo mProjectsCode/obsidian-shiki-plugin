@@ -139,6 +139,41 @@ export class ShikiSettingsTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			});
+		
+		new Setting(this.containerEl).setHeading().setName('Button Settings').setDesc('Configure code block button settings. Changes will apply to NEWLY RENDERED CODE.');
+
+		new Setting(this.containerEl)
+			.setName('Show Row Edit Buttons in Live Preivew')
+			.setDesc('Whether to add a row edit button to each line of code block to improve editability.')
+			.addToggle(toggle => {
+				toggle.setValue(this.plugin.settings.rowEditButtons).onChange(async value => {
+					hideNativeBlockEdit.setDisabled(!value);
+					this.plugin.settings.rowEditButtons = value;
+					await this.plugin.saveSettings();
+				});
+			});
+		
+		const hideNativeBlockEdit = new Setting(this.containerEl)
+			.setName('Hide Native Block Edit Buttons')
+			.setDesc('When row edit buttons are enabled, whether to hide native block edit buttons to avoid blocking.')
+			.setClass('shiki-foldable-setting')
+			.setDisabled(!this.plugin.settings.rowEditButtons)
+			.addToggle(toggle => {
+				toggle.setValue(this.plugin.settings.hideNativeBlockEdit).onChange(async value => {
+					this.plugin.settings.hideNativeBlockEdit = value;
+					await this.plugin.saveSettings();
+				});
+			});
+		
+		new Setting(this.containerEl)
+			.setName('Hide Native Copy Buttons')
+			.setDesc('Whether to hide copy buttons for shiki code blocks. When enabled, right-click on a code block to copy the entire code.')
+			.addToggle(toggle => {
+				toggle.setValue(this.plugin.settings.hideNativeCopy).onChange(async value => {
+					this.plugin.settings.hideNativeCopy = value;
+					await this.plugin.saveSettings();
+				});
+			});
 
 		new Setting(this.containerEl).setHeading().setName('Language Settings').setDesc('Configure language settings. RESTART REQUIRED AFTER CHANGES.');
 
