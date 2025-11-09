@@ -189,7 +189,9 @@ export function getEmbedEditor(
 		parent: divContent // targetEl
 	})
 
-	// Strategy 3：只取extensions，生成新state. bug: ~~很难拿到全部的extension，拿到的那个基本没用~~ 有extension也似乎不起作用
+	// Strategy 3：只取extensions，生成新state.
+	// bug: ~~很难拿到全部的extension，拿到的那个基本没用~~ 有extension也似乎不起作用
+	// 因为有些扩展并不以 extensions 的形式使用，而是直接外部去更改 cm 的 state 等状态
 	const obView: MarkdownView|null = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
 	const controller = makeFakeController(this.plugin.app, obView??null, () => this.editor)
 	const containerEl = document.createElement("div")
