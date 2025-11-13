@@ -1,5 +1,6 @@
 import { ICON_SVGS, type IconKey } from './svgs';
 import iconMap from './iconNames.json';
+import iconsCss from './icons.css?raw';
 
 const ICON_CLASS = 'shiki-vscode-icon';
 
@@ -60,3 +61,11 @@ export function injectIconIntoFrame(frameEl: HTMLElement, options?: { filename?:
 }
 
 export default { createIconElement, injectIconIntoFrame, getIconIdFor };
+
+export function ensureIconStyles(): void {
+  if (document.getElementById('shiki-vscode-icon-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'shiki-vscode-icon-styles';
+  style.textContent = iconsCss;
+  document.head.appendChild(style);
+}

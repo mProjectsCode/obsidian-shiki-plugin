@@ -19,6 +19,7 @@ import { getECTheme } from 'src/themes/ECTheme';
 import { normalizePath, Notice } from 'obsidian';
 import { DEFAULT_SETTINGS } from 'src/settings/Settings';
 import { toHtml } from '@expressive-code/core/hast';
+import { injectIconIntoFrame, ensureIconStyles } from 'src/icons/iconRenderer';
 
 interface CustomTheme {
 	name: string;
@@ -214,6 +215,35 @@ export class CodeHighlighter {
 		});
 
 		container.innerHTML = toHtml(this.themeMapper.fixAST(result.renderedGroupAst));
+
+		// Ensure icon styles are present in document head (idempotent)
+		try {
+			ensureIconStyles();
+		} catch (e) {
+			console.warn('Unable to inject icon styles', e);
+		}
+
+		// Inject icons into rendered frames based on title or language/meta
+		try {
+			// Parse filename from meta if present: title="file.py" or title='file.py'
+			let filenameFromMeta: string | undefined;
+			if (meta) {
+				const m = meta.match(/title=(?:"([^"]+)"|'([^']+)'|(\S+))/);
+				if (m) filenameFromMeta = m[1] ?? m[2] ?? m[3];
+			}
+
+			const frames = Array.from(container.querySelectorAll('figure.frame, figure, .frame, div.frame'));
+			if (frames.length === 0) {
+				// fallback to container itself
+				if (container instanceof HTMLElement) injectIconIntoFrame(container, { filename: filenameFromMeta, language });
+			} else {
+				for (const f of frames) {
+					injectIconIntoFrame(f as HTMLElement, { filename: filenameFromMeta, language });
+				}
+			}
+		} catch (e) {
+			console.warn('Unable to inject icons into frames', e);
+		}
 	}
 
 	async getHighlightTokens(code: string, lang: string): Promise<TokensResult | undefined> {

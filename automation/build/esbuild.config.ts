@@ -34,6 +34,10 @@ const build = await esbuild.build({
 	treeShaking: true,
 	outfile: 'main.js',
 	minify: true,
+	loader: {
+		'.svg': 'text',
+		'.css': 'text',
+	},
 	metafile: true,
 	define: {
 		MB_GLOBAL_CONFIG_DEV_BUILD: 'false',

@@ -34,6 +34,10 @@ const context = await esbuild.context({
 	treeShaking: true,
 	outdir: `exampleVault/.obsidian/plugins/${manifest.id}/`,
 	outbase: 'src',
+	loader: {
+		'.svg': 'text',
+		'.css': 'text',
+	},
 	define: {
 		MB_GLOBAL_CONFIG_DEV_BUILD: 'true',
 	},
