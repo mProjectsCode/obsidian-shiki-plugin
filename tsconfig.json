@@ -12,7 +12,8 @@
 		"importHelpers": true,
 		"isolatedModules": true,
 		"lib": ["DOM", "ESNext"],
-		"allowSyntheticDefaultImports": true
+		"allowSyntheticDefaultImports": true,
+		"resolveJsonModule": true
 	},
-	"include": ["src/**/*.ts", "tests/**/*.ts"]
+	"include": ["src/**/*", "tests/**/*.ts"]
 }

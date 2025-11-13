@@ -1,0 +1,17 @@
+.shiki-vscode-icon {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  vertical-align: text-bottom;
+  margin-right: 0.5em;
+}
+.shiki-vscode-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Dark theme monochrome fallback */
+.theme-dark .shiki-vscode-icon svg {
+  filter: grayscale(100%) brightness(0.95);
+}
