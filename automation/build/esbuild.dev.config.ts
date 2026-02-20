@@ -2,7 +2,6 @@ import esbuild from 'esbuild';
 import copy from 'esbuild-plugin-copy-watch';
 import manifest from '../../manifest.json' assert { type: 'json' };
 import { getBuildBanner } from 'build/buildBanner';
-import { nodeModulesPolyfillPlugin } from 'esbuild-plugins-node-modules-polyfill';
 
 const banner = getBuildBanner('Dev Build', _ => 'Dev Build');
 
@@ -49,13 +48,6 @@ const context = await esbuild.context({
 					to: '',
 				},
 			],
-		}),
-		nodeModulesPolyfillPlugin({
-			modules: {
-				fs: true,
-				path: true,
-				url: true,
-			},
 		}),
 	],
 });

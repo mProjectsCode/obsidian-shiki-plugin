@@ -1,7 +1,6 @@
 import builtins from 'builtin-modules';
 import esbuild from 'esbuild';
 import { getBuildBanner } from 'build/buildBanner';
-import { nodeModulesPolyfillPlugin } from 'esbuild-plugins-node-modules-polyfill';
 
 const banner = getBuildBanner('Release Build', version => version);
 
@@ -38,15 +37,7 @@ const build = await esbuild.build({
 	define: {
 		MB_GLOBAL_CONFIG_DEV_BUILD: 'false',
 	},
-	plugins: [
-		nodeModulesPolyfillPlugin({
-			modules: {
-				fs: true,
-				path: true,
-				url: true,
-			},
-		}),
-	],
+	plugins: [],
 });
 
 const file = Bun.file('meta.txt');
