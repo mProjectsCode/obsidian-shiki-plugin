@@ -55,7 +55,13 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 			 * @param update
 			 */
 			update(update: ViewUpdate): void {
-				this.decorations = this.decorations.map(update.changes);
+				try {
+					this.decorations = this.decorations.map(update.changes);
+				} catch (e) {
+					// Decorations may have stale positions if the document changed while an async
+					// updateWidgets call was in flight. Reset them so the next update can rebuild.
+					this.decorations = Decoration.none;
+				}
 
 				// we handle doc changes and selection changes here
 				if (update.docChanged || update.selectionSet) {
@@ -79,6 +85,9 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 				let lang = '';
 				let state: SyntaxNode[] = [];
 				const decorationUpdates: DecorationUpdate[] = [];
+				// Capture the state at the time of the syntax tree traversal so we can
+				// detect if the document changed while async decoration building was in flight.
+				const capturedState = view.state;
 
 				// const t1 = performance.now();
 
@@ -172,6 +181,11 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 							this.removeDecoration(node.from, node.to);
 						} else if (node.type === DecorationUpdateType.Insert) {
 							const decorations = await this.buildDecorations(node.hideTo ?? node.from, node.to, node.lang, node.content);
+							// If the document changed while we were awaiting, the positions we captured
+							// from the syntax tree are stale. Abort to avoid applying out-of-range decorations.
+							if (this.view.state !== capturedState) {
+								return;
+							}
 							this.removeDecoration(node.from, node.to);
 							if (node.hideLang) {
 								// add the decoration that hides the language tag
