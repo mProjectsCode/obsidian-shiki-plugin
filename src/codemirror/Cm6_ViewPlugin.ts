@@ -61,6 +61,7 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 					// Decorations may have stale positions if the document changed while an async
 					// updateWidgets call was in flight. Reset them so the next update can rebuild.
 					this.decorations = Decoration.none;
+					console.warn('Resetting decorations due to error:', e);
 				}
 
 				// we handle doc changes and selection changes here
