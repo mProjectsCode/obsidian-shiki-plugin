@@ -142,7 +142,7 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 						if (props.has('HyperMD-codeblock-begin')) {
 							const content = Cm6_Util.getContent(view.state, node.from, node.to);
 
-							lang = /^```\s*(\S+)/.exec(content)?.[1] ?? '';
+							lang = /```\s*(\S+)/.exec(content)?.[1] ?? '';
 						}
 
 						if (props.has('HyperMD-codeblock-end')) {
@@ -200,8 +200,13 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 					}
 				}
 
-				if (decorationUpdates.length > 0) {
-					this.view.dispatch(this.view.state.update({}));
+				if (decorationUpdates.length > 0 && this.view.state === capturedState) {
+					// Use requestAnimationFrame to avoid "Calls to EditorView.update are not allowed while an update is in progress"
+					requestAnimationFrame(() => {
+						if (this.view.state === capturedState) {
+							this.view.dispatch(this.view.state.update({}));
+						}
+					});
 				}
 
 				// console.log('Traversed syntax tree in', performance.now() - t1, 'ms');
