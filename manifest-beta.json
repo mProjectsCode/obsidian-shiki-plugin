@@ -1,7 +1,7 @@
 {
 	"id": "shiki-highlighter",
 	"name": "Shiki Highlighter",
-	"version": "0.7.7",
+	"version": "0.7.7-canary.20260802T134945",
 	"minAppVersion": "1.10.0",
 	"description": "Highlight code blocks with Shiki.",
 	"author": "Moritz Jung",
