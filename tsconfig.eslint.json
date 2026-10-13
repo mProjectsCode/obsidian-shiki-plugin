@@ -1,0 +1,29 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": false,
+		"noEmit": true,
+		"rootDir": ".",
+		"types": ["bun", "vite/client"],
+		"moduleResolution": "bundler",
+		"module": "ESNext"
+	},
+	"include": [
+		"src/**/*",
+		"packages/*/src/**/*",
+		"packages/*/index.ts",
+		"tests/**/*",
+		"test/**/*",
+		"automation/**/*.ts",
+		"scripts/**/*",
+		"*.ts",
+		"*.mts",
+		"*.mjs",
+		"*.js",
+		"packages/**/*.d.ts",
+		"packages/*/tests/**/*",
+		"packages/*/test/**/*"
+	],
+	"exclude": ["node_modules", "dist", "exampleVault", "vendor", "packages/lemons-search", "packages/lemons-search-ui", "**/dist/**", "**/pkg/**"]
+}

@@ -1,25 +1,44 @@
-name: Run Checks and Tests on PR
-
-on: pull_request
-
+name: Verify plugin
+on:
+    pull_request:
+    push:
+        branches: [master]
+permissions:
+    contents: read
 jobs:
-    check:
+    verify:
         runs-on: ubuntu-latest
-
         steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-
-            - name: Install Bun
-              uses: oven-sh/setup-bun@v1
+            - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
               with:
-                  bun-version: latest
-
-            - name: Install Dependencies
-              id: build
-              run: |
-                  bun install
-
-            - name: Run Checks
-              run: |
-                  bun run check
+                  persist-credentials: false
+            - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+              with:
+                  node-version: '25.8.0'
+            - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+              with:
+                  bun-version: '1.4.0'
+            - run: bun install --frozen-lockfile
+            - run: bun run verify
+    review:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+              with:
+                  persist-credentials: false
+            - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+              with:
+                  node-version: '25.8.0'
+            - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+              with:
+                  bun-version: '1.4.0'
+            - run: bun install --frozen-lockfile
+            - name: Capture advisory review findings
+              continue-on-error: true
+              run: bun run lint:review --format json --output-file review.json
+            - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+              if: always()
+              with:
+                  name: review-findings
+                  path: review.json
+                  if-no-files-found: error

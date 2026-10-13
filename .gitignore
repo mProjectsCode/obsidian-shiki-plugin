@@ -1,5 +1,5 @@
 # vscode
-.vscode 
+.vscode
 
 # Intellij
 *.iml
@@ -35,3 +35,5 @@ exampleVault/.obsidian/plugins/lemons-plugin-template/*
 !exampleVault/.obsidian/plugins/lemons-plugin-template/.hotreload
 
 dist
+/dist/
+/artifacts/

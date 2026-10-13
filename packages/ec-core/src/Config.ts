@@ -5,7 +5,7 @@ import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 import { pluginShiki } from '@expressive-code/plugin-shiki';
 import { pluginTextMarkers } from '@expressive-code/plugin-text-markers';
 import { type LanguageRegistration, type ThemeRegistration } from 'shiki';
-// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths -- needed for vite to load this correctly
+// Relative import keeps this module loadable by Vite.
 import { getECTheme } from './ECTheme';
 
 export interface EcSettingsProps {

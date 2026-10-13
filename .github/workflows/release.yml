@@ -1,68 +1,51 @@
-name: Create Plugin Release
-
+name: Create plugin release
 on:
     push:
-        # Sequence of patterns matched against refs/tags
-        tags:
-            - '*' # Push events to matching any tag format, i.e. 1.0, 20.15.10
-
-env:
-    PLUGIN_NAME: shiki-highlighter # Change this to the name of your plugin-id folder
-
+        tags: ['*']
+permissions:
+    contents: read
 jobs:
-    build:
+    release:
         runs-on: ubuntu-latest
-
         permissions:
             contents: write
             id-token: write
             attestations: write
-
         steps:
-            - name: Checkout
-              uses: actions/checkout@v6
-
-            - name: Determine prerelease status
-              id: status
-              run: |
-                  if [[ "${{ github.ref }}" == *"canary"* ]]; then
-                  echo "prerelease=true" >> $GITHUB_OUTPUT
-                  else
-                  echo "prerelease=false" >> $GITHUB_OUTPUT
-                  fi
-
-            - name: Install Bun
-              uses: oven-sh/setup-bun@v2
+            - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
               with:
-                  bun-version: latest
-
-            - name: Build
-              id: build
-              run: |
-                  bun install
-                  bun run build
-                  mkdir ${{ env.PLUGIN_NAME }}
-                  cp -r dist/* ${{ env.PLUGIN_NAME }}
-                  zip -r ${{ env.PLUGIN_NAME }}-${{ github.ref_name }}.zip ${{ env.PLUGIN_NAME }}
-                  ls
-
-            - name: Attest build provenance
-              uses: actions/attest@v4
+                  persist-credentials: false
+            - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+              with:
+                  node-version: '25.8.0'
+            - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+              with:
+                  bun-version: '1.4.0'
+            - run: bun install --frozen-lockfile
+            - name: Validate tagged version and prepare release manifest
+              env:
+                  RELEASE_TAG: ${{ github.ref_name }}
+              run: bun x --no-install lemons-automation release:manifest
+            - name: Capture review findings for this release
+              continue-on-error: true
+              run: bun run lint:review --format json --output-file review.json
+            - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+              if: ${{ !cancelled() && hashFiles('review.json') != '' }}
+              with:
+                  name: release-review-findings
+                  path: review.json
+                  if-no-files-found: error
+            - run: bun run verify
+            - run: bun run package
+            - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
               with:
                   subject-path: |
-                      dist/main.js
-                      dist/manifest.json
-                      dist/styles.css
-                      ${{ env.PLUGIN_NAME }}-${{ github.ref_name }}.zip
-
-            - name: Release
-              id: release
-              uses: softprops/action-gh-release@v3
+                      dist/*
+                      artifacts/*.zip
+            - uses: softprops/action-gh-release@5113cdc90fd4d541c801c55356214017bf5ae34b # v3
               with:
-                  prerelease: ${{ steps.status.outputs.prerelease }}
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  prerelease: ${{ contains(github.ref_name, 'canary') }}
+                  fail_on_unmatched_files: true
                   files: |
-                      ${{ env.PLUGIN_NAME }}-${{ github.ref_name }}.zip
-                      dist/main.js
-                      dist/manifest.json
-                      dist/styles.css
+                      dist/*
+                      artifacts/*.zip
