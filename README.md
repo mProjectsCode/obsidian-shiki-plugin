@@ -34,7 +34,7 @@ This feature can be turned off in the settings.
 
 ### Custom Themes
 
-This plugin comes bundled with a [wide variety of themes](https://expressive-code.com/guides/themes/#using-bundled-themes). In addition, it supports custom JSON theme files compatible with VS Code. To enable custom themes, create a folder containing your theme files, and specify the folder's path relative to your Vault in the plugin settings. After restarting Obsidian, your custom themes will be available in the Theme dropdown.
+This plugin comes bundled with a [wide variety of themes](https://expressive-code.com/guides/themes/#using-bundled-themes). In addition, it supports custom JSON theme files compatible with VS Code. To enable custom themes, create a folder containing your theme files, and specify the folder's path relative to your Vault in the plugin settings. Settings changes apply automatically one second after the last change, and your custom themes will then be available in the theme dropdown. After editing custom theme or language files, run the **Shiki Highlighter: Reload highlighter** command to load the changes.
 
 ## Code Block Configuration
 

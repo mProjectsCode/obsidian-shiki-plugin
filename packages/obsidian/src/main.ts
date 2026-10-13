@@ -1,11 +1,14 @@
-import { debounce, loadPrism, Plugin, TFile, type MarkdownPostProcessor } from 'obsidian';
+import type { MarkdownPostProcessor } from 'obsidian';
+import { debounce, loadPrism, MarkdownPreviewRenderer, MarkdownView, Plugin, TFile } from 'obsidian';
 import { CodeBlock } from 'packages/obsidian/src/CodeBlock';
 import { createCm6Plugin } from 'packages/obsidian/src/codemirror/Cm6_ViewPlugin';
-import { DEFAULT_SETTINGS, type Settings } from 'packages/obsidian/src/settings/Settings';
-import { ShikiSettingsTab } from 'packages/obsidian/src/settings/SettingsTab';
-import { filterHighlightAllPlugin, type PrismWithFilterHighlightAll } from 'packages/obsidian/src/PrismPlugin';
 import { CodeHighlighter } from 'packages/obsidian/src/Highlighter';
 import { InlineCodeBlock } from 'packages/obsidian/src/InlineCodeBlock';
+import type { PrismWithFilterHighlightAll } from 'packages/obsidian/src/PrismPlugin';
+import { filterHighlightAllPlugin } from 'packages/obsidian/src/PrismPlugin';
+import type { Settings } from 'packages/obsidian/src/settings/Settings';
+import { DEFAULT_SETTINGS } from 'packages/obsidian/src/settings/Settings';
+import { ShikiSettingsTab } from 'packages/obsidian/src/settings/SettingsTab';
 
 import 'packages/obsidian/src/styles.css';
 import 'virtual:ec-styles.css';
@@ -16,24 +19,43 @@ export const SHIKI_INLINE_REGEX = /^\{([^\s]+)\} (.*)/i; // format: `{lang} code
 export default class ShikiPlugin extends Plugin {
 	highlighter!: CodeHighlighter;
 	activeCodeBlocks!: Map<string, (CodeBlock | InlineCodeBlock)[]>;
-	settings!: Settings;
+	declare settings: Settings;
 	loadedSettings!: Settings;
-	updateCm6Plugin!: () => Promise<void>;
+	updateCm6Plugin?: () => Promise<void>;
 
-	codeBlockProcessors: MarkdownPostProcessor[] = [];
+	private codeBlockProcessors = new Map<string, MarkdownPostProcessor>();
+	private settingTab!: ShikiSettingsTab;
+	private isUnloading = false;
+	private reloadTask: Promise<void> = Promise.resolve();
+	readonly scheduleHighlighterReload = debounce(
+		() => {
+			void this.reloadHighlighter().catch(error => console.error('Failed to reload highlighter.', error));
+		},
+		1000,
+		true,
+	);
 
 	async onload(): Promise<void> {
 		await this.loadSettings();
 		this.loadedSettings = structuredClone(this.settings);
-		this.addSettingTab(new ShikiSettingsTab(this));
 
 		this.highlighter = new CodeHighlighter(this);
 		await this.highlighter.load();
+
+		this.settingTab = new ShikiSettingsTab(this);
+		this.addSettingTab(this.settingTab);
+		this.register(() => this.scheduleHighlighterReload.cancel());
 
 		this.activeCodeBlocks = new Map();
 
 		this.registerInlineCodeProcessor();
 		this.registerCodeBlockProcessors();
+		this.register(() => {
+			for (const processor of this.codeBlockProcessors.values()) {
+				MarkdownPreviewRenderer.unregisterPostProcessor(processor);
+			}
+			this.codeBlockProcessors.clear();
+		});
 
 		this.registerEditorExtension([createCm6Plugin(this)]);
 
@@ -54,45 +76,58 @@ export default class ShikiPlugin extends Plugin {
 			}),
 		);
 
-		const debouncedReload = debounce(
-			() => {
-				void this.reloadHighlighter();
-			},
-			500,
-			true,
-		);
-
-		this.registerEvent(
-			this.app.workspace.on('css-change', () => {
-				debouncedReload();
-			}),
-		);
+		this.registerEvent(this.app.workspace.on('css-change', () => this.scheduleHighlighterReload()));
 
 		this.addCommand({
 			id: 'reload-highlighter',
 			name: 'Reload highlighter',
 			callback: () => {
-				void this.reloadHighlighter();
+				this.scheduleHighlighterReload.cancel();
+				void this.reloadHighlighter().catch(error => console.error('Failed to reload highlighter.', error));
 			},
 		});
 
 		await this.registerPrismPlugin();
 	}
 
-	async reloadHighlighter(): Promise<void> {
-		await this.highlighter.unload();
-
-		this.loadedSettings = structuredClone(this.settings);
-
-		await this.highlighter.load();
-
-		for (const [_, codeBlocks] of this.activeCodeBlocks) {
-			for (const codeBlock of codeBlocks) {
-				await codeBlock.forceRerender();
+	reloadHighlighter(): Promise<void> {
+		// Serialize reloads so settings and CSS changes cannot unload an engine being rebuilt.
+		const task = this.reloadTask.then(async () => {
+			if (this.isUnloading) {
+				return;
 			}
-		}
+			await this.highlighter.unload();
+			this.loadedSettings = structuredClone(this.settings);
+			await this.highlighter.load();
+			if (this.isUnloading) {
+				return;
+			}
 
-		await this.updateCm6Plugin();
+			const registrationsChanged = this.registerCodeBlockProcessors();
+
+			for (const codeBlocks of this.activeCodeBlocks.values()) {
+				for (const codeBlock of codeBlocks) {
+					if (codeBlock instanceof CodeBlock && !this.codeBlockProcessors.has(codeBlock.language)) {
+						continue;
+					}
+					await codeBlock.forceRerender();
+				}
+			}
+
+			if (registrationsChanged) {
+				for (const leaf of this.app.workspace.getLeavesOfType('markdown')) {
+					if (leaf.view instanceof MarkdownView) {
+						leaf.view.previewMode.rerender(true);
+					}
+				}
+			}
+
+			await this.updateCm6Plugin?.();
+			this.settingTab.update();
+		});
+		// Keep the queue usable after a failed reload; the caller receives the error.
+		this.reloadTask = task.catch(() => {});
+		return task;
 	}
 
 	async registerPrismPlugin(): Promise<void> {
@@ -101,29 +136,40 @@ export default class ShikiPlugin extends Plugin {
 		filterHighlightAll?.reject.addSelector('div.expressive-code pre code');
 	}
 
-	registerCodeBlockProcessors(): void {
-		const languages = this.highlighter.obsidianSafeLanguageNames();
+	registerCodeBlockProcessors(): boolean {
+		const languages = new Set(this.highlighter.obsidianSafeLanguageNames());
+		let changed = false;
+		for (const [language, processor] of this.codeBlockProcessors) {
+			if (!languages.has(language)) {
+				MarkdownPreviewRenderer.unregisterPostProcessor(processor);
+				this.codeBlockProcessors.delete(language);
+				changed = true;
+			}
+		}
 
 		for (const language of languages) {
+			if (this.codeBlockProcessors.has(language)) {
+				continue;
+			}
 			try {
-				this.registerMarkdownCodeBlockProcessor(
-					language,
-					async (source, el, ctx) => {
-						// we need to avoid making the hidden frontmatter code block visible
-						if (el.parentElement?.classList.contains('mod-frontmatter')) {
-							return;
-						}
+				const processor = MarkdownPreviewRenderer.createCodeBlockPostProcessor(language, async (source, el, ctx) => {
+					// we need to avoid making the hidden frontmatter code block visible
+					if (el.parentElement?.classList.contains('mod-frontmatter')) {
+						return;
+					}
 
-						const codeBlock = new CodeBlock(this, el, source, language, ctx);
+					const codeBlock = new CodeBlock(this, el, source, language, ctx);
 
-						ctx.addChild(codeBlock);
-					},
-					1000,
-				);
+					ctx.addChild(codeBlock);
+				});
+				MarkdownPreviewRenderer.registerPostProcessor(processor, 1000);
+				this.codeBlockProcessors.set(language, processor);
+				changed = true;
 			} catch (e) {
 				console.warn(`Failed to register code block processor for ${language}.`, e);
 			}
 		}
+		return changed;
 	}
 
 	registerInlineCodeProcessor(): void {
@@ -143,7 +189,9 @@ export default class ShikiPlugin extends Plugin {
 	}
 
 	onunload(): void {
-		void this.highlighter.unload();
+		this.isUnloading = true;
+		this.scheduleHighlighterReload.cancel();
+		void this.reloadTask.then(() => this.highlighter.unload());
 	}
 
 	addActiveCodeBlock(codeBlock: CodeBlock | InlineCodeBlock): void {
