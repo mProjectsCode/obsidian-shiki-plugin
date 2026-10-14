@@ -1,10 +1,12 @@
-import { ExpressiveCodeTheme, type ExpressiveCodeEngineConfig } from '@expressive-code/core';
+import type { ExpressiveCodeEngineConfig } from '@expressive-code/core';
+import { ExpressiveCodeTheme } from '@expressive-code/core';
 import { pluginCollapsibleSections } from '@expressive-code/plugin-collapsible-sections';
 import { pluginFrames } from '@expressive-code/plugin-frames';
 import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 import { pluginShiki } from '@expressive-code/plugin-shiki';
 import { pluginTextMarkers } from '@expressive-code/plugin-text-markers';
-import { type LanguageRegistration, type ThemeRegistration } from 'shiki';
+import type { LanguageRegistration, ThemeRegistration } from 'shiki';
+import 'shiki';
 // Relative import keeps this module loadable by Vite.
 import { getECTheme } from './ECTheme';
 

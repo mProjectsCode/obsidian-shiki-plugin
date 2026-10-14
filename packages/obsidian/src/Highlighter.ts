@@ -1,14 +1,7 @@
 import { ExpressiveCodeEngine } from '@expressive-code/core';
 import type ShikiPlugin from 'packages/obsidian/src/main';
-import {
-	bundledLanguages,
-	createHighlighter,
-	type LanguageRegistration,
-	type Highlighter,
-	type TokensResult,
-	type BundledLanguage,
-	type ThemedToken,
-} from 'shiki';
+import type { LanguageRegistration, Highlighter, TokensResult, BundledLanguage, ThemedToken } from 'shiki';
+import { bundledLanguages, createHighlighter } from 'shiki';
 import { ThemeMapper } from 'packages/obsidian/src/themes/ThemeMapper';
 import { normalizePath, Notice } from 'obsidian';
 import { DEFAULT_SETTINGS } from 'packages/obsidian/src/settings/Settings';
@@ -63,7 +56,9 @@ export class CodeHighlighter {
 	async loadCustomLanguages(): Promise<void> {
 		this.customLanguages = [];
 
-		if (!this.plugin.loadedSettings.customLanguageFolder) return;
+		if (!this.plugin.loadedSettings.customLanguageFolder) {
+			return;
+		}
 
 		const languageFolder = normalizePath(this.plugin.loadedSettings.customLanguageFolder);
 		if (!(await this.plugin.app.vault.adapter.exists(languageFolder))) {
@@ -95,7 +90,9 @@ export class CodeHighlighter {
 		this.customThemes = [];
 
 		// custom themes are disabled unless users specify a folder for them in plugin settings
-		if (!this.plugin.loadedSettings.customThemeFolder) return;
+		if (!this.plugin.loadedSettings.customThemeFolder) {
+			return;
+		}
 
 		const themeFolder = normalizePath(this.plugin.loadedSettings.customThemeFolder);
 		if (!(await this.plugin.app.vault.adapter.exists(themeFolder))) {

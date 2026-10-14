@@ -1,4 +1,5 @@
-import { type ThemeRegistration } from 'shiki';
+import type { ThemeRegistration } from 'shiki';
+import 'shiki';
 
 export const OBSIDIAN_THEME = {
 	displayName: 'Obsidian Theme',

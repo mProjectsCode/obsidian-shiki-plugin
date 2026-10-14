@@ -1,11 +1,15 @@
+import type { EditorState, Range } from '@codemirror/state';
+import type { DecorationSet, EditorView, ViewUpdate } from '@codemirror/view';
 import type ShikiPlugin from 'packages/obsidian/src/main';
 import { SHIKI_INLINE_REGEX } from 'packages/obsidian/src/main';
-import { Decoration, type DecorationSet, type EditorView, ViewPlugin, type ViewUpdate } from '@codemirror/view';
-import { type EditorState, type Range } from '@codemirror/state';
-import { type SyntaxNode } from '@lezer/common';
+import { Decoration, ViewPlugin } from '@codemirror/view';
+import '@codemirror/state';
+import type { SyntaxNode } from '@lezer/common';
+import '@lezer/common';
 import { syntaxTree } from '@codemirror/language';
 import { Cm6_Util } from 'packages/obsidian/src/codemirror/Cm6_Util';
-import { type ThemedToken } from 'shiki';
+import type { ThemedToken } from 'shiki';
+import 'shiki';
 import { editorLivePreviewField } from 'obsidian';
 
 enum DecorationUpdateType {
@@ -31,7 +35,6 @@ interface RemoveDecoration {
 	to: number;
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- not an easily named type
 export function createCm6Plugin(plugin: ShikiPlugin) {
 	return ViewPlugin.fromClass(
 		class Cm6ViewPlugin {
@@ -72,7 +75,6 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 			}
 
 			isLivePreview(state: EditorState): boolean {
-				// @ts-ignore some strange private field not being assignable
 				return state.field(editorLivePreviewField);
 			}
 

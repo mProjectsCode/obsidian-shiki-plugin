@@ -1,5 +1,7 @@
-import { type EditorState, type EditorSelection } from '@codemirror/state';
-import { type DecorationSet } from '@codemirror/view';
+import type { EditorState, EditorSelection } from '@codemirror/state';
+import '@codemirror/state';
+import type { DecorationSet } from '@codemirror/view';
+import '@codemirror/view';
 
 export class Cm6_Util {
 	/**

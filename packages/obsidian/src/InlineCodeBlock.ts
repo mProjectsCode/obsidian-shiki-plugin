@@ -1,4 +1,5 @@
-import { type MarkdownPostProcessorContext, MarkdownRenderChild } from 'obsidian';
+import type { MarkdownPostProcessorContext } from 'obsidian';
+import { MarkdownRenderChild } from 'obsidian';
 import type ShikiPlugin from 'packages/obsidian/src/main';
 
 export class InlineCodeBlock extends MarkdownRenderChild {

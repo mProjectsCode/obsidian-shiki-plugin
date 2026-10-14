@@ -1,4 +1,5 @@
-import { type ExpressiveCodeEngineConfig, type ExpressiveCodeTheme, type StyleValueOrValues, type UnresolvedStyleValue } from '@expressive-code/core';
+import type { ExpressiveCodeEngineConfig, ExpressiveCodeTheme, StyleValueOrValues, UnresolvedStyleValue } from '@expressive-code/core';
+import '@expressive-code/core';
 
 export function getECTheme(useThemeColors: boolean): ExpressiveCodeEngineConfig['styleOverrides'] {
 	let backgroundColor: UnresolvedStyleValue;

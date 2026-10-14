@@ -15,7 +15,6 @@
 		"packages/*/index.ts",
 		"tests/**/*",
 		"test/**/*",
-		"automation/**/*.ts",
 		"scripts/**/*",
 		"*.ts",
 		"*.mts",
