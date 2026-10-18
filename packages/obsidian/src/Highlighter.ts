@@ -86,6 +86,7 @@ export class CodeHighlighter {
 	}
 
 	async loadCustomThemes(): Promise<void> {
+		const activeThemeSetting = this.plugin.app.isDarkMode() ? 'darkTheme' : 'lightTheme';
 		const activeTheme = this.themeMapper.getThemeIdentifier();
 		this.customThemes = [];
 
@@ -126,12 +127,9 @@ export class CodeHighlighter {
 		// if the user's set theme cannot be loaded (e.g. it was deleted), fall back to default theme
 		if (this.themeMapper.usingCustomTheme() && !this.customThemes.find(theme => theme.name === activeTheme)) {
 			// ony reset the theme that's currently broken
-			if (activeTheme == this.plugin.loadedSettings.darkTheme) {
-				this.plugin.settings.darkTheme = DEFAULT_SETTINGS.darkTheme;
-				this.plugin.loadedSettings.darkTheme = DEFAULT_SETTINGS.darkTheme;
-			} else if (activeTheme == this.plugin.loadedSettings.lightTheme) {
-				this.plugin.settings.lightTheme = DEFAULT_SETTINGS.lightTheme;
-				this.plugin.loadedSettings.lightTheme = DEFAULT_SETTINGS.lightTheme;
+			if (activeTheme === this.plugin.loadedSettings[activeThemeSetting]) {
+				this.plugin.settings[activeThemeSetting] = DEFAULT_SETTINGS[activeThemeSetting];
+				this.plugin.loadedSettings[activeThemeSetting] = DEFAULT_SETTINGS[activeThemeSetting];
 			}
 
 			await this.plugin.saveSettings();
