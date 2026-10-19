@@ -1,12 +1,12 @@
 import { ExpressiveCodeEngine } from '@expressive-code/core';
+import { toDom } from 'hast-util-to-dom';
+import { normalizePath, Notice } from 'obsidian';
+import { createEcEngineConfig } from 'packages/ec-core/src/Config';
 import type ShikiPlugin from 'packages/obsidian/src/main';
+import { DEFAULT_SETTINGS } from 'packages/obsidian/src/settings/Settings';
+import { ThemeMapper } from 'packages/obsidian/src/themes/ThemeMapper';
 import type { LanguageRegistration, Highlighter, TokensResult, BundledLanguage, ThemedToken } from 'shiki';
 import { bundledLanguages, createHighlighter } from 'shiki';
-import { ThemeMapper } from 'packages/obsidian/src/themes/ThemeMapper';
-import { normalizePath, Notice } from 'obsidian';
-import { DEFAULT_SETTINGS } from 'packages/obsidian/src/settings/Settings';
-import { toDom } from 'hast-util-to-dom';
-import { createEcEngineConfig } from 'packages/ec-core/src/Config';
 
 interface CustomTheme {
 	name: string;

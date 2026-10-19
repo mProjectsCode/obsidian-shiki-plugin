@@ -1,8 +1,8 @@
-import { bundledThemes } from 'shiki';
 import type * as hast_types from 'hast';
 import { OBSIDIAN_THEME } from 'packages/ec-core/src/ObsidianTheme';
 import type ShikiPlugin from 'packages/obsidian/src/main';
 import type { BundledTheme, ThemeRegistration } from 'shiki';
+import { bundledThemes } from 'shiki';
 
 export const OBSIDIAN_THEME_IDENTIFIER = 'obsidian-theme';
 

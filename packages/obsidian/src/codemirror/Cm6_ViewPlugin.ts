@@ -1,16 +1,16 @@
+import { syntaxTree } from '@codemirror/language';
 import type { EditorState, Range } from '@codemirror/state';
 import type { DecorationSet, EditorView, ViewUpdate } from '@codemirror/view';
+import { Decoration, ViewPlugin } from '@codemirror/view';
+import type { SyntaxNode } from '@lezer/common';
+import { editorLivePreviewField } from 'obsidian';
+import { Cm6_Util } from 'packages/obsidian/src/codemirror/Cm6_Util';
 import type ShikiPlugin from 'packages/obsidian/src/main';
 import { SHIKI_INLINE_REGEX } from 'packages/obsidian/src/main';
-import { Decoration, ViewPlugin } from '@codemirror/view';
 import '@codemirror/state';
-import type { SyntaxNode } from '@lezer/common';
 import '@lezer/common';
-import { syntaxTree } from '@codemirror/language';
-import { Cm6_Util } from 'packages/obsidian/src/codemirror/Cm6_Util';
 import type { ThemedToken } from 'shiki';
 import 'shiki';
-import { editorLivePreviewField } from 'obsidian';
 
 enum DecorationUpdateType {
 	Insert,
@@ -207,7 +207,7 @@ export function createCm6Plugin(plugin: ShikiPlugin) {
 					// Update the view directly instead of dispatching an empty transaction. A
 					// transaction during IME composition can interrupt the browser's composing
 					// text, notably with the Windows Korean IME.
-					requestAnimationFrame(() => {
+					window.requestAnimationFrame(() => {
 						if (this.view.state === capturedState) {
 							this.view.update([]);
 						}
