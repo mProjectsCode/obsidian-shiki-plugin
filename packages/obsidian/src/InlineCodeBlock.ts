@@ -52,6 +52,6 @@ export class InlineCodeBlock extends MarkdownRenderChild {
 		this.plugin.removeActiveCodeBlock(this);
 
 		this.containerEl.empty();
-		this.containerEl.innerText = 'unloaded shiki inline code block';
+		this.containerEl.innerText = 'Unloaded Shiki inline code block';
 	}
 }

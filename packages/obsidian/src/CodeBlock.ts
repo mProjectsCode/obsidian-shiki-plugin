@@ -74,6 +74,6 @@ export class CodeBlock extends MarkdownRenderChild {
 		this.plugin.removeActiveCodeBlock(this);
 
 		this.containerEl.empty();
-		this.containerEl.innerText = 'unloaded shiki code block';
+		this.containerEl.innerText = 'Unloaded Shiki code block';
 	}
 }
