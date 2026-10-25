@@ -36,7 +36,7 @@ jobs:
                   path: review.json
                   if-no-files-found: error
             - run: bun run verify
-            - run: bun run package
+            - run: bun x --no-install lemons-automation package
             - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
               with:
                   subject-path: |
