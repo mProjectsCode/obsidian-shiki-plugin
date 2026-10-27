@@ -22,6 +22,11 @@ jobs:
               with:
                   bun-version: '1.4.0'
             - run: bun install --frozen-lockfile
+            - name: Extract tagged changelog entry
+              env:
+                  RELEASE_TAG: ${{ github.ref_name }}
+                  RELEASE_NOTES_PATH: ${{ runner.temp }}/plugin-release-notes.md
+              run: bun x --no-install lemons-automation release:notes
             - name: Validate tagged version and prepare release manifest
               env:
                   RELEASE_TAG: ${{ github.ref_name }}
@@ -46,6 +51,7 @@ jobs:
               with:
                   prerelease: ${{ contains(github.ref_name, 'canary') }}
                   fail_on_unmatched_files: true
+                  body_path: ${{ runner.temp }}/plugin-release-notes.md
                   files: |
                       dist/*
                       artifacts/*.zip

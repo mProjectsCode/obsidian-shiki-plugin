@@ -35,7 +35,7 @@
 		"@expressive-code/plugin-shiki": "^0.41.7",
 		"@expressive-code/plugin-text-markers": "^0.41.7",
 		"@happy-dom/global-registrator": "^20.9.0",
-		"@lemons_dev/lemons-obsidian-plugin-automation": "https://github.com/mProjectsCode/lemons-obsidian-plugin-helpers/releases/download/automation-v0.2.6/automation-v0.2.6.tgz",
+		"@lemons_dev/lemons-obsidian-plugin-automation": "https://github.com/mProjectsCode/lemons-obsidian-plugin-helpers/releases/download/automation-v0.2.8/automation-v0.2.8.tgz",
 		"@lezer/common": "^1.5.2",
 		"@tsconfig/svelte": "^5.0.8",
 		"@types/bun": "1.3.14",
