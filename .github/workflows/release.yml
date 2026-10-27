@@ -33,13 +33,15 @@ jobs:
               run: bun x --no-install lemons-automation release:manifest
             - name: Capture review findings for this release
               continue-on-error: true
-              run: bun run lint:review --format json --output-file review.json
+              env:
+                  REVIEW_REPORT_PATH: ${{ runner.temp }}/release-review.json
+              run: bun run lint:review --format json --output-file "$REVIEW_REPORT_PATH"
             - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
-              if: ${{ !cancelled() && hashFiles('review.json') != '' }}
+              if: ${{ !cancelled() }}
               with:
                   name: release-review-findings
-                  path: review.json
-                  if-no-files-found: error
+                  path: ${{ runner.temp }}/release-review.json
+                  if-no-files-found: warn
             - run: bun run verify
             - run: bun x --no-install lemons-automation package
             - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
